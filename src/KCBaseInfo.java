@@ -12,7 +12,7 @@ import bwta.BaseLocation;
  * 
  * @author harshnet037
  * 
- *  게임 시작시에 map의 전체 정보를 저장해 두는 자료 구조<br>
+ *  게임 시작, 진행시에 map의 전체 정보를 저장해 두는 자료 구조<br>
  *  게임 중에도 계속 업데이트 됩니다.<br>
  *  시야에 밝혀진 시점의 상황을 계속 업데이트 합니다.<br>
  *  MapGrid와, MapTool과 같이 활용됩니다.<br>
@@ -29,7 +29,6 @@ import bwta.BaseLocation;
  */
 public class KCBaseInfo {
 
-	
 	private Position originPosition;
 	private boolean isScouted;
 	private int scoutCount;
