@@ -1,5 +1,14 @@
+# sc ignore
+*.classpath
+*.project
+*.bwta
+*.prefs
+
+
 # Compiled class file
 *.class
+
+
 
 # Log file
 *.log
