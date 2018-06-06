@@ -12,18 +12,19 @@ import bwta.BaseLocation;
  * 
  * @author harshnet037
  * 
+ * <P>
  *  게임 시작, 진행시에 map의 전체 정보를 저장해 두는 자료 구조<br>
  *  게임 중에도 계속 업데이트 됩니다.<br>
  *  시야에 밝혀진 시점의 상황을 계속 업데이트 합니다.<br>
  *  MapGrid와, MapTool과 같이 활용됩니다.<br>
- *  
+ * <P>  
  *  base 포지션, 정찰여부, 정찰 횟수, starting인지 여부, 적군이 건물을 건설여부, 적군의 존재 여부, 적군의 유형, 기본 미네날 양, 기본 가스 양, 남아 있는 미네날 양, 남아있는 가스 양, 나의 본진으로 부터의 거리
- *  
+ * <P>  
  *	import bwta.BWTA;
  *	import bwta.BaseLocation;
  *	import bwta.Region;
  *  for (BaseLocation baseLocation : BWTA.getBaseLocations()){}
- *  
+ *<P>  
  *  // GroundDistance 를 기준으로 가장 가까운 곳으로 선정
  *	double distanceFromMyBase = (double)(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getGroundDistance(baseLocation));
  */
