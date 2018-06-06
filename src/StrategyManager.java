@@ -661,9 +661,8 @@ public class StrategyManager {
 		) 
 		{	
 			// 공격 유닛이 충족하면(저글링이 16마리이상, 히드라가 12마리이상, 럴커가 4마리 이상
-			if (myCombatUnitType1List.size() > 12
+			if ((myCombatUnitType1List.size() > 24 && myCombatUnitType3List.size() > 2)
 				|| myCombatUnitType2List.size() > 8 
-				|| myCombatUnitType3List.size() > 4
 			) {
 				
 				// 에너지 100 이상 갖고있는 특수 유닛이 존재하면 
