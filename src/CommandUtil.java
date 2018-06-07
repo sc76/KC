@@ -200,7 +200,8 @@ public class CommandUtil {
 //
 //		return std::sqrtf(static_cast<float>(diffX*diffX + diffY*diffY));
 //	}
-
+	
+	
 	public boolean CanAttack(Unit attacker, Unit target)
 	{
 		return GetWeapon(attacker, target) != WeaponType.None;
@@ -228,16 +229,37 @@ public class CommandUtil {
 		return 0; // C++ : static_cast<double>(weapon.damageAmount()) / weapon.damageCooldown();
 	}
 
+	/**
+	 * 
+	 * Unit이 공중공격 혹은 지상공격 타입인지 반환
+	 * @param attacker
+	 * @param target
+	 * @return
+	 * 
+	 */
 	public WeaponType GetWeapon(Unit attacker, Unit target)
 	{
 		return target.isFlying() ? attacker.getType().airWeapon() : attacker.getType().groundWeapon();
 	}
 
+	/**
+	 * 
+	 * UnitType이 공중공격 혹은 지상공격 타입인지 반환
+	 * @param attacker
+	 * @param target
+	 * @return
+	 */
 	public WeaponType GetWeapon(UnitType attacker, UnitType target)
 	{
 		return target.isFlyer() ? attacker.airWeapon() : attacker.groundWeapon();
 	}
 
+	/**
+	 * Unit의 최대 공격 유효 거리를 반환
+	 * @param attacker
+	 * @param target
+	 * @return
+	 */
 	public int GetAttackRange(Unit attacker, Unit target)
 	{
 		WeaponType weapon = GetWeapon(attacker, target);
@@ -259,6 +281,12 @@ public class CommandUtil {
 		return range;
 	}
 
+	/**
+	 * UnitType의 최대 공격 유효 거리를 반환
+	 * @param attacker
+	 * @param target
+	 * @return
+	 */
 	public int GetAttackRange(UnitType attacker, UnitType target)
 	{
 		WeaponType weapon = GetWeapon(attacker, target);
@@ -270,7 +298,12 @@ public class CommandUtil {
 
 		return weapon.maxRange();
 	}
-
+	
+	/**
+	 * 아군의 Type별 총 Unit수를 반환 
+	 * @param type
+	 * @return
+	 */
 	public int GetAllUnitCount(UnitType type)
 	{
 		int count = 0;
@@ -303,7 +336,13 @@ public class CommandUtil {
 		return count;
 	}
 
-	// 전체 순차탐색을 하기 때문에 느리다
+	/**
+	 * 지정한 UnitType중, 지정한 Postion으로 부터 가장 가까운 Unit을 반환 
+	 * 전체 순차탐색을 하기 때문에 느리다
+	 * @param type
+	 * @param target
+	 * @return
+	 */
 	public Unit GetClosestUnitTypeToTarget(UnitType type, Position target)
 	{
 		Unit closestUnit = null;
