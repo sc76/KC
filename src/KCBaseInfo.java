@@ -5,9 +5,6 @@ import bwapi.UnitType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 
-// 
-// 해당 Unit의 ID, UnitType, 소속 Player, HitPoint, lastPosition, completed(건물이 완성된 것인지) 등을 저장해두는 자료구조<br>
-// 적군 유닛의 경우 아군 시야 내에 있지 않아 invisible 상태가 되었을 때 정보를 조회할수도 없어지고 파악했던 정보도 유실되기 때문에 별도 자료구조가 필요합니다
 /**
  * 
  * @author harshnet037
