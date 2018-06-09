@@ -411,13 +411,6 @@ public class OverloadManager {
 			overloadData.setOverloadJob(mySecondChokeOverload, OverloadData.OverloadJob.MySecondChoke, (Unit)null);
 			commandUtil.move(mySecondChokeOverload, selfSecondChokePosition);
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
-		} 
-		// 적의 두번째 choke position
-		else if(enemySecondChokeOverload == null && enemyMainBaseLocation != null){
-			enemySecondChokeOverload = unit;
-					overloadData.setOverloadJob(enemySecondChokeOverload, OverloadData.OverloadJob.EnemySecondChoke, (Unit)null);
-					commandUtil.move(enemySecondChokeOverload, enemySecondChokePosition);
-					//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		}
 		// 센터 position
 		else if(centerChokeOverload == null){
@@ -425,6 +418,13 @@ public class OverloadManager {
 			overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
 			commandUtil.move(centerChokeOverload, centerLocationPosition);
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
+		} 
+		// 적의 두번째 choke position
+		else if(enemySecondChokeOverload == null && enemyMainBaseLocation != null){
+			enemySecondChokeOverload = unit;
+					overloadData.setOverloadJob(enemySecondChokeOverload, OverloadData.OverloadJob.EnemySecondChoke, (Unit)null);
+					commandUtil.move(enemySecondChokeOverload, enemySecondChokePosition);
+					//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		}
 	}
 	
