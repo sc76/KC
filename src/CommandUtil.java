@@ -9,6 +9,12 @@ import bwapi.WeaponType;
 
 public class CommandUtil {
 
+	/**
+	 * 특정한 Unit에게 공격 명령을 내립니다.
+	 * 
+	 * @param attacker
+	 * @param target
+	 */
 	public void attackUnit(Unit attacker, Unit target)
 	{
 		if (attacker == null || target == null)
@@ -35,6 +41,12 @@ public class CommandUtil {
 		attacker.attack(target);
 	}
 
+	/**
+	 * 특정한 position으로 attak명령으로 이동합니다.
+	 * 
+	 * @param attacker
+	 * @param targetPosition
+	 */
 	public void attackMove(Unit attacker, final Position targetPosition)
 	{
 		// Position 객체에 대해서는 == 가 아니라 equals() 로 비교해야 합니다		
@@ -62,6 +74,12 @@ public class CommandUtil {
 		attacker.attack(targetPosition);
 	}
 
+	/**
+	 * 특정한 지역으로 단순 move합니다.
+	 * 
+	 * @param attacker
+	 * @param targetPosition
+	 */
 	public void move(Unit attacker, final Position targetPosition)
 	{
 		if (attacker == null || !targetPosition.isValid())
@@ -88,6 +106,12 @@ public class CommandUtil {
 		attacker.move(targetPosition);
 	}
 
+	/**
+	 * 특정한 unit에게 우 클릭 명령을 내립니다. 보통 move 명령과 비슷합니다.
+	 * 
+	 * @param unit
+	 * @param target
+	 */
 	public void rightClick(Unit unit, Unit target)
 	{
 		if (unit == null || target == null)
@@ -114,6 +138,12 @@ public class CommandUtil {
 		unit.rightClick(target);
 	}
 
+	/**
+	 * 특정 유닛을 수리합니다.
+	 * 
+	 * @param unit
+	 * @param target
+	 */
 	public void repair(Unit unit, Unit target)
 	{
 		if (unit == null || target == null)
@@ -140,6 +170,11 @@ public class CommandUtil {
 		unit.repair(target);
 	}
 
+	/**
+	 * 공격 가능한 유닛인지 판변합니다.
+	 * @param unit
+	 * @return
+	 */
 	public boolean IsCombatUnit(Unit unit)
 	{
 		if (unit == null)
@@ -166,6 +201,12 @@ public class CommandUtil {
 		return false;
 	}
 
+	/**
+	 * 현재 unit이 유효한 유닛인지 판별합니다. 유효하지 않은  unit에서 명령을 내리면, 에러가 발생하기 때문에 판별되는 함수입니다.
+	 * 
+	 * @param unit
+	 * @return
+	 */
 	public boolean IsValidUnit(Unit unit)
 	{
 		if (unit == null)
@@ -201,22 +242,41 @@ public class CommandUtil {
 //		return std::sqrtf(static_cast<float>(diffX*diffX + diffY*diffY));
 //	}
 	
-	
+	/**
+	 * 공격 가능하고 무기를 가진 unit인지 판별합니다.
+	 * 
+	 * @param attacker
+	 * @param target
+	 * @return
+	 */
 	public boolean CanAttack(Unit attacker, Unit target)
 	{
 		return GetWeapon(attacker, target) != WeaponType.None;
 	}
 
+	/**
+	 * 공중 공격이 가능한 unit인지 판별합니다.
+	 * 
+	 * @param unit
+	 * @return
+	 */
 	public boolean CanAttackAir(Unit unit)
 	{
 		return unit.getType().airWeapon() != WeaponType.None;
 	}
 
+	/**
+	 * 지상공격이 가능한 unit인지 판별합니다.
+	 * 
+	 * @param unit
+	 * @return
+	 */
 	public boolean CanAttackGround(Unit unit)
 	{
 		return unit.getType().groundWeapon() != WeaponType.None;
 	}
 
+	
 	public double CalculateLTD(Unit attacker, Unit target)
 	{
 		WeaponType weapon = GetWeapon(attacker, target);
@@ -231,7 +291,7 @@ public class CommandUtil {
 
 	/**
 	 * 
-	 * Unit이 공중공격 혹은 지상공격 타입인지 반환
+	 * Unit이 공중공격 혹은 지상공격 무기의 타입을 알수 있습니다.
 	 * @param attacker
 	 * @param target
 	 * @return
