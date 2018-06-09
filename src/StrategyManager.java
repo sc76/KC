@@ -355,7 +355,6 @@ public class StrategyManager {
 		// 프로토스 : 초기에 포톤 캐논으로 방어하며 질럿 드라군 을 생산합니다
 		// 테란     : 초기에 벙커와 마린으로 방어하며 마린 메딕 을 생산합니다
 		// 저그     : 초기에 성큰과 저글링으로 방어하며 저글링 히드라 를 생산합니다
-
 		// 참가자께서 자유롭게 빌드오더를 수정하셔도 됩니다 
 		
 		if (MyBotModule.Broodwar.self().getRace() == Race.Protoss) {
@@ -520,8 +519,8 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//16
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//17
 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-					seedPositionStrategyOfMyDefenseBuildingType);	//16
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+			//		seedPositionStrategyOfMyDefenseBuildingType);	//16
 						
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//17
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
@@ -529,10 +528,10 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 					seedPositionStrategyOfMyDefenseBuildingType);	//20
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor); //19
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			
@@ -544,12 +543,11 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//22
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//23
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//24			
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//24			
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//25
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
@@ -573,10 +571,10 @@ public class StrategyManager {
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//32
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//33
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//34
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//35
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//34
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//35
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
 		}
 	}
 
@@ -750,12 +748,13 @@ public class StrategyManager {
 		// sc76.choi 단, 정찰 오버로드는 자기 할일이 있다.
 		for (Unit unit : myAllCombatUnitList) {
 
+			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
+			if(unit.getType() == UnitType.Zerg_Overlord 
+				&& OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
+				continue;
+			}
+			
 			if (!commandUtil.IsValidUnit(unit)) continue;
-			if (unit.getType() == UnitType.Zerg_Overlord 
-					//&& 
-					//commandUtil.IsValidUnit(OverloadManager.Instance().getFirstScoutOverload()) && 
-					//unit.equals(OverloadManager.Instance().getFirstScoutOverload())
-				) continue;
 			
 			boolean hasCommanded = false;
 
@@ -829,6 +828,12 @@ public class StrategyManager {
 			
 			// 모든 아군 공격유닛들로 하여금 targetPosition 을 향해 공격하게 한다
 			for (Unit unit : myAllCombatUnitList) {
+				
+				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.
+				if(unit.getType() == UnitType.Zerg_Overlord && OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
+					continue;
+				}
+				
 				boolean hasCommanded = false;
 
 				if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
@@ -843,6 +848,7 @@ public class StrategyManager {
 				if (unit.getType() == mySpecialUnitType2) {					
 					hasCommanded = controlSpecialUnitType2(unit);
 				}
+				
 				
 				// 따로 명령 내린 적이 없으면, targetPosition 을 향해 공격 이동시킵니다
 				if (hasCommanded == false) {
