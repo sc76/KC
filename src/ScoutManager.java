@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import bwapi.Color;
 import bwapi.Position;
+import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwta.BWTA;
@@ -30,9 +31,11 @@ public class ScoutManager {
 
 	private CommandUtil commandUtil = new CommandUtil();
 	
-	private static ScoutManager instance = new ScoutManager();
+	BaseLocation enemyMainBaseLocation = null;
+	BaseLocation selfMainBaseLocation = null;
 	
 	/// static singleton 객체를 리턴합니다
+	private static ScoutManager instance = new ScoutManager();
 	public static ScoutManager Instance() {
 		return instance;
 	} 
@@ -43,6 +46,9 @@ public class ScoutManager {
 		// 1초에 4번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
 		
+		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		
 		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함. 
 		assignScoutIfNeeded();
 		moveScoutUnit();
@@ -51,12 +57,12 @@ public class ScoutManager {
 	}
 
 	/// 정찰 유닛을 필요하면 새로 지정합니다
-	public void assignScoutIfNeeded()
-	{
-		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
-
-		if (enemyBaseLocation == null)
-		{
+	public void assignScoutIfNeeded(){
+		
+		// 상대가 저그 일때만, 정찰을 간다.
+		if(InformationManager.Instance().enemyRace != Race.Zerg) return;
+		
+		if (enemyMainBaseLocation == null){
 			if (currentScoutUnit == null || currentScoutUnit.exists() == false || currentScoutUnit.getHitPoints() <= 0)
 			{
 				currentScoutUnit = null;
@@ -67,6 +73,7 @@ public class ScoutManager {
 
 				for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 				{
+					
 					if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false)
 					{
 						firstBuilding = unit;

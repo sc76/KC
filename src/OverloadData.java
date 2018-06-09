@@ -34,9 +34,7 @@ public class OverloadData {
 	};
 	
 	/// overload 목록
-	private List<Unit> overloads = new ArrayList<Unit>();
-	/// Depot 목록
-	private List<Unit> depots = new ArrayList<Unit>();
+	private ArrayList<Unit> overloads = new ArrayList<Unit>();
 
 	private Map<Integer, OverloadJob> overloadJobMap = new HashMap<Integer, OverloadJob>();
 	private Map<Integer, Integer> depotOverloadCount = new HashMap<Integer, Integer>();
@@ -88,30 +86,24 @@ public class OverloadData {
 	public void overloasDestroyed(Unit unit)
 	{
 		if (unit == null) { return; }
+		
+		for (Iterator<Unit> it = overloads.iterator(); it.hasNext(); ) {
+			Unit overload = it.next();
 
+			if (!commandUtil.IsValidUnit(overload)) {			
+				overloads.remove(overload);
+			}
+		}
+		
 		clearPreviousJob(unit);
 		overloads.remove(unit);
 	}
 
-	// WorkerJob::Idle 로 일단 추가한다
-	public void addOverload(Unit unit)
-	{
+	// OverloadJob::Idle 로 일단 추가한다
+	public void addOverload(Unit unit){
 		if (unit ==  null) { return; }
-		//System.out.println("addOverload " + unit.getType());
-		overloads.add(unit); // C++ : workers.insert(unit);
-		//System.out.println("overloads " + overloads.size());
-		
+		overloads.add(unit); 
 		overloadJobMap.put(unit.getID(), OverloadJob.Idle);
-	}
-	
-	public void addDepot(Unit unit)
-	{
-		if (unit == null) { return; }
-	}
-
-	public List<Unit> getDepots()
-	{
-		return depots;
 	}
 	
 	public void setOverloadJob(Unit unit, OverloadJob job, Unit jobUnit)
@@ -191,8 +183,7 @@ public class OverloadData {
 		overloadJobMap.remove(unit.getID()); // C++ : workerJobMap.erase(unit);
 	}
 	
-	public final int getNumOverloads()
-	{
+	public final int getNumOverloads(){
 		return overloads.size();
 	}
 

@@ -102,6 +102,8 @@ public class InformationManager {
 
 	/// Unit 및 BaseLocation, ChokePoint 등에 대한 정보를 업데이트합니다
 	public void update() {
+
+		
 		updateUnitsInfo();
 		// occupiedBaseLocation 이나 occupiedRegion 은 거의 안바뀌므로 자주 안해도 된다
 		if (MyBotModule.Broodwar.getFrameCount() % 120 == 0) {

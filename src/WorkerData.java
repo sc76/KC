@@ -428,8 +428,7 @@ public class WorkerData {
 		return num;
 	}
 
-	public final int getNumIdleWorkers()
-	{
+	public final int getNumIdleWorkers(){
 		int num = 0;
 		for (Unit unit : workers)
 		{

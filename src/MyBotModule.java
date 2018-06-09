@@ -202,6 +202,7 @@ public class MyBotModule extends DefaultBWListener {
 		else {
 			
 			try {
+				/* 실제 호출되는 onFrame 메소드 */
 				gameCommander.onFrame();
 			} 
 			catch (Exception e) {

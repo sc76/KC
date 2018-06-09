@@ -163,10 +163,17 @@ public class StrategyManager {
 		// 경기 결과 파일 Save / Load 및 로그파일 Save 예제 추가
 		
 		// 과거 게임 기록을 로딩합니다
-		loadGameRecordList();
+		//loadGameRecordList();
 		
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 
+		
+		// sc76.choi 
+		KCBaseInfoManager.Instance().updateByOneTime();
+		//if(Config.DEBUG){
+			//System.out.println(KCBaseInfoManager.Instance().printKCBaseList());
+		//}
+		
 		/// 변수 초기값을 설정합니다
 		setVariables();
 
@@ -740,9 +747,15 @@ public class StrategyManager {
 
 		// 아군 공격유닛을 방어 건물이 세워져있는 위치로 배치시킵니다
 		// 아군 공격유닛을 아군 방어 건물 뒤쪽에 배치시켰다가 적들이 방어 건물을 공격하기 시작했을 때 다함께 싸우게하면 더 좋을 것입니다
+		// sc76.choi 단, 정찰 오버로드는 자기 할일이 있다.
 		for (Unit unit : myAllCombatUnitList) {
 
-			if (unit == null || unit.exists() == false) continue;
+			if (!commandUtil.IsValidUnit(unit)) continue;
+			if (unit.getType() == UnitType.Zerg_Overlord 
+					//&& 
+					//commandUtil.IsValidUnit(OverloadManager.Instance().getFirstScoutOverload()) && 
+					//unit.equals(OverloadManager.Instance().getFirstScoutOverload())
+				) continue;
 			
 			boolean hasCommanded = false;
 
@@ -769,9 +782,9 @@ public class StrategyManager {
 				hasCommanded = controlSpecialUnitType2(unit);
 			}
 			
-			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다
+			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다. 단, 오버로드는 제외
 			if (hasCommanded == false) {
-
+				
 				if (unit.isIdle()) {
 					if (unit.canAttack()) {
 						commandUtil.attackMove(unit, myDefenseBuildingPosition);

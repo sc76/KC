@@ -7,6 +7,7 @@ import java.util.Map;
 import bwapi.Game;
 import bwapi.Position;
 import bwapi.Race;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
@@ -14,14 +15,23 @@ import bwta.BaseLocation;
 import bwta.Chokepoint;
 
 
-/// Overload 상태를 관리하고 컨트롤하는 class
+/**
+ * Overload 상태를 관리하고 정찰 컨트롤하는 class
+ * 오버워치, 서킷 브레이크는 맵이 넓어서 오버로드가 정찰 가다가,
+ * 이미 만들어진 포토캐논이나, 벙커 및 공중 공격 가능 유닛에 저격을 먼저 당한다.
+ * 정찰 도중  적을 발견하지 못했을때는 계속 적으로 오버로드는 보내려는 버그가 있음(수정 요망)
+ * 
+ * @author sc76.choi
+ *
+ */
 public class OverloadManager {
 	public static Game Broodwar;
 	private int currentOverloadScoutStatus;
 	private int currentScoutStatus;
 	private int moveTogglingConut = 0;
 
-	private Unit firstScoutOverload;
+	
+	private Unit firstScoutOverload; // 게임 시작시에, 첫번째 정찰에 투입될 오버로드
 	private Unit currentScoutUnit;
 	
 	private Unit myMainLocationOverload;
@@ -45,36 +55,48 @@ public class OverloadManager {
 	};
 	
 	/// 오버로드 목록
-	private List<Unit> overloads = new ArrayList<Unit>();
-	
-	private BaseLocation currentScoutTargetBaseLocation = null;
-	
+	//private List<Unit> overloads = new ArrayList<Unit>();
+	private BaseLocation currentScoutTargetBaseLocation = null; // 현재 정찰할 Target base
 	/// 각 Overload 에 대한 OverloadJob 상황을 저장하는 자료구조 객체
 	private OverloadData overloadData = new OverloadData();
-	
 	private CommandUtil commandUtil = new CommandUtil();
+
+	BaseLocation selfMainBaseLocation = null;
+	BaseLocation selfFirstExpansionLocation = null;
+	Chokepoint selfFirstChokePoint = null;
+	Chokepoint selfSecondChokePoint = null;	
+	BaseLocation enemyMainBaseLocation = null;
+	Chokepoint enemyFirstChokePoint = null;
+	Chokepoint enemySecondChokePoint = null;
 	
+	// static singleton 객체를 리턴합니다
 	private static OverloadManager instance = new OverloadManager();
-	
-	/// static singleton 객체를 리턴합니다
 	public static OverloadManager Instance() {
 		return instance;
 	}
 	
 	/// 경기가 시작되면 오버로드를 정찰합니다.
 	public void update() {
-		// harsshNet
+		
+		// 1초에 4번만 실행합니다
+		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
+				
+		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		selfFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+		selfFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		selfSecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+		
 		assignFirstScoutOverload(); // firstScoutOverload를 지정한다.
-		initialScoutOverload(); // 
-	
+		initialFirstScoutOverload(); // 지정된 오버로드를 정찰 시킨다.
+		//handleMoveOverloads();
 	}
 	
 	/// 게임 시작시에 정찰 오버로드을 필요하면 새로 지정합니다
-	public void assignFirstScoutOverload()
-	{
+	public void assignFirstScoutOverload(){
 		if(isFinishedInitialScout) return;
-		
-		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
 		
 		// 적의 위치가 없고
 		//if (enemyBaseLocation == null){
@@ -107,11 +129,10 @@ public class OverloadManager {
 				}
 			}
 		//}
-	} // AssignFirstScoutOverload
+	}
 	
 	/// 정찰 유닛을 필요하면 새로 지정합니다
-	public void assignScoutIfNeeded()
-	{
+	public void assignScoutIfNeeded(){
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
 
 		if (enemyBaseLocation == null)
@@ -137,7 +158,7 @@ public class OverloadManager {
 
 				if (currentScoutUnit != null){
 					// set unit as scout unit
-					if (MyBotModule.Broodwar.getFrameCount() % Config.showDelayDisplayTime == 0) {
+					if (MyBotModule.Broodwar.getFrameCount() % Config.showConsoleLogDelayDisplayTime == 0) {
 						if(Config.DEBUG) System.out.println("- restSearchOverload          : " + currentScoutUnit.getID() + " " + currentScoutUnit.getType());
 					}
 					// set unit as scout unit
@@ -147,64 +168,37 @@ public class OverloadManager {
 		}
 	}
 	
-	public void restUnitSearchScoutOverload(){
-//		initAssignScoutIfNeeded();
-		
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			//if (unit.getType().isBuilding() == true && unit.getType().isResourceDepot() == false)
-			//if(unit.getType() == UnitType.Zerg_Spawning_Pool)
-			
-			if(unit.getType() == UnitType.Zerg_Overlord)
-			{
-				restSearchOverload = unit;
-				break;
-			}
-		}
-		
-		for (BaseLocation b : BWTA.getBaseLocations()) {
-			// do something. For example send some unit to attack that position:
-			// myUnit.attack(b.getPosition());
-			//if (MyBotModule.Broodwar.isExplored(b.getTilePosition()) == false){
-				//currentOverloadScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
-				if(restSearchOverload != null){ 
-					restSearchOverload.move(b.getPosition());
-				}
-			//}
-		}
-	}
-	
 	/**
 	 * initialScoutOverload
 	 * 경기시작하자 말자, overload 정찰을 보낸다.
 	 */
-	public void initialScoutOverload(){
+	public void initialFirstScoutOverload(){
 		
 		if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음
 		
-		if (firstScoutOverload == null || firstScoutOverload.exists() == false || firstScoutOverload.getHitPoints() <= 0 ){
+		// 정찰 유닛이 valid 하지 않으면 return
+		if (!commandUtil.IsValidUnit(firstScoutOverload)){
 			firstScoutOverload = null;
 			currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
 			return;
 		}
 		
-		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
-		BaseLocation myBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-		
-		// 적이 없으면 맵을 투어
-		if (enemyBaseLocation == null){
+		// 적이 없으면 맵을 투어를 계속 한다.
+		if (enemyMainBaseLocation == null){
 			BaseLocation closestBaseLocation = null;
 			double closestDistance = 1000000000;
 			double tempDistance = 0;
 			
+			// sc76.choi 정찰할 Target base가 없다면 나의 메인 base를 지정한다.
 			if(currentScoutTargetBaseLocation == null){
-				currentScoutTargetBaseLocation = myBaseLocation; // harshZerg 수정
+				currentScoutTargetBaseLocation = selfMainBaseLocation;
 			}
 			
 			boolean isExploredTemp = false;
 			Position tempPosition = null;
-			for (BaseLocation startLocation : BWTA.getStartLocations())
-			{
+			
+			// starting location별로 loop를 돌며 가장 가까운 공중 거리(getAirDistance)부터 정찰 수행한다.
+			for (BaseLocation startLocation : BWTA.getStartLocations()){
 				isExploredTemp = MyBotModule.Broodwar.isExplored(startLocation.getTilePosition());
 				
 				// if we haven't explored it yet (방문했었던 곳은 다시 가볼 필요 없음)
@@ -212,7 +206,6 @@ public class OverloadManager {
 				{
 					// GroundDistance 를 기준으로 가장 가까운 곳으로 선정
 					tempDistance = currentScoutTargetBaseLocation.getAirDistance(startLocation) + 0.5;
-					//tempDistance = (double)(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getAirDistance(startLocation) + 0.5);
 
 					if (tempDistance > 0 && tempDistance < closestDistance) {
 						closestBaseLocation = startLocation;
@@ -221,163 +214,65 @@ public class OverloadManager {
 				}
 			}
 			
+			// 현재 정찰할 가장 가까운 Target base 지정
 			currentScoutTargetBaseLocation = closestBaseLocation;
 
-			
 			if (currentScoutTargetBaseLocation != null && firstScoutOverload != null) {
 				currentOverloadScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
 				//System.out.println("move scout overload : " + currentScoutTargetBaseLocation.getPosition());
 				commandUtil.move(firstScoutOverload, closestBaseLocation.getPosition());
 			}
-			//firstScoutOverload.move(closestBaseLocation.getPosition());
-			
-//			for (BaseLocation b : BWTA.getBaseLocations()) {
-//				// If this is a possible start location,
-//				if (b.isStartLocation()) {
-//					// do something. For example send some unit to attack that position:
-//					// myUnit.attack(b.getPosition());
-//					
-//					if (MyBotModule.Broodwar.isExplored(b.getTilePosition()) == false){
-//						currentOverloadScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
-//						firstScoutOverload.move(b.getPosition());
-//					}
-//				}
-//			}
 		}
-		// 적진이 발견되었다면, 적진의 앞마당에 포진
+		// 적진이 발견되었다면,
 		else{
 			//if(isFinishedInitialScout) return;
 //			if (firstScoutOverload == null || firstScoutOverload.exists() == false || firstScoutOverload.getHitPoints() <= 0 ){
 //				// 다시 정찰이 필요하다면 assing해 준다.
 //				assignFirstScoutOverload();
 //			}
-			// TODO harshZerg 20170611:2002 적군 앞마당 확인 - nullpoint error 조심
-			// TODO harshZerg 다시 정찰 가는 것이 라면 어디로 갈지 선택해야 한다.
-			//Chokepoint firstEnemyChokePoint = BWTA.getNearestChokepoint(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer).getTilePosition());
-			//Chokepoint firstEnemyChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
-			Chokepoint firstEnemyChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
-			Position enemyMainLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer).getPosition();
-			Position enemyFirstChokeLocation = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer).getSides().second;
-			Position enemySecondChokeLocation = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer).getSides().second;
-//			int x = firstEnemyChokePoint.getSides().first.getX(); // + Config.TILE_SIZE*3;
-//			int y = firstEnemyChokePoint.getSides().first.getY(); // + Config.TILE_SIZE*2;
-//			commandUtil.move(firstScoutOverload, new Position(x, y));
-			if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
-				commandUtil.move(firstScoutOverload, enemySecondChokeLocation);
-			}else{
-				commandUtil.move(firstScoutOverload, enemyMainLocation);
+
+//			if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
+//				commandUtil.move(firstScoutOverload, enemySecondChokeLocation);
+//			}else{
+//				commandUtil.move(firstScoutOverload, enemyMainLocation);
+//			}
+			
+			// 적진과 TilePosition 3개 정도의 가까이에 들어 왔으면, 두번째 적군의 chokepoint에 패트롤 한다.  
+			double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
+			if(distanceFromEnemyMainBaseLocation <= (double)TilePosition.SIZE_IN_PIXELS*3){
+				firstScoutOverload.patrol(enemySecondChokePoint.getCenter());
+				currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
+				isFinishedInitialScout = true; // 초반 정찰 끝
 			}
-			//firstScoutOverload.patrol(firstEnemyChokePoint.getCenter());
-			currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
 			//setIdleOverload(firstScoutOverload); // 정찰 임무를 풀어준다. Scout Job 유지
-			isFinishedInitialScout = true; // 초반 정찰 끝
 		}
 	}
 
-	/**
-	 * setInitialRelley
-	 * 초반 한번만 수행
-	 * 첫번째 정찰 overload가 적진에 도착했으면, 
-	 * 그 다음은 앞마당까지 rally를 한다.
-	 */
-	boolean isFinishedInitialPatrol = false;
-	public void setInitialPatrol(){
-		
-		if(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()) == null){
-			return;
-		}
-		
-		if(firstScoutOverload == null || firstScoutOverload.exists() == false || firstScoutOverload.getHitPoints() <= 0){
-			return;
-		}
-		
-		if(isFinishedInitialPatrol) return; // patrol이 수행되었으면 return
-		
-		Position enemyMainLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()).getPosition();
-		Position enemyFirstChokeLocation = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.enemy()).getPoint();
-		
-		if(firstScoutOverload.getPosition().equals(enemyMainLocation)){
-			firstScoutOverload.patrol(enemyFirstChokeLocation);
-			if(Config.DEBUG) System.out.println("** setInitialPatrol : " + firstScoutOverload.getID());
-			isFinishedInitialPatrol = true;
+	public void handleMoveOverloads(){
+		// for each of our workers
+		for (Unit overload : overloadData.getOverloads())
+		{
+			if (!commandUtil.IsValidSelfUnit(overload)) continue;
+
+			// if it is a move worker
+			if (overloadData.getOverloadJob(overload) == OverloadData.OverloadJob.Move)	{
+				OverloadMoveData data = overloadData.getOverloadMoveData(overload);
+
+				// 목적지에 도착한 경우 이동 명령을 해제한다
+				if (overload.getPosition().getDistance(data.getPosition()) < 4) {
+					setIdleOverload(overload);
+				}
+				else {
+					commandUtil.move(overload, data.getPosition());
+				}
+			}
 		}
 	}
 	
-	public boolean isFinishedInitialScout() {
-		return isFinishedInitialScout;
-	}
-
-	public void setFinishedInitialScout(boolean isFinishedInitialScout) {
-		this.isFinishedInitialScout = isFinishedInitialScout;
-	}
-
-	public int getCurrentOverloadScoutStatus() {
-		return currentOverloadScoutStatus;
-	}
-
-	public void setCurrentOverloadScoutStatus(int currentOverloadScoutStatus) {
-		this.currentOverloadScoutStatus = currentOverloadScoutStatus;
-	}
-
-	public Unit getFirstScoutOverload() {
-		return firstScoutOverload;
-	}
-
-	public void setFirstScoutOverload(Unit firstScoutOverload) {
-		this.firstScoutOverload = firstScoutOverload;
-	}
-
 	/// 해당 일꾼 정찰 unit 의 OverloadJob 값를 Idle 로 변경합니다
 	public void setIdleOverload(Unit unit){
 		if (unit == null) return;
 		overloadData.setOverloadJob(unit, OverloadData.OverloadJob.Idle, (Unit)null);
-	}
-	
-	// TODO harshZerg 20170611:1737 target으로 오버로드를 보낸다.
-	public void moveScoutOverloadToTarget(Position targetPosion){
-		if (targetPosion != null) 
-		{
-			// 오버로드 이동
-			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-									
-				// idle overload를 move Command 로 앞마당으로 보냅니다
-				if (unit.getType() == UnitType.Zerg_Overlord) {
-					
-					// 정찰중인 임무는 계속 하도록 둔다
-					if(overloadData.getOverloadJob(unit) == OverloadData.OverloadJob.Scout){
-						continue;
-					}
-					
-					if(firstScoutOverload.equals(unit))
-						continue;
-					
-					//if (unit.isIdle()) {
-						if(moveTogglingConut % 4 == 0){
-							int x = targetPosion.getX() + Config.TILE_SIZE*5;
-							int y = targetPosion.getY() + Config.TILE_SIZE*5;
-							commandUtil.move(unit, new Position(x, y));
-							//commandUtil.move(unit, targetBaseLocation.getPosition());
-						}else if(moveTogglingConut % 4 == 1){
-							int x = targetPosion.getX() + Config.TILE_SIZE*5;
-							int y = targetPosion.getY() - Config.TILE_SIZE*5;
-							commandUtil.move(unit, new Position(x, y));
-							//commandUtil.move(unit, targetBaseLocation.getPosition());
-						}else if(moveTogglingConut % 4 == 2){
-							int x = targetPosion.getX() - Config.TILE_SIZE*5;
-							int y = targetPosion.getY() + Config.TILE_SIZE*5;
-							commandUtil.move(unit, new Position(x, y));
-							//commandUtil.move(unit, targetBaseLocation.getPosition());
-						}else if(moveTogglingConut % 4 == 3){
-							int x = targetPosion.getX() - Config.TILE_SIZE*5;
-							int y = targetPosion.getY() - Config.TILE_SIZE*5;
-							commandUtil.move(unit, new Position(x, y));
-							//commandUtil.move(unit, targetBaseLocation.getPosition());
-						}
-						moveTogglingConut++;
-					//}
-				} 
-			}
-		}
 	}
 	
 	// sets a worker as a scout
@@ -398,36 +293,16 @@ public class OverloadManager {
 		Unit closestUnit = null;
 		double closestDist = 1000000000;
 
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
-			//if (unit.getType().isDetector())
-			if (unit.getType() == UnitType.Zerg_Overlord)
-			{
+		for (Unit unit : overloadData.getOverloads()){
 				double dist = unit.getDistance(target);
-				//System.out.println("unit : " + unit.getType());
-				//System.out.println("dist : " + dist);
-				if (closestUnit == null || dist < closestDist)
-				{
+				if (closestUnit == null || dist < closestDist){
 					closestUnit = unit;
 					closestDist = dist;
 				}
 				return closestUnit;
-			}
 		}
 
 		return closestUnit;
-	}
-
-	// 정찰 상태를 리턴합니다
-	public int getScoutStatus()
-	{
-		return currentOverloadScoutStatus;
-	}
-	
-	/// 정찰 유닛을 리턴합니다
-	public Unit getScoutUnit()
-	{
-		return currentScoutUnit;
 	}
 
 	public void onUnitShow(Unit unit){
@@ -439,17 +314,27 @@ public class OverloadManager {
 	}
 	
 	/**
+	 * onUnitComplete
+	 * @param unit
+	 * 
+	 * overload 정보를 갱신한다.
+	 * setOverloadsBasicPosition이 onUnitComplete에서만 실행되는데, 확인 해봐야 합니다.
+	 */
+	public void onUnitComplete(Unit unit) {
+		if (unit.getType() == UnitType.Zerg_Overlord 
+			&& commandUtil.IsValidSelfUnit(unit)){
+			overloadData.addOverload(unit);
+			setOverloadsBasicPosition(unit);
+		}
+	}
+	
+	/**
 	 * onUnitCreate
 	 * @param unit
 	 * 
 	 * overload 정보를 갱신한다.
-	 */
-	public void onUnitComplete(Unit unit) { 
-		if(unit.getPlayer() == MyBotModule.Broodwar.self()){
-			if(unit.getType() == UnitType.Zerg_Overlord){
-				overloads.add(unit);
-			}
-		}
+	 */	
+	public void onUnitCreate(Unit unit) { 
 	}
 
 	/**
@@ -459,13 +344,7 @@ public class OverloadManager {
 	 * overload 정보를 갱신한다.
 	 */
 	public void onUnitDestroy(Unit unit){
-		if(unit.getPlayer() == MyBotModule.Broodwar.self()){
-			if(unit.getType() == UnitType.Zerg_Overlord &&
-					unit.getHitPoints() >= 0){
-				overloadData.clearPreviousJob(unit);
-				overloads.remove(unit);
-			}
-		}
+		overloadData.overloasDestroyed(unit);
 	}
 	
 	public void getOverloadJobMapCount()
@@ -478,62 +357,9 @@ public class OverloadManager {
 		overloadData.printOverloadJobMap();
 	}
 
-//	public void moveBeforeCombatOverload(Position targetPosition, int canMoveOverloeads){
-//		
-//		if (targetPosition != null && 1 == 2 ) {
-//			// 오버로드 이동
-//			int tempOverloadCount = 0;
-//			for (Unit unit : MyBotModule.Broodwar.self().getUnits()) {
-//				if (MyBotModule.Broodwar.getFrameCount() % Config.showDelayDisplayTime == 0) {
-//					if(Config.DEBUG) System.out.println("-------------------moveBeforeCombatOverload2-----------------");
-//					if(Config.DEBUG) System.out.println("- moverBore targetPosition     : " + targetPosition + " ");
-//					if(Config.DEBUG) System.out.println("- canMoveOverloeads            : " + canMoveOverloeads + " ");
-//					if(Config.DEBUG) System.out.println("- tempOverloadCount            : " + tempOverloadCount + " ");
-//				}
-//					
-//				// TODO harshZerg Zerg_Overlord 중, Detector와 Scout 역활이 아닌 idle인 유닛을 적진에 보낸다.
-//				if (unit.getType() == UnitType.Zerg_Overlord){
-////					&& 
-////				}
-////						(overloadData.getOverloadJob(unit) == OverloadData.OverloadJob.Detector ||
-////							overloadData.getOverloadJob(unit) == OverloadData.OverloadJob.Idle ||
-////							overloadData.getOverloadJob(unit) == OverloadData.OverloadJob.Default)) {
-//					
-//					//unit.stop();
-//					
-//					// Detector로 지정
-//					// set Detector role
-//					setSDetectorOverload(unit);
-//					
-//					if (MyBotModule.Broodwar.getFrameCount() % Config.showDelayDisplayTime == 0) {
-//						if(Config.DEBUG) System.out.println("- canMoveOverloeads            : " + canMoveOverloeads );
-//						if(Config.DEBUG) System.out.println("- moving overload              : " + unit.getID() + " " + overloadData.getOverloadJob(unit));
-//					}
-//					
-//					//commandUtil.move(unit, targetBaseLocation.getPosition());
-//					if(firstTwoMoveScoutOverload % 2 == 0){
-//						// TODO 앞마당의 공격당하기 불가능한 포지션 지정 ????, 맵별 하디코딩이라도 해야 할까?
-//						int x = targetPosition.getX() + Config.TILE_SIZE*4;
-//						int y = targetPosition.getY() + Config.TILE_SIZE*3;
-//						commandUtil.move(unit, new Position(x, y));
-//					}else{
-//						int x = targetPosition.getX() - Config.TILE_SIZE*4;
-//						int y = targetPosition.getY() - Config.TILE_SIZE*3;
-//						commandUtil.move(unit, new Position(x, y));
-//					}
-//					firstTwoMoveScoutOverload++; // 오버로드 출발시 증가
-//					
-//					tempOverloadCount++;
-//				}
-//				
-//				// harshZerg 필요한 overload를 보냈으면 종료
-//				if(tempOverloadCount >= canMoveOverloeads) break;
-//			}
-//		}
-//	}
-	
+
 	/**
-	 * setOverloadsPosition
+	 * setOverloadsBasicPosition
 	 * 오버로드가 태어나는 순서대로 위치를 지정하여 보낸다.
 
 	private Unit myMainLocationOverload;
@@ -560,80 +386,74 @@ public class OverloadManager {
 	 */
 	public void setOverloadsBasicPosition(Unit unit){
 
-//		if (MyBotModule.Broodwar.getFrameCount() % Config.showDelayDisplayTime == 0) {
-//			if(Config.DEBUG) System.out.println("** setOverloadsPosition firstScoutOverload : " + getFirstScoutOverload().getID());
-//			//if(Config.DEBUG) System.out.println("** setOverloadsPosition centerChokeOverload : " + centerChokeOverload.getID());
-//			if(Config.DEBUG) System.out.println("** setOverloadsPosition myFirstChokeOverload : " + myFirstChokeOverload.getID());
-//			if(Config.DEBUG) System.out.println("** setOverloadsPosition mySecondChokeOverload : " + mySecondChokeOverload.getID());
-//			if(Config.DEBUG) System.out.println("** setOverloadsPosition enemySecondChokeOverload : " + enemySecondChokeOverload.getID());
-//		}
-		Position myMainPosition = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getPosition();
-		Position myExpansionPosition = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self()).getPosition();
-		Position myFirstChokePosition = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.self()).getCenter();
-		Position mySecondChokePosition = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.self()).getSides().second;
-		Position centerPosition = new Position(2000, 2000);
+		Position selfMainBaseLocationPosition = selfMainBaseLocation.getPosition();
+		Position selfExpansionBaseLocationPosition = selfFirstExpansionLocation.getPosition();
+		Position selfFirstChokePosition = selfFirstChokePoint.getCenter();
+		Position selfSecondChokePosition = selfSecondChokePoint.getCenter();
+		Position centerLocationPosition = new Position(2000, 2000);
+		Position enemyMainbaseLocationPosition = null;
+		Position enemySecondChokePosition = null;
+		if(enemyMainBaseLocation != null){
+			enemyMainbaseLocationPosition = enemyMainBaseLocation.getPosition();
+			enemySecondChokePosition = enemySecondChokePoint.getCenter();
+		}
 		
-		if(MyBotModule.Broodwar.self().completedUnitCount(UnitType.Zerg_Overlord) < 1) return;
-		
+		// 나의 첫번째 choke position
 		if(myFirstChokeOverload == null){
 			myFirstChokeOverload = unit;
 			overloadData.setOverloadJob(myFirstChokeOverload, OverloadData.OverloadJob.MyFirstChoke, (Unit)null);
-			
-			commandUtil.move(myFirstChokeOverload, myFirstChokePosition);
-			if(Config.DEBUG) System.out.println("** myFirstChokeOverload : " + myFirstChokeOverload.getID());
+			commandUtil.move(myFirstChokeOverload, selfFirstChokePosition);
+			//if(Config.DEBUG) System.out.println("** myFirstChokeOverload : " + myFirstChokeOverload.getID());
 		}
+		// 나의 두번째 choke position
 		else if(mySecondChokeOverload == null){
 			mySecondChokeOverload = unit;
 			overloadData.setOverloadJob(mySecondChokeOverload, OverloadData.OverloadJob.MySecondChoke, (Unit)null);
-			
-			commandUtil.move(mySecondChokeOverload, mySecondChokePosition);
+			commandUtil.move(mySecondChokeOverload, selfSecondChokePosition);
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
-		}else if(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()) != null){
-			if(MyBotModule.Broodwar.enemy().getRace() != Race.Terran){
-				Position enemyFirstChokePosition = InformationManager.Instance().getFirstChokePoint(MyBotModule.Broodwar.enemy()).getCenter();
-				Position enemySecondChokePosition = InformationManager.Instance().getSecondChokePoint(MyBotModule.Broodwar.enemy()).getSides().second;
-				
-				if(enemySecondChokeOverload == null){
-					enemySecondChokeOverload = unit;
+		} 
+		// 적의 두번째 choke position
+		else if(enemySecondChokeOverload == null && enemyMainBaseLocation != null){
+			enemySecondChokeOverload = unit;
 					overloadData.setOverloadJob(enemySecondChokeOverload, OverloadData.OverloadJob.EnemySecondChoke, (Unit)null);
-					
 					commandUtil.move(enemySecondChokeOverload, enemySecondChokePosition);
-					if(Config.DEBUG) System.out.println("** enemySecondChokeOverload : " + enemySecondChokeOverload.getID());
-				}
-			}
-		}else if(myExpansionLocationOverload == null){
-			myExpansionLocationOverload = unit;
-			overloadData.setOverloadJob(myExpansionLocationOverload, OverloadData.OverloadJob.MyExpansionBase, (Unit)null);
-			
-			commandUtil.move(myExpansionLocationOverload, myExpansionPosition);
-			//if(Config.DEBUG) System.out.println("** myExpansionLocationOverload : " + myExpansionLocationOverload.getID());
-		}else if(myMainLocationOverload == null){
-			myMainLocationOverload = unit;
-			overloadData.setOverloadJob(myMainLocationOverload, OverloadData.OverloadJob.MyMainBase, (Unit)null);
-			
-			commandUtil.move(myMainLocationOverload, myMainPosition);
-			//if(Config.DEBUG) System.out.println("** myMainLocationOverload : " + myMainLocationOverload.getID());
-		}else if(enemyBasePatrolOverload == null){
-			if(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()) != null){
-				enemyBasePatrolOverload = unit;
-				overloadData.setOverloadJob(enemyBasePatrolOverload, OverloadData.OverloadJob.enemyBasePatrol, (Unit)null);
-				
-				enemyBasePatrolOverload.patrol(InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy()).getPosition());
-			}
+					//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
+		}
+		// 센터 position
+		else if(centerChokeOverload == null){
+			centerChokeOverload = unit;
+			overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
+			commandUtil.move(centerChokeOverload, centerLocationPosition);
+			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		}
 	}
 	
-	public List<Unit> getOverloads() {
-		return overloads;
-	}
-
-	public void setOverloads(List<Unit> overloads) {
-		this.overloads = overloads;
-	}
-	
-	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 리턴합니다
-	public OverloadData getOverloadData()
-	{
+	/// 오버로드 유닛들의 상태를 저장하는 workerData 객체를 리턴합니다
+	public OverloadData getOverloadData(){
 		return overloadData;
 	}
+	
+	public boolean isFinishedInitialScout() {
+		return isFinishedInitialScout;
+	}
+
+	public void setFinishedInitialScout(boolean isFinishedInitialScout) {
+		this.isFinishedInitialScout = isFinishedInitialScout;
+	}
+
+	public int getCurrentOverloadScoutStatus() {
+		return currentOverloadScoutStatus;
+	}
+
+	public void setCurrentOverloadScoutStatus(int currentOverloadScoutStatus) {
+		this.currentOverloadScoutStatus = currentOverloadScoutStatus;
+	}
+
+	public Unit getFirstScoutOverload() {
+		return firstScoutOverload;
+	}
+
+	public void setFirstScoutOverload(Unit firstScoutOverload) {
+		this.firstScoutOverload = firstScoutOverload;
+	}	
 }
