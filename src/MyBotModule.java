@@ -131,9 +131,9 @@ public class MyBotModule extends DefaultBWListener {
 
 		// Config 파일 관리가 번거롭고, 배포 및 사용시 Config 파일 위치를 지정해주는 것이 번거롭기 때문에, 
 		// Config 를 파일로부터 읽어들이지 않고, Config 클래스의 값을 사용하도록 한다.
-		if(Config.EnableCompleteMapInformation){
-			Broodwar.enableFlag(Enum.CompleteMapInformation.getValue());
-		}
+		//if(Config.EnableCompleteMapInformation){
+		//	Broodwar.enableFlag(Enum.CompleteMapInformation.getValue());
+		//}
 
 		if(Config.EnableUserInput){
 			Broodwar.enableFlag(Enum.UserInput.getValue());
