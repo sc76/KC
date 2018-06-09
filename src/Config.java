@@ -7,7 +7,7 @@ import bwapi.UnitType;
 public class Config {
 	
 	/// KC custom start
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = true; // debug show 여부를 판단할 boolean
 	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
 	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
