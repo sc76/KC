@@ -6,17 +6,16 @@ import bwapi.UnitType;
 /// 봇 프로그램 설정
 public class Config {
 	
-	/// harshZerg custom start
+	/// KC custom start
 	public static final boolean DEBUG = true;
-	public static int showDelayDisplayTime = 240/2; // 화면에 보여주는 delay time
+	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
 	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
-
 	/// 봇 이름
-	public static final String BotName = "harshNet";
+	public static final String BotName = "KC";
 	/// 봇 개발자 이름
-	public static final String BotAuthors = "sc76.choi";
+	public static final String BotAuthors = "KC";
 	
 	
 	
@@ -36,7 +35,7 @@ public class Config {
 	/// Fastest: 42 ms/frame.  1초에 24 frame. 일반적으로 1초에 24frame을 기준 게임속도로 합니다<br>
 	/// Normal: 67 ms/frame. 1초에 15 frame<br>
 	/// As fast as possible : 0 ms/frame. CPU가 할수있는 가장 빠른 속도.
-	public static int SetLocalSpeed = 5;
+	public static int SetLocalSpeed = 10;
 	
 	/// 로컬에서 게임을 실행할 때 FrameSkip (코드 제출 후 서버에서 게임을 실행할 때는 서버 설정을 사용함)<br>
 	/// frameskip을 늘리면 화면 표시도 업데이트 안하므로 훨씬 빠릅니다
