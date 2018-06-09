@@ -2,6 +2,7 @@ import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
+import bwapi.UnitType;
 
 /// 실제 봇프로그램의 본체가 되는 class<br>
 /// 스타크래프트 경기 도중 발생하는 이벤트들이 적절하게 처리되도록 해당 Manager 객체에게 이벤트를 전달하는 관리자 Controller 역할을 합니다
@@ -36,7 +37,7 @@ public class GameCommander {
 			return;
 		}
 		
-		//harshZerg  TODO : 추가, 20170606 1. 오버로드 최초 탐색 추가
+		//KC 추가 TODO : 추가, 20180609 1. 오버로드 최초 탐색 추가
 		OverloadManager.Instance().update();
 
 		if ( isToFindError) System.out.print("(a");
@@ -90,7 +91,10 @@ public class GameCommander {
 		
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitDestroy(unit);
-
+		
+		// 오버로드 삭제 처리
+		OverloadManager.Instance().onUnitDestroy(unit);
+		
 		InformationManager.Instance().onUnitDestroy(unit);
 	}
 	
@@ -122,6 +126,9 @@ public class GameCommander {
 
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitComplete(unit);
+		
+		// OverloadManager의 list 정보 갱신과  setOverloadPosition을 호출한다.
+		OverloadManager.Instance().onUnitComplete(unit);
 	}
 
 	// BasicBot 1.1 Patch End //////////////////////////////////////////////////
