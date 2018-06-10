@@ -605,7 +605,8 @@ public class StrategyManager {
 			
 			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
 			if(unit.getType() == UnitType.Zerg_Overlord 
-				&& OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X'){
+				&& (OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X' || 
+				    OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'S')){
 				continue;
 			}
 			
@@ -644,7 +645,8 @@ public class StrategyManager {
 
 			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
 			if(unit.getType() == UnitType.Zerg_Overlord 
-				&& OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X'){
+				&& (OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X' || 
+				    OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'S')){
 				continue;
 			}
 			
