@@ -90,25 +90,42 @@ public class WorkerManager {
 	}
 
 
-	public void handleGasWorkers()
-	{
+	/**
+	 * @modifier sc76.choi
+	 * 
+	 * 가스량이 미네랄의 3배가 넘게 되면, 가스 일꾼을 보정하여, 미네랄을 채집할 수 있도록 한다.
+	 */
+	public void handleGasWorkers(){
+		
+		int selfMinerals = InformationManager.Instance().selfPlayer.minerals();
+		int selfGas = InformationManager.Instance().selfPlayer.gas();
+		
 		// for each unit we have
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
 			// refinery 가 건설 completed 되었으면,
-			if (unit.getType().isRefinery() && unit.isCompleted() )
-			{
-				// get the number of workers currently assigned to it
-				int numAssigned = workerData.getNumAssignedWorkers(unit);
-
-				// if it's less than we want it to be, fill 'er up
-				// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
-				for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i)
-				{
-					Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
-					if (gasWorker != null)
-					{
-						workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+			if (unit.getType().isRefinery() && unit.isCompleted() )	{
+				
+				// 미네랄*3이 가스보다 많으면
+				if(selfMinerals*3 >= selfGas){
+					// get the number of workers currently assigned to it
+					int numAssigned = workerData.getNumAssignedWorkers(unit);
+	
+					// if it's less than we want it to be, fill 'er up
+					// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
+					for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i){
+						Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
+						if (gasWorker != null){
+							workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+						}
+					}
+				}
+				// 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 300 이하이면 skip
+				else{
+					if(selfGas <= 300) return;
+					for (Unit changeMineralWorker : MyBotModule.Broodwar.self().getUnits()){
+						if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
+							setIdleWorker(changeMineralWorker);
+						}
 					}
 				}
 			}
@@ -399,14 +416,16 @@ public class WorkerManager {
 
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 
-		for (Unit unit : workerData.getWorkers())
-		{
+		for (Unit unit : workerData.getWorkers()){
 			if (unit == null) continue;
 			
 			if (unit.isCompleted() && workerData.getWorkerJob(unit) == WorkerData.WorkerJob.Minerals)
 			{
 				double distance = unit.getDistance(refinery);
-				if (closestWorker == null || (distance < closestDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
+				if (closestWorker == null || 
+						(distance < closestDistance 
+						&& unit.isCarryingMinerals() == false 
+						&& unit.isCarryingGas() == false ))
 				{
 					closestWorker = unit;
 					closestDistance = distance;
