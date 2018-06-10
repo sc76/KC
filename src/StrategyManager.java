@@ -121,6 +121,7 @@ public class StrategyManager {
 	int necessaryNumberOfDefenseBuilding2;		/// 방어 건물 건설 갯수
 
 	// 아군 방어 건물 건설 위치
+	BuildOrderItem.SeedPositionStrategy seedPositionStrategyOfMyInitialBuildingType;
 	BuildOrderItem.SeedPositionStrategy seedPositionStrategyOfMyDefenseBuildingType;
 	BuildOrderItem.SeedPositionStrategy seedPositionStrategyOfMyCombatUnitTrainingBuildingType;
 
@@ -153,6 +154,7 @@ public class StrategyManager {
 	boolean isInitialBuildOrderFinished;	/// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
 
 	enum CombatState { 
+		initialMode,                        // 초반 빌드오더 타임
 		defenseMode,						// 아군 진지 방어
 		attackStarted,						// 아군 유닛으로 적 공격 시작
 		eliminateEnemy						// 적 Eliminate 
@@ -189,6 +191,7 @@ public class StrategyManager {
 	}
 	
 	/// 변수 초기값을 설정합니다
+	// onStart에서 한번만 수행
 	void setVariables(){
 		
 		// 참가자께서 자유롭게 초기값을 수정하셔도 됩니다 
@@ -208,103 +211,11 @@ public class StrategyManager {
 		selfKilledWorkerUnitCount = 0;
 		
 		isInitialBuildOrderFinished = false;
-		combatState = CombatState.defenseMode;
+		combatState = CombatState.initialMode;
 		
 		if (myRace == Race.Protoss) {
-
-			// 공격 유닛 종류 설정 
-			myCombatUnitType1 = UnitType.Protoss_Zealot;		
-			myCombatUnitType2 = UnitType.Protoss_Dragoon;
-			myCombatUnitType3 = UnitType.Protoss_Dark_Templar;
-			
-			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-			necessaryNumberOfCombatUnitType1 = 6;			            // 공격을 시작하기위해 필요한 최소한의 질럿 유닛 숫자 
-			necessaryNumberOfCombatUnitType2 = 6;                     	// 공격을 시작하기위해 필요한 최소한의 드라군 유닛 숫자 
-			necessaryNumberOfCombatUnitType3 = 2;                     	// 공격을 시작하기위해 필요한 최소한의 다크템플러 유닛 숫자 
-			
-			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[]{1,2,2,3};		// 생산 순서 : 질럿 드라군 드라군 다크템플러 ...
-			nextTargetIndexOfBuildOrderArray = 0; 	    		// 다음 생산 순서 index
-
-			// 특수 유닛 종류 설정 
-			mySpecialUnitType1 = UnitType.Protoss_Observer;
-			mySpecialUnitType2 = UnitType.Protoss_High_Templar;
-
-			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-			necessaryNumberOfSpecialUnitType1 = 1;	                 	 
-			necessaryNumberOfSpecialUnitType2 = 1;	               
-			
-			// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
-			maxNumberOfSpecialUnitType1 = 4;  
-			maxNumberOfSpecialUnitType2 = 4;  
-						
-			// 방어 건물 종류 및 건설 갯수 설정
-			myDefenseBuildingType1 = UnitType.Protoss_Pylon;
-			necessaryNumberOfDefenseBuilding1 = 1; 					
-			myDefenseBuildingType2 = UnitType.Protoss_Photon_Cannon;
-			necessaryNumberOfDefenseBuilding2 = 3; 					
-
-			// 방어 건물 건설 위치 설정
-			seedPositionStrategyOfMyDefenseBuildingType 
-				= BuildOrderItem.SeedPositionStrategy.SecondChokePoint;	// 두번째 길목
-			seedPositionStrategyOfMyCombatUnitTrainingBuildingType 
-				= BuildOrderItem.SeedPositionStrategy.SecondChokePoint;	// 두번째 길목
-			
-			// 업그레이드 및 리서치 대상 설정
-			necessaryUpgradeType1 = UpgradeType.Singularity_Charge;
-			necessaryUpgradeType2 = UpgradeType.Leg_Enhancements;
-			necessaryUpgradeType3 = UpgradeType.Khaydarin_Amulet;
-			necessaryTechType1 = TechType.Psionic_Storm;
-			necessaryTechType2 = TechType.Hallucination;
-			necessaryTechType3 = null;
 		}
 		else if (myRace == Race.Terran) {
-
-			// 공격 유닛 종류 설정  
-			myCombatUnitType1 = UnitType.Terran_Marine;
-			myCombatUnitType2 = UnitType.Terran_Medic;
-			myCombatUnitType3 = UnitType.Terran_Siege_Tank_Tank_Mode;
-			
-			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-			necessaryNumberOfCombatUnitType1 = 12;                      // 공격을 시작하기위해 필요한 최소한의 마린 유닛 숫자 
-			necessaryNumberOfCombatUnitType2 = 4;                       // 공격을 시작하기위해 필요한 최소한의 메딕 유닛 숫자 
-			necessaryNumberOfCombatUnitType3 = 2;                       // 공격을 시작하기위해 필요한 최소한의 시즈탱크 유닛 숫자 
-			
-			// 공격 유닛 생산 순서 설정
-			buildOrderArrayOfMyCombatUnitType = new int[]{1,1,1,2,3}; 	// 마린 마린 마린 메딕 시즈탱크 ...
-			nextTargetIndexOfBuildOrderArray = 0; 			    // 다음 생산 순서 index
-			
-			// 특수 유닛 종류 설정 
-			mySpecialUnitType1 = UnitType.Terran_Science_Vessel;			
-			mySpecialUnitType2 = UnitType.Terran_Battlecruiser;
-			
-			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-			necessaryNumberOfSpecialUnitType1 = 1;		             	 
-			necessaryNumberOfSpecialUnitType2 = 1;	
-			
-			// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
-			maxNumberOfSpecialUnitType1 = 4;  
-			maxNumberOfSpecialUnitType2 = 4;  
-
-			// 방어 건물 종류 및 건설 갯수 설정
-			myDefenseBuildingType1 = UnitType.Terran_Bunker;
-			necessaryNumberOfDefenseBuilding1 = 3; 						
-			myDefenseBuildingType2 = UnitType.Terran_Missile_Turret;
-			necessaryNumberOfDefenseBuilding2 = 1;						
-			
-			// 방어 건물 건설 위치 설정
-			seedPositionStrategyOfMyDefenseBuildingType 
-				= BuildOrderItem.SeedPositionStrategy.SecondChokePoint;	// 두번째 길목
-			seedPositionStrategyOfMyCombatUnitTrainingBuildingType 
-				= BuildOrderItem.SeedPositionStrategy.SecondChokePoint;	// 두번째 길목
-
-			// 업그레이드 및 리서치 대상 설정
-			necessaryUpgradeType1 = UpgradeType.U_238_Shells;
-			necessaryUpgradeType2 = UpgradeType.Terran_Infantry_Weapons;
-			necessaryUpgradeType3 = UpgradeType.Titan_Reactor;
-			necessaryTechType1 = TechType.Tank_Siege_Mode;
-			necessaryTechType2 = TechType.Irradiate;
-			necessaryTechType3 = TechType.Yamato_Gun;
 		}
 		else if (myRace == Race.Zerg) {
 			
@@ -342,18 +253,20 @@ public class StrategyManager {
 			necessaryNumberOfDefenseBuilding2 = 3; 					
 		
 			// 방어 건물 건설 위치 설정 
+			seedPositionStrategyOfMyInitialBuildingType
+				= BuildOrderItem.SeedPositionStrategy.MainBaseLocation;	// 본진
 			seedPositionStrategyOfMyDefenseBuildingType 
-				= BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;	// 앞마당
+				= BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;	// 첫번째 choke point
 			seedPositionStrategyOfMyCombatUnitTrainingBuildingType 
 				= BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;	// 앞마당
 		
 			// 업그레이드 및 리서치 대상 설정
-			necessaryUpgradeType1 = UpgradeType.Grooved_Spines;
-			necessaryUpgradeType2 = UpgradeType.Muscular_Augments;
-			necessaryUpgradeType3 = UpgradeType.Pneumatized_Carapace;
-			necessaryTechType1 = TechType.Lurker_Aspect;
-			necessaryTechType2 = TechType.Consume;
-			necessaryTechType3 = TechType.Plague;
+			necessaryUpgradeType1 = UpgradeType.Grooved_Spines; // 히드라 사정업
+			necessaryUpgradeType2 = UpgradeType.Muscular_Augments; // 히드라 발업
+			necessaryUpgradeType3 = UpgradeType.Pneumatized_Carapace; // 오버로드 속도업
+			necessaryTechType1 = TechType.Lurker_Aspect; // 럴커
+			necessaryTechType2 = TechType.Consume; // 컨슘
+			necessaryTechType3 = TechType.Plague; // 플레이그
 		}
 	}
 
@@ -532,6 +445,22 @@ public class StrategyManager {
 	public void executeCombat() {
 
 		//////////////////////////////////////////////////////////////////////////
+		// 초기 빌드오더 타임까지는 본진을 방어 하거나, 특공대 임무를 수행합니다.
+		// ///////////////////////////////////////////////////////////////////////
+		if (combatState == CombatState.initialMode) {
+
+			/// 아군 공격유닛 들에게 방어를 지시합니다
+			commandMyCombatUnitToInitial();
+			
+			/// 방어 모드로 전환할 때인지 여부를 판단합니다			
+			// sc76.choi intial 모드에서 defence모드로 처음 변경되는 시점
+			if(myPlayer.allUnitCount(UnitType.Zerg_Hatchery) >= 2
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) >= 2){
+				combatState = CombatState.defenseMode;
+			}
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
 		// 공격을 시작할만한 상황이 되기 전까지는 방어를 합니다
 		// ///////////////////////////////////////////////////////////////////////
 		if (combatState == CombatState.defenseMode) {
@@ -578,8 +507,6 @@ public class StrategyManager {
 			myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1 // 저글링
 			|| myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2 // 히드라
 			|| myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3 // 럴커
-		//	&& mySpecialUnitType1List.size() >= necessaryNumberOfSpecialUnitType1 // 오버로드
-		//	&& mySpecialUnitType2List.size() >= necessaryNumberOfSpecialUnitType2 // 디파일러
 		) 
 		{
 			//////////////////////////////////////////////////////////////////////////////
@@ -628,6 +555,7 @@ public class StrategyManager {
 			countDefence++;
 			return true;
 		}
+		
 		return false;
 	}
 
@@ -652,6 +580,50 @@ public class StrategyManager {
 		return false;
 	}
 
+	// sc76.choi 초반 빌드오더 타임까지의 초기 상태입니다.
+	void commandMyCombatUnitToInitial(){
+
+		// 아군 방어 건물이 세워져있는 위치
+		Position myInitialBuildingPosition = null;
+		switch (seedPositionStrategyOfMyInitialBuildingType) {
+			case MainBaseLocation: myInitialBuildingPosition = myMainBaseLocation.getPosition(); break;
+			case FirstChokePoint: myInitialBuildingPosition = myFirstChokePoint.getCenter(); break;
+			case FirstExpansionLocation: myInitialBuildingPosition = myFirstExpansionLocation.getPosition(); break;
+			case SecondChokePoint: myInitialBuildingPosition = mySecondChokePoint.getCenter(); break;
+			default: myInitialBuildingPosition = myMainBaseLocation.getPosition(); break;
+		}
+
+		// 아군 공격유닛을 방어 건물이 세워져있는 위치로 배치시킵니다
+		// 아군 공격유닛을 아군 방어 건물 뒤쪽에 배치시켰다가 적들이 방어 건물을 공격하기 시작했을 때 다함께 싸우게하면 더 좋을 것입니다
+		// sc76.choi 단, 정찰 오버로드는 자기 할일이 있다.
+		for (Unit unit : myAllCombatUnitList) {
+
+			if (!commandUtil.IsValidUnit(unit)) continue;
+			
+			boolean hasCommanded = false;
+
+			
+			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
+			if(unit.getType() == UnitType.Zerg_Overlord 
+				&& OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X'){
+				continue;
+			}
+			
+			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다. 단, 오버로드는 제외
+			if (hasCommanded == false) {
+				
+				if (unit.isIdle()) {
+					if (unit.canAttack()) {
+						commandUtil.attackMove(unit, myInitialBuildingPosition);
+					}
+					else {
+						commandUtil.move(unit, myInitialBuildingPosition);
+					}
+				}
+			}
+		}	
+	}
+	
 	/// 아군 공격유닛 들에게 방어를 지시합니다
 	void commandMyCombatUnitToDefense(){
 
@@ -706,14 +678,16 @@ public class StrategyManager {
 			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다. 단, 오버로드는 제외
 			if (hasCommanded == false) {
 				
-				if (unit.isIdle()) {
+				// sc76.choi 무조건 후퇴 해야 한다. unit.isIdle() 체크 제거
+				// sc76.choi 먼저 명령을 받은 유닛은 그 명령이 끝날때까지 수행하기 때문
+				//if (unit.isIdle()) {
 					if (unit.canAttack()) {
 						commandUtil.attackMove(unit, myDefenseBuildingPosition);
 					}
 					else {
 						commandUtil.move(unit, myDefenseBuildingPosition);
 					}
-				}
+				//}
 			}
 		}	
 	}
@@ -1791,78 +1765,32 @@ public class StrategyManager {
 			return;
 		}
 		
-		boolean			isTimeToStartUpgradeType1 = false;	/// 업그레이드할 타이밍인가
-		boolean			isTimeToStartUpgradeType2 = false;	/// 업그레이드할 타이밍인가
-		boolean			isTimeToStartUpgradeType3 = false;	/// 업그레이드할 타이밍인가
-		boolean			isTimeToStartResearchTech1 = false;	/// 리서치할 타이밍인가
+		boolean			isTimeToStartUpgradeType1 = false;	/// 업그레이드할 타이밍인가, 히드라 사정 업
+		boolean			isTimeToStartUpgradeType2 = false;	/// 업그레이드할 타이밍인가, 히드라 발업
+		boolean			isTimeToStartUpgradeType3 = false;	/// 업그레이드할 타이밍인가, 오버로드 속도업
+		boolean			isTimeToStartResearchTech1 = false;	/// 리서치할 타이밍인가, 럴커
 		boolean			isTimeToStartResearchTech2 = false;	/// 리서치할 타이밍인가
 		boolean			isTimeToStartResearchTech3 = false;	/// 리서치할 타이밍인가
 
 		// 업그레이드 / 리서치할 타이밍인지 판단
 		if (myRace == Race.Protoss) {
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 드라군 4기 생산 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Cybernetics_Core) > 0
-					&& myPlayer.completedUnitCount(UnitType.Protoss_Dragoon) >= 4) {
-				isTimeToStartUpgradeType1 = true;
-			}
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 질럿 6기 생산 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Citadel_of_Adun) > 0
-				&& myPlayer.completedUnitCount(UnitType.Protoss_Zealot) >= 6) {
-				isTimeToStartUpgradeType2 = true;
-			}			
-			// 사이오닉스톰은 최우선으로 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Templar_Archives) > 0) {
-				isTimeToStartResearchTech1 = true;
-			}
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 사이오닉스톰 리서치 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Templar_Archives) > 0
-				&& myPlayer.hasResearched(necessaryTechType1) == true) {
-				isTimeToStartUpgradeType3 = true;
-				isTimeToStartResearchTech2 = true;
-			}			
-			
 		}
 		else if (myRace == Race.Terran) {		
-			// 시즈모드는 최우선으로 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Machine_Shop) > 0) {
-				isTimeToStartResearchTech1 = true;
-			}			
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 탱크 2기 생산 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Academy) > 0
-				&& myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 2) {
-				isTimeToStartUpgradeType1 = true;
-			}
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 탱크 2기 생산 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Engineering_Bay) > 0
-				&& myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) + myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 2) {
-				isTimeToStartUpgradeType2 = true;
-			}			
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 이라디에이트 리서치 후 리서치한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Science_Facility) > 0) {
-				isTimeToStartResearchTech2 = true;
-			}
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 이라디에이트 리서치 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Science_Facility) > 0
-				&& myPlayer.hasResearched(necessaryTechType2) == true) {
-				isTimeToStartUpgradeType3 = true;
-			}			
-			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 사이언스베슬 2기 생산 후 업그레이드한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Physics_Lab) > 0
-					&& myPlayer.completedUnitCount(UnitType.Terran_Science_Vessel) >= 2) {
-				isTimeToStartResearchTech3 = true;
-			}			
 		}
 		else if (myRace == Race.Zerg) {
 			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 4기 생산 후 업그레이드한다
+			// 히드라 사정 업그레이드
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 					&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
 				isTimeToStartUpgradeType1 = true;
 			}
 			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 사정거리 업그레이드 후 업그레이드한다
+			// 히드라 발업
 			if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
 				isTimeToStartUpgradeType2 = true;
 			}			
 			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
+			// 오버로드 속도업
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.hasResearched(TechType.Lurker_Aspect)) {
 				isTimeToStartUpgradeType3 = true;
 			}			
@@ -1875,6 +1803,7 @@ public class StrategyManager {
 				isTimeToStartResearchTech2 = true;
 			}			
 			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 컨슘 리서치 후 리서치한다
+			// 컨슘
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0
 					&& myPlayer.hasResearched(necessaryTechType2) == true) {
 				isTimeToStartResearchTech3 = true;
@@ -1882,6 +1811,7 @@ public class StrategyManager {
 		}
 		
 		// 테크 리서치는 높은 우선순위로 우선적으로 실행
+		// 럴커
 		if (isTimeToStartResearchTech1) 
 		{
 			if (myPlayer.isResearching(necessaryTechType1) == false
@@ -1892,6 +1822,7 @@ public class StrategyManager {
 			}
 		}
 		
+		// 컨슘
 		if (isTimeToStartResearchTech2) 
 		{
 			if (myPlayer.isResearching(necessaryTechType2) == false
@@ -1902,6 +1833,7 @@ public class StrategyManager {
 			}
 		}
 		
+		// 플레이그
 		if (isTimeToStartResearchTech3) 
 		{
 			if (myPlayer.isResearching(necessaryTechType3) == false
@@ -1913,6 +1845,7 @@ public class StrategyManager {
 		}		
 		
 		// 업그레이드는 낮은 우선순위로 실행
+		// sc76.choi 히드라 사정 업그레이드
 		if (isTimeToStartUpgradeType1) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 0 
@@ -1923,6 +1856,8 @@ public class StrategyManager {
 			}
 		}
 		
+		
+		// 히드라 발업
 		if (isTimeToStartUpgradeType2) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 0 
@@ -1933,6 +1868,7 @@ public class StrategyManager {
 			}
 		}
 
+		// 오버로드 속도업
 		if (isTimeToStartUpgradeType3) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) == 0 
@@ -1947,7 +1883,9 @@ public class StrategyManager {
 		if (myRace == Race.Zerg) {
 			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
 				if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0 
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0) 
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
+					&& (myPlayer.allUnitCount(UnitType.Zerg_Hive) < 1
+					|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) < 1)) 
 				{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);					
 				}
@@ -1970,156 +1908,13 @@ public class StrategyManager {
 		}
 
 		if (myRace == Race.Protoss) {
-			
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 드라군 2기 생산 후 건설한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Cybernetics_Core) > 0
-				&& myPlayer.completedUnitCount(UnitType.Protoss_Dragoon) >= 4
-				&& myPlayer.allUnitCount(UnitType.Protoss_Robotics_Facility) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Protoss_Robotics_Facility) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Protoss_Robotics_Facility, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Protoss_Robotics_Facility, true);
-			}
-
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Robotics_Facility) > 0
-				&& myPlayer.allUnitCount(UnitType.Protoss_Observatory) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Protoss_Observatory) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Protoss_Observatory, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Protoss_Observatory, true);
-			}		
-
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 질럿 2기 생산 후 건설한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Cybernetics_Core) > 0
-				&& myPlayer.completedUnitCount(UnitType.Protoss_Zealot) >= 2
-				&& myPlayer.allUnitCount(UnitType.Protoss_Citadel_of_Adun) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Protoss_Citadel_of_Adun) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Protoss_Citadel_of_Adun, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Protoss_Citadel_of_Adun, true);
-			}
-
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 드라군 4기 생산 후 건설한다
-			if (myPlayer.completedUnitCount(UnitType.Protoss_Citadel_of_Adun) > 0
-				&& myPlayer.completedUnitCount(UnitType.Protoss_Dragoon) >= 4
-				&& myPlayer.allUnitCount(UnitType.Protoss_Templar_Archives) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Protoss_Templar_Archives) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Protoss_Templar_Archives, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Protoss_Templar_Archives, true);
-			}
-			
 		}
 		else if (myRace == Race.Terran) {
-			
-			if (myPlayer.completedUnitCount(UnitType.Terran_Barracks) > 0
-				&& myPlayer.allUnitCount(UnitType.Terran_Factory) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Factory) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Factory, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Factory, true);
-			}
-
-			if (myPlayer.completedUnitCount(UnitType.Terran_Factory) > 0 ) {
-				
-				// myPlayer.allUnitCount() 으로 제대로 카운트 안되는 경우가 있어서, 별도 카운트
-				int addonBuildingCount = 0;
-				for(Unit unit : myPlayer.getUnits()) {
-					if (unit.getType() == UnitType.Terran_Machine_Shop) {
-						addonBuildingCount ++;
-						break;
-					}
-					
-					if (unit.getType() == UnitType.Terran_Factory) {
-						if (unit.isCompleted() && unit.isConstructing()) {
-							addonBuildingCount ++;
-						}
-					}
-				}
-				
-				if (addonBuildingCount == 0
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Machine_Shop) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Machine_Shop, null) == 0) 
-				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Machine_Shop, true);
-				}
-			}
-			
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 탱크 2기 생산 후 건설한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Factory) > 0
-				&& myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) +myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 2
-				&& myPlayer.allUnitCount(UnitType.Terran_Starport) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Starport) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Starport, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Starport, true);
-			}
-
-			if (myPlayer.completedUnitCount(UnitType.Terran_Starport) > 0) {
-
-				// myPlayer.allUnitCount() 으로 제대로 카운트 안되는 경우가 있어서, 별도 카운트
-				int addonBuildingCount = 0;
-				for(Unit unit : myPlayer.getUnits()) {
-					if (unit.getType() == UnitType.Terran_Control_Tower) {
-						addonBuildingCount ++;
-						break;
-					}
-					
-					if (unit.getType() == UnitType.Terran_Starport) {
-						if (unit.isCompleted() && unit.isConstructing()) {
-							addonBuildingCount ++;
-						}
-					}
-				}
-				
-				if (addonBuildingCount == 0
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Control_Tower) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Control_Tower, null) == 0) 
-				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Control_Tower, true);
-				}		
-			}
-			
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 탱크 2기 생산 후 건설한다
-			if (myPlayer.completedUnitCount(UnitType.Terran_Starport) > 0
-				&& myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Tank_Mode) +myPlayer.completedUnitCount(UnitType.Terran_Siege_Tank_Siege_Mode) >= 2
-				&& myPlayer.allUnitCount(UnitType.Terran_Science_Facility) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Science_Facility) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Science_Facility, null) == 0) 
-			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Science_Facility, true);
-			}
-
-			if (myPlayer.completedUnitCount(UnitType.Terran_Science_Facility) > 0 ) {
-				
-				// myPlayer.allUnitCount() 으로 제대로 카운트 안되는 경우가 있어서, 별도 카운트
-				int addonBuildingCount = 0;
-				for(Unit unit : myPlayer.getUnits()) {
-					if (unit.getType() == UnitType.Terran_Physics_Lab) {
-						addonBuildingCount ++;
-						break;
-					}
-					
-					if (unit.getType() == UnitType.Terran_Science_Facility) {
-						if (unit.isCompleted() && unit.isConstructing()) {
-							addonBuildingCount ++;
-						}
-					}
-				}
-				
-				if (addonBuildingCount == 0
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Terran_Physics_Lab) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Terran_Physics_Lab, null) == 0) 
-				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Terran_Physics_Lab, true);
-				}
-			}
-
 		}
 		else if (myRace == Race.Zerg) {
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 4기 생산 후 건설한다
+			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
 				&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null) == 0) 
@@ -2127,9 +1922,9 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Queens_Nest, true);
 			}
 			
-			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 4기 생산 후 건설한다
+			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0
 				&& myPlayer.allUnitCount(UnitType.Zerg_Hive) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) == 0
@@ -2141,15 +1936,14 @@ public class StrategyManager {
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 4기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 6
 				&& myPlayer.allUnitCount(UnitType.Zerg_Defiler_Mound) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Defiler_Mound) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Defiler_Mound, null) == 0) 
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Defiler_Mound, true);
 			}
-			
 		}
-		
 	}
 
 
