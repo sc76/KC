@@ -55,6 +55,8 @@ public class Config {
 	/// StarCraft 및 BWAPI 에서 1 Tile = 32 * 32 Point (Pixel) 입니다<br>
 	/// Position 은 Point (Pixel) 단위이고, TilePosition 은 Tile 단위입니다 
 	public static int TILE_SIZE = 32;
+	// 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
+	public static int DISTANCE_WORKER_CANATTACK = TILE_SIZE * 5;
 
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static int WorkersPerRefinery = 3;
@@ -89,7 +91,7 @@ public class Config {
 	/// 화면 표시 여부 - 유닛 통계
 	public static boolean DrawEnemyUnitInfo = false;
 	/// 화면 표시 여부 - 유닛 ~ Target 간 직선
-	public static boolean DrawUnitTargetInfo = true;
+	public static boolean DrawUnitTargetInfo = false;
 
 	/// 화면 표시 여부 - 빌드 큐
 	public static boolean DrawProductionInfo = true;
