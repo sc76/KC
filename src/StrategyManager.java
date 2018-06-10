@@ -50,6 +50,9 @@ public class StrategyManager {
 	/// 
 	///////////////////////////////////////////////////////////////////
 	
+	private int countAttack;
+	private int countDefence;
+	
 	// 아군
 	Player myPlayer;
 	Race myRace;
@@ -604,11 +607,13 @@ public class StrategyManager {
 //				}				
 //				if (isSpecialUnitHasEnoughEnergy) {
 //					return true;
-//				}			
+//				}
+				countAttack++;
 				return true;
 			}
 			
 			if (myCombatUnitType4List.size() >= 8) {
+				countAttack++;
 				return true;
 			}
 		}
@@ -620,8 +625,8 @@ public class StrategyManager {
 	boolean isTimeToStartDefense() {
 		
 		// 공격 유닛 숫자가 10 미만으로 떨어지면 후퇴
-		if (myCombatUnitType1List.size() + myCombatUnitType2List.size() + myCombatUnitType3List.size() < 10) 
-		{
+		if (myCombatUnitType1List.size() + myCombatUnitType2List.size() + myCombatUnitType3List.size() < 10){
+			countDefence++;
 			return true;
 		}
 		return false;
@@ -2500,5 +2505,19 @@ public class StrategyManager {
 	}
 
 	// BasicBot 1.1 Patch End //////////////////////////////////////////////////
-	
+	public int getCountAttack() {
+		return countAttack;
+	}
+
+	public void setCountAttack(int countAttack) {
+		this.countAttack = countAttack;
+	}
+
+	public int getCountDefence() {
+		return countDefence;
+	}
+
+	public void setCountDefence(int countDefence) {
+		this.countDefence = countDefence;
+	}
 }
