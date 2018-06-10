@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -100,9 +101,9 @@ public class StrategyManager {
 	// 아군 공격 유닛 목록	
 	ArrayList<Unit> myAllCombatUnitList = new ArrayList<Unit>();      
 	
-	ArrayList<Unit> myCombatUnitType1List = new ArrayList<Unit>();      
-	ArrayList<Unit> myCombatUnitType2List = new ArrayList<Unit>();      
-	ArrayList<Unit> myCombatUnitType3List = new ArrayList<Unit>();      
+	ArrayList<Unit> myCombatUnitType1List = new ArrayList<Unit>(); // 저글링      
+	ArrayList<Unit> myCombatUnitType2List = new ArrayList<Unit>(); // 히드라
+	ArrayList<Unit> myCombatUnitType3List = new ArrayList<Unit>(); // 럴커
 	ArrayList<Unit> myCombatUnitType4List = new ArrayList<Unit>();      
 
 	ArrayList<Unit> mySpecialUnitType1List = new ArrayList<Unit>();       
@@ -171,7 +172,7 @@ public class StrategyManager {
 		// sc76.choi 
 		KCBaseInfoManager.Instance().updateByOneTime();
 		//if(Config.DEBUG){
-			//System.out.println(KCBaseInfoManager.Instance().printKCBaseList());
+		//	System.out.println(KCBaseInfoManager.Instance().printKCBaseList());
 		//}
 		
 		/// 변수 초기값을 설정합니다
@@ -359,132 +360,8 @@ public class StrategyManager {
 		
 		if (MyBotModule.Broodwar.self().getRace() == Race.Protoss) {
 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 5
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 6
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 7
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Pylon, 
-					seedPositionStrategyOfMyDefenseBuildingType); // 첫번째 파일런
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 8			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 9
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 10
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Forge,
-					seedPositionStrategyOfMyDefenseBuildingType); // 포지
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 11
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 12
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 13
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Photon_Cannon,
-					seedPositionStrategyOfMyDefenseBuildingType); // 첫번째 포톤캐논
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Photon_Cannon,
-					seedPositionStrategyOfMyDefenseBuildingType); // 두번째 포톤캐논
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Gateway,
-					seedPositionStrategyOfMyCombatUnitTrainingBuildingType); // 첫번째 게이트웨이
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 14
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Photon_Cannon,
-					seedPositionStrategyOfMyDefenseBuildingType); // 세번째 포톤캐논
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 15
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Assimilator);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Pylon); // 두번째 파일런
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Zealot); // 17
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Cybernetics_Core);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 18
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Zealot); // 20
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Pylon); // 세번째 파일런
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 21
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Zealot); // 23
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Gateway); // 두번째 게이트웨이
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 24
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Zealot); // 26
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Dragoon); // 28
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 29
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Zealot); // 31
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Dragoon); // 33
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Pylon); // 네번째 파일런
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Nexus, 
-					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Assimilator, 
-					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 34
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Protoss_Probe); // 35
 		} 
 		else if (MyBotModule.Broodwar.self().getRace() == Race.Terran) {
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 5
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 6
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 7
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 8
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot); 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 9
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 10
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks,
-					seedPositionStrategyOfMyDefenseBuildingType); 
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 11
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 12
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
-					seedPositionStrategyOfMyDefenseBuildingType); 
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 13
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 14
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Engineering_Bay);
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 15
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot); 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 16
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 17
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Missile_Turret,
-					seedPositionStrategyOfMyDefenseBuildingType);
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Barracks); 
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 18
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
-					seedPositionStrategyOfMyDefenseBuildingType); 
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 19
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 20
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 21
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Academy);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot); 
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 22
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 23
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 24
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Bunker,
-					seedPositionStrategyOfMyDefenseBuildingType); 
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 25
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 26
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 27
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_SCV); // 28
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 29
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Marine); // 30
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Supply_Depot); 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Factory); 
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Command_Center,
-					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Terran_Refinery,
-					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 		} 
 		else if (MyBotModule.Broodwar.self().getRace() == Race.Zerg) {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//5
@@ -525,6 +402,9 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//17
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//19
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor); //19
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
 
@@ -532,7 +412,6 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 					seedPositionStrategyOfMyDefenseBuildingType);	//20
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor); //19
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
@@ -545,17 +424,18 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//22
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//23
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//22
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//23
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//24			
 
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//25
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27			
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber, false); //26
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 다섯번째 오버로드
 			
@@ -563,16 +443,17 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//28
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//29
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//30
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//31
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//32
+			
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//34
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//35
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
-
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//32
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//33
-			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//34
-			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//35
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
 		}
@@ -581,6 +462,12 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 
+		// 베이스 정보를 업데이트 합니다.
+		// sc76.choi start
+		updateKCBaseInfo();
+		combatWorker();
+		// sc76.choi end
+		
 		/// 변수 값을 업데이트 합니다
 		updateVariables();
 
@@ -617,10 +504,23 @@ public class StrategyManager {
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 	}
 	
+	public void updateKCBaseInfo(){
+		
+		// 2초에 1번만 실행합니다
+		if (MyBotModule.Broodwar.getFrameCount() % 24 * 2 != 0) return;
+				
+		KCBaseInfoManager.Instance().update();
+		//if(Config.DEBUG){
+		//	System.out.println(KCBaseInfoManager.Instance().printKCBaseList());
+		//}
+	}
+	
 	/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 	public void executeCombat() {
 
+		//////////////////////////////////////////////////////////////////////////
 		// 공격을 시작할만한 상황이 되기 전까지는 방어를 합니다
+		// ///////////////////////////////////////////////////////////////////////
 		if (combatState == CombatState.defenseMode) {
 
 			/// 아군 공격유닛 들에게 방어를 지시합니다
@@ -631,7 +531,9 @@ public class StrategyManager {
 				combatState = CombatState.attackStarted;
 			}
 		}
+		//////////////////////////////////////////////////////////////////////////
 		// 공격을 시작한 후에는 공격을 계속 실행하다가, 거의 적군 기지를 파괴하면 Eliminate 시키기를 합니다 
+		//////////////////////////////////////////////////////////////////////////
 		else if (combatState == CombatState.attackStarted) {
 
 			/// 아군 공격유닛 들에게 공격을 지시합니다
@@ -647,8 +549,10 @@ public class StrategyManager {
 				combatState = CombatState.eliminateEnemy;
 			}
 		}
+		//////////////////////////////////////////////////////////////////////////
+		// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
+		//////////////////////////////////////////////////////////////////////////
 		else if (combatState == CombatState.eliminateEnemy) {
-			/// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
 			commandMyCombatUnitToEliminate();	
 		}
 	}
@@ -664,10 +568,14 @@ public class StrategyManager {
 		//	&& mySpecialUnitType1List.size() >= necessaryNumberOfSpecialUnitType1 // 오버로드
 		//	&& mySpecialUnitType2List.size() >= necessaryNumberOfSpecialUnitType2 // 디파일러
 		) 
-		{	
-			// 공격 유닛이 충족하면(저글링이 16마리이상, 히드라가 12마리이상, 럴커가 4마리 이상
-			if ((myCombatUnitType1List.size() > 24 && myCombatUnitType3List.size() > 2)
-				|| myCombatUnitType2List.size() > 8 
+		{
+			//////////////////////////////////////////////////////////////////////////////
+			// 공격 유닛이 충족하면
+			// 1. 저글링이 12마리이상, 럴커가 2마리 이상
+			// 2. 히드라가 8마리이상, 럴커가 1마리 이상
+			//////////////////////////////////////////////////////////////////////////////
+			if ((myCombatUnitType1List.size() >= 12 && myCombatUnitType3List.size() >= 2)
+				|| (myCombatUnitType2List.size() >= 8 && myCombatUnitType3List.size() >= 1)
 			) {
 				
 				// 에너지 100 이상 갖고있는 특수 유닛이 존재하면 
@@ -750,7 +658,7 @@ public class StrategyManager {
 
 			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
 			if(unit.getType() == UnitType.Zerg_Overlord 
-				&& OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
+				&& OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X'){
 				continue;
 			}
 			
@@ -803,8 +711,7 @@ public class StrategyManager {
 		BaseLocation targetEnemyBaseLocation = enemyMainBaseLocation;
 		Position targetPosition = null;
 		
-		if (targetEnemyBaseLocation != null) 
-		{
+		if (targetEnemyBaseLocation != null){
 			// 테란 종족의 경우, 벙커 안에 있는 유닛은 밖으로 빼낸다
 			if (myRace == Race.Terran) {
 				for(Unit bunker : myDefenseBuildingType1List) {
@@ -823,7 +730,9 @@ public class StrategyManager {
 				}
 			}
 
+			///////////////////////////////////////////////////////////////////////////////////////
 			// targetPosition 을 설정한다
+			///////////////////////////////////////////////////////////////////////////////////////
 			targetPosition = targetEnemyBaseLocation.getPosition();
 			
 			// 모든 아군 공격유닛들로 하여금 targetPosition 을 향해 공격하게 한다
@@ -934,10 +843,10 @@ public class StrategyManager {
 			if (unit.getType() == UnitType.Zerg_Lurker) {
 				hasCommanded = controlLurkerUnitType(unit);					
 			}
-			if (unit.getType() == mySpecialUnitType1) {					
+			if (unit.getType() == mySpecialUnitType1) {	// 저글링				
 				hasCommanded = controlSpecialUnitType1(unit);
 			}
-			if (unit.getType() == mySpecialUnitType2) {					
+			if (unit.getType() == mySpecialUnitType2) {	// 럴커		
 				hasCommanded = controlSpecialUnitType2(unit);
 			}
 			
@@ -998,6 +907,60 @@ public class StrategyManager {
 		}
 	}
 
+	/**
+	 * combatWorker
+	 * 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다.
+	 * 
+	 * @author sc76.choi
+	 */
+	void combatWorker(){
+		// 1초에 1번만 실행합니다
+		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		
+		int countEnemyAroundWorker = 0;
+		int countselfCombatWorker = 0;
+		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
+			if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
+				countselfCombatWorker++;
+			}
+		}
+		
+		// 일꾼 공격 합세는 2마리만 한다.
+		if(countselfCombatWorker >= Config.COUNT_WORKERS_CANATTACK) return;
+			
+		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
+			if(!commandUtil.IsValidSelfUnit(worker)) return;
+			
+			// 각 worker의 주변 DISTANCE_WORKER_CANATTACK을 살펴 본다.
+			Iterator iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), Config.DISTANCE_WORKER_CANATTACK).iterator();
+			while(iter.hasNext()){
+				Unit unit = (Unit)iter.next();
+				// 지상공격이 가능한 적군이면 CombatWorker으로 변경한다.
+				if(commandUtil.IsValidEnemyGroundAttackUnit(unit)){
+					// 일꾼 공격 합세는 2마리만 한다.
+					if(countselfCombatWorker >= Config.COUNT_WORKERS_CANATTACK) return;
+					// 적군과 나와의 거리가 DISTANCE_WORKER_CANATTACK내에 있는 worker를 상태를 combat으로 변경한다.
+					if(worker.getDistance(unit) < Config.DISTANCE_WORKER_CANATTACK){
+						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
+							WorkerManager.Instance().setCombatWorker(worker);
+							countEnemyAroundWorker++;
+						}
+					}
+				}
+			} // while
+		}
+		
+		// 적군이 없다면 idle로 변경하여, 다시 일을 할수 있게 한다.
+		if(countEnemyAroundWorker <= 0){
+			for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
+				if(!commandUtil.IsValidSelfUnit(worker)) return;
+				if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
+					WorkerManager.Instance().setIdleWorker(worker);
+				}
+			}
+		}
+	}
+	
 	/// 시즈탱크 유닛에 대해 컨트롤 명령을 내립니다
 	boolean controlSiegeTankUnitType(Unit unit){
 		
@@ -1074,6 +1037,7 @@ public class StrategyManager {
 				default: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
 			}
 
+			// sc76.choi, defenseMode이지만, 적진에 깊이 박혀 있으면, 그대로 둔다.
 			if (myDefenseBuildingPosition != null) {
 				if (unit.isBurrowed() == false) {			
 					if (unit.getDistance(myDefenseBuildingPosition) < 5 * Config.TILE_SIZE) {
@@ -2365,13 +2329,13 @@ public class StrategyManager {
 		UnitType nextUnitTypeToTrain = null;
 
 		if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
-			nextUnitTypeToTrain = myCombatUnitType1;
+			nextUnitTypeToTrain = myCombatUnitType1; // 저글링
 		}
 		else if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 2) {
-			nextUnitTypeToTrain = myCombatUnitType2;
+			nextUnitTypeToTrain = myCombatUnitType2; // 히드라
 		}
 		else {
-			nextUnitTypeToTrain = myCombatUnitType3;
+			nextUnitTypeToTrain = myCombatUnitType3; // 럴커
 		}
 		
 		return nextUnitTypeToTrain;	

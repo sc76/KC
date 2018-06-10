@@ -615,7 +615,9 @@ public class WorkerManager {
 		{
 			double dist = unit.getDistance(worker);
 
-			if ((dist < 400) && (closestUnit == null || (dist < closestDist)))
+			// sc76.choi, dist < 400 에서 DISTANCE_WORKER_CANATTACK으로 수정
+			// combatWorker와 같은 사이즈
+			if ((dist < Config.DISTANCE_WORKER_CANATTACK) && (closestUnit == null || (dist < closestDist)))
 			{
 				closestUnit = unit;
 				closestDist = dist;

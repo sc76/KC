@@ -57,14 +57,8 @@ public class KCBaseInfoManager {
 			KCBaseInfo currentBase = new KCBaseInfo(); // 저장한 base 객체 생성
 			
 			BaseLocation selfBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-			
 			currentBase.setBaseId(++baseId);
 			currentBase.setInintialBaseOwner((selfBaseLocation.getPosition().equals(baseLocation.getPosition())) ? "S" : "");
-			
-			//System.out.println("equals                         : " + (selfBaseLocation.getPosition().equals(baseLocation.getPosition())));
-			//System.out.println("selfBaseLocation.getPosition() : " + selfBaseLocation.getPosition());
-			//System.out.println("baseLocation.getPosition()     : " + baseLocation.getPosition());
-			
 			currentBase.setOriginPosition(baseLocation.getPosition()); // position 정보
 			currentBase.setOriginTilePosition(baseLocation.getTilePosition()); // tile position 정보
 			//currentBase.setScouted(false); // 정찰 여부
@@ -78,38 +72,77 @@ public class KCBaseInfoManager {
 			double distanceByAirFromMyBase = (double)selfBaseLocation.getAirDistance(baseLocation)+0.5;
 			currentBase.setDistanceByAirFromMyBase(distanceByAirFromMyBase); // 나의 본진으로 부터의 공중으로 이동시 거리
 			
-			// 기본 미네랄 갯수
+			// 초기 미네랄 량 측정
 			int baseAmountMineral = 0; 
 			for(Unit mineral : baseLocation.getMinerals()){
 				if(mineral.getType() == UnitType.Resource_Mineral_Field){
-					baseAmountMineral += 1500;
+					baseAmountMineral += mineral.getInitialResources();
 				}
 			}
 			currentBase.setBaseAmountMineral(baseAmountMineral);
 			currentBase.setCurrentAmountMineral(baseAmountMineral);
-			
+
+			// 초기 가스 량 측정
 			int baseAmountGas = 0; 
 			for(Unit gas : baseLocation.getGeysers()){
 				if(gas.getType() == UnitType.Resource_Vespene_Geyser){
-					baseAmountGas += 5000;
+					baseAmountGas +=  gas.getInitialResources();
 				}
 			}
 			currentBase.setBaseAmountGas(baseAmountGas);
 			currentBase.setCurrentAmountGas(baseAmountGas);
 			
 			kcBaseList.add(currentBase);
-			
-			
 		}
 	}
 	
+	/**
+	 * List 객체에 담긴 KCBaseInfo를 갱신 한다.
+	 * StrategyManager update에서 호출 합니다.
+	 * @author sc76.choi
+	 */	
 	public void update() {
-		
+		boolean isExploredTemp = false;
+		for(KCBaseInfo kcBaseInfo : kcBaseList){
+			
+			BaseLocation currentBase = BWTA.getNearestBaseLocation(kcBaseInfo.getOriginPosition());  
+			isExploredTemp = (MyBotModule.Broodwar.isExplored(currentBase.getTilePosition())
+								&& MyBotModule.Broodwar.isVisible(currentBase.getTilePosition()));
+
+			// 정찰 된 base이면
+			if(isExploredTemp){
+				//BaseLocation selfBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+				//currentBase.setInintialBaseOwner((selfBaseLocation.getPosition().equals(currentBase.getPosition())) ? "S" : "");
+				
+				//currentBase.setScouted(false); // 정찰 여부
+				//currentBase.setScoutCount(0); // 정찰 횟수
+				//currentBase.setExistEnemyArmy(false); // 적군 존재 여부
+				//currentBase.setExistEnemyBuilding(false); // 적군 건물 존재 여부
+				
+				// 남은 미네랄 량 측정
+				int baseAmountMineral = 0; 
+				for(Unit mineral : currentBase.getMinerals()){
+					if(mineral.getType() == UnitType.Resource_Mineral_Field){
+						baseAmountMineral += mineral.getResources();
+					}
+				}
+				kcBaseInfo.setCurrentAmountMineral(baseAmountMineral);
+	
+				// 남은 가스 량 측정
+				int baseAmountGas = 0; 
+				for(Unit gas : currentBase.getGeysers()){
+					if(gas.getType() == UnitType.Resource_Vespene_Geyser){
+						baseAmountGas +=  gas.getResources();
+					}
+				}
+				kcBaseInfo.setCurrentAmountGas(baseAmountGas);
+			}
+		}
 	}
 	
 	/**
 	 * List 객체에 담긴 KCBaseInfo를 print 한다.
-	 * 
+	 * StrategyManager.onStart에서 호출 합니다.
 	 * @author sc76.choi
 	 */
 	public String printKCBaseList(){

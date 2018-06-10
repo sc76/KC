@@ -9,6 +9,10 @@ public class Config {
 	/// KC custom start
 	public static final boolean DEBUG = true; // debug show 여부를 판단할 boolean
 	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
+	// 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
+	public static int DISTANCE_WORKER_CANATTACK = 32 * 5; // TILE_SIZE
+	public static int COUNT_WORKERS_CANATTACK = 2; // 일꾼 공격 합세는 2마리만 한다.
+
 	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
@@ -55,8 +59,6 @@ public class Config {
 	/// StarCraft 및 BWAPI 에서 1 Tile = 32 * 32 Point (Pixel) 입니다<br>
 	/// Position 은 Point (Pixel) 단위이고, TilePosition 은 Tile 단위입니다 
 	public static int TILE_SIZE = 32;
-	// 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
-	public static int DISTANCE_WORKER_CANATTACK = TILE_SIZE * 5;
 
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static int WorkersPerRefinery = 3;

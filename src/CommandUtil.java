@@ -231,13 +231,12 @@ public class CommandUtil {
 	/**
 	 * 현재 unit이 유효한 유닛인지 판별합니다. 유효하지 않은  unit에서 명령을 내리면, 에러가 발생하기 때문에 판별되는 함수입니다.
 	 * 
+	 * @author sc76.choi
 	 * @param unit
 	 * @return
 	 */
-	public boolean IsValidSelfUnit(Unit unit)
-	{
-		if (unit == null)
-		{
+	public boolean IsValidSelfUnit(Unit unit){
+		if (unit == null){
 			return false;
 		}
 
@@ -250,12 +249,42 @@ public class CommandUtil {
 		{
 			return true;
 		}
-		else
-		{
+		else{
 			return false;
 		}
 	}	
 
+	/**
+	 * 현재 적 유닛이 공격 가능한 유닛인지 판별합니다. 
+	 * 유효하지 않은  unit에서 명령을 내리면, 에러가 발생하기 때문에 판별되는 함수입니다.
+	 * 
+	 * @author sc76.choi
+	 * @param unit
+	 * @return
+	 */
+	public boolean IsValidEnemyGroundAttackUnit(Unit unit){
+		if (unit == null){
+			return false;
+		}
+
+		if (unit.isFlying()){
+			return false;
+		}
+		
+		if (unit.getPlayer() == MyBotModule.Broodwar.enemy()
+			&& unit.isCompleted() 
+			&& unit.getHitPoints() > 0
+			&& unit.exists()
+			&& unit.getType() != UnitType.Unknown
+			&& unit.getPosition().isValid())
+		{
+			return true;
+		}
+		else{
+			return false;
+		}
+	}	
+	
 	// 미사용
 //	public double GetDistanceBetweenTwoRectangles(Rect rect1, Rect rect2)
 //	{
