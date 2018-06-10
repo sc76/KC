@@ -152,6 +152,9 @@ public class UXManager {
 		//MyBotModule.Broodwar.drawTextScreen(x, y, white + "Time : ");
 		//MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + MyBotModule.Broodwar.getFrameCount());
 		//MyBotModule.Broodwar.drawTextScreen(x + 90, y, "" + white + (int)(MyBotModule.Broodwar.getFrameCount() / (23.8 * 60)) + ":" + (int)((int)(MyBotModule.Broodwar.getFrameCount() / 23.8) % 60));
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "A/D Counter : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 60, y, "" + white + StrategyManager.Instance().getCountAttack() + "/" + StrategyManager.Instance().getCountDefence());
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다
