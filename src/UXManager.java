@@ -874,7 +874,7 @@ public class UXManager {
 				MyBotModule.Broodwar.drawTextScreen(x, y + 10 + ((yspace)* 10), "" + white + b.getType() + " - Under Construction");
 			}
 			yspace++;
-		}
+		} 
 	}
 
 	/// Unit 의 Id 를 Map 에 표시합니다

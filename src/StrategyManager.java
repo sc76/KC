@@ -736,7 +736,7 @@ public class StrategyManager {
 							continue;
 						}
 						
-						if (unit.canAttack() ) {
+						if (unit.canAttack() ) { 
 							commandUtil.attackMove(unit, targetPosition);
 							hasCommanded = true;
 						}
