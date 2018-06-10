@@ -119,9 +119,9 @@ public class WorkerManager {
 						}
 					}
 				}
-				// 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 300 이하이면 skip
+				// 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 400 이하이면 skip
 				else{
-					if(selfGas <= 300) return;
+					if(selfGas <= 400) return;
 					for (Unit changeMineralWorker : MyBotModule.Broodwar.self().getUnits()){
 						if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
 							setIdleWorker(changeMineralWorker);
