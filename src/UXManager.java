@@ -894,7 +894,7 @@ public class UXManager {
 		{
 			MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
 		}
-	}
+	} 
 
 	/// Worker Unit 들의 상태를 Screen 에 표시합니다
 	/// if (j == WorkerData.WorkerJob.Build) return 'B';

@@ -734,7 +734,7 @@ public class StrategyManager {
 						if(unit.getType() == UnitType.Zerg_Overlord 
 								&& OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
 							continue;
-						}
+						}  
 						
 						if (unit.canAttack() ) { 
 							commandUtil.attackMove(unit, targetPosition);
