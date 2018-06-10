@@ -133,6 +133,9 @@ public class StrategyManager {
 	int enemyKilledCombatUnitCount;					/// 적군 공격유닛 사망자 숫자 누적값
 	int enemyKilledWorkerUnitCount;					/// 적군 일꾼유닛 사망자 숫자 누적값
 	
+	// 아군 유닛 사망자 수 
+	int selfKilledCombatUnitCount;					/// 적군 공격유닛 사망자 숫자 누적값
+	int selfKilledWorkerUnitCount;					/// 적군 일꾼유닛 사망자 숫자 누적값
 	
 	// 아군 / 적군의 본진, 첫번째 길목, 두번째 길목
 	BaseLocation myMainBaseLocation; 
@@ -199,7 +202,8 @@ public class StrategyManager {
 		numberOfCompletedEnemyWorkerUnit = 0;
 		enemyKilledCombatUnitCount = 0;
 		enemyKilledWorkerUnitCount = 0;
-	
+		selfKilledWorkerUnitCount = 0;
+		
 		isInitialBuildOrderFinished = false;
 		combatState = CombatState.defenseMode;
 		
@@ -422,12 +426,16 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
+			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost); // 저글링 속도업(Faster Zergling movement)
+			
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//22
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//23
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//24			
 
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//25
@@ -445,28 +453,30 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//30
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//32
 			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//34
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//35
-			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
-			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
-			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
 		}
 	}
 
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 
-		// 베이스 정보를 업데이트 합니다.
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi start
+		// 베이스 정보를 업데이트 합니다.
 		updateKCBaseInfo();
+		// 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다. 
 		combatWorker();
 		// sc76.choi end
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		/// 변수 값을 업데이트 합니다
 		updateVariables();
@@ -1264,36 +1274,41 @@ public class StrategyManager {
 	private void drawStrategyManagerStatus() {
 		
 		int y = 200;
-		
+		int t = 240;
 		// 아군 공격유닛 숫자 및 적군 공격유닛 숫자
-		MyBotModule.Broodwar.drawTextScreen(200, y, "My " + myCombatUnitType1.toString());
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + myCombatUnitType1List.size());
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + myKilledCombatUnitCount1);
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType1.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType1List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount1);
 		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200, y, "My " + myCombatUnitType2.toString());
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + myCombatUnitType2List.size());
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + myKilledCombatUnitCount2);
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType2.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType2List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount2);
 		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200, y, "My " + myCombatUnitType3.toString());
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + myCombatUnitType3List.size());
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + myKilledCombatUnitCount3);
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType3.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType3List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount3);
 		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200, y, "My " + mySpecialUnitType1.toString());
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + mySpecialUnitType1List.size());
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + myKilledSpecialUnitCount1);
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType1.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType1List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount1);
 		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200, y, "My " + mySpecialUnitType2.toString());
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + mySpecialUnitType2List.size());
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + myKilledSpecialUnitCount2);
-		y += 20;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType2.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType2List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount2);
 
-		MyBotModule.Broodwar.drawTextScreen(200, y, "Enemy CombatUnit");
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + numberOfCompletedEnemyCombatUnit);
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + enemyKilledCombatUnitCount);
 		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200, y, "Enemy WorkerUnit");
-		MyBotModule.Broodwar.drawTextScreen(350, y, "alive " + numberOfCompletedEnemyWorkerUnit);
-		MyBotModule.Broodwar.drawTextScreen(400, y, "killed " + enemyKilledWorkerUnitCount);
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My Worker");
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + WorkerManager.Instance().getWorkerData().getWorkers().size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + selfKilledWorkerUnitCount);
+
+		y += 20;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "Enemy CombatUnit");
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + numberOfCompletedEnemyCombatUnit);
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + enemyKilledCombatUnitCount);
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "Enemy WorkerUnit");
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + numberOfCompletedEnemyWorkerUnit);
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + enemyKilledWorkerUnitCount);
 		y += 20;
 
 		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
@@ -1473,6 +1488,11 @@ public class StrategyManager {
 			else if (unit.getType() == mySpecialUnitType2 ) {
 				myKilledSpecialUnitCount2 ++;		
 			} 
+			
+			/// 적군 일꾼 유닛타입의 사망 유닛 숫자 누적값
+			if (unit.getType().isWorker() == true) {
+				selfKilledWorkerUnitCount ++;
+			}
 		}
 		else if (unit.getPlayer() == enemyPlayer) {
 			/// 적군 공격 유닛타입의 사망 유닛 숫자 누적값
