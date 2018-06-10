@@ -702,23 +702,6 @@ public class StrategyManager {
 		Position targetPosition = null;
 		
 		if (targetEnemyBaseLocation != null){
-			// 테란 종족의 경우, 벙커 안에 있는 유닛은 밖으로 빼낸다
-			if (myRace == Race.Terran) {
-				for(Unit bunker : myDefenseBuildingType1List) {
-					if (bunker.getLoadedUnits().size() > 0) {
-						boolean isThereSomeEnemyUnit = false;
-						for(Unit someUnit : MyBotModule.Broodwar.getUnitsInRadius(bunker.getPosition(), 6 * Config.TILE_SIZE)) {
-							if (someUnit.getPlayer() == enemyPlayer) {
-								isThereSomeEnemyUnit = true;
-								break;
-							}
-						}
-						if (isThereSomeEnemyUnit == false) {
-							bunker.unloadAll();
-						}
-					}
-				}
-			}
 
 			///////////////////////////////////////////////////////////////////////////////////////
 			// targetPosition 을 설정한다
@@ -727,17 +710,10 @@ public class StrategyManager {
 			
 			// 모든 아군 공격유닛들로 하여금 targetPosition 을 향해 공격하게 한다
 			for (Unit unit : myAllCombatUnitList) {
-				
-				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.
-				if(unit.getType() == UnitType.Zerg_Overlord && OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
-					continue;
-				}
+
 				
 				boolean hasCommanded = false;
 
-				if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-					hasCommanded = controlSiegeTankUnitType(unit);					
-				}
 				if (unit.getType() == UnitType.Zerg_Lurker) {
 					hasCommanded = controlLurkerUnitType(unit);					
 				}
@@ -748,11 +724,17 @@ public class StrategyManager {
 					hasCommanded = controlSpecialUnitType2(unit);
 				}
 				
-				
 				// 따로 명령 내린 적이 없으면, targetPosition 을 향해 공격 이동시킵니다
 				if (hasCommanded == false) {
 
 					if (unit.isIdle()) {
+						
+						
+						// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.
+						if(unit.getType() == UnitType.Zerg_Overlord 
+								&& OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
+							continue;
+						}
 						
 						if (unit.canAttack() ) {
 							commandUtil.attackMove(unit, targetPosition);

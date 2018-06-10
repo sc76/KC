@@ -882,6 +882,13 @@ public class UXManager {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
+			if(unit.getType() == UnitType.Zerg_Overlord){
+				String OverloadJobTyep = OverloadManager.Instance().getOverloadData().getOverloadJob(unit).toString();
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + OverloadJobTyep);
+			}else if(unit.getType() == UnitType.Zerg_Drone){
+				String WorkerJobTyep = WorkerManager.Instance().getWorkerData().getWorkerJob(unit).toString();
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + WorkerJobTyep);
+			}
 		}
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 		{
