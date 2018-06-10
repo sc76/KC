@@ -623,7 +623,6 @@ public class StrategyManager {
 
 	/// 방어 모드로 전환할 때인지 여부를 리턴합니다
 	boolean isTimeToStartDefense() {
-		
 		// 공격 유닛 숫자가 10 미만으로 떨어지면 후퇴
 		if (myCombatUnitType1List.size() + myCombatUnitType2List.size() + myCombatUnitType3List.size() < 10){
 			countDefence++;
