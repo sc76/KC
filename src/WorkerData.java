@@ -428,6 +428,19 @@ public class WorkerData {
 		return num;
 	}
 
+	public final int getNumCombatWorkers()
+	{
+		int num = 0;
+		for (Unit unit : workers)
+		{
+			if (workerJobMap.get(unit.getID()) == WorkerData.WorkerJob.Combat)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+	
 	public final int getNumIdleWorkers(){
 		int num = 0;
 		for (Unit unit : workers)
