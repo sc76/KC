@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.sun.xml.internal.bind.v2.runtime.Location;
+
 import bwapi.Bullet;
 import bwapi.BulletType;
 import bwapi.Color;
@@ -133,6 +135,13 @@ public class UXManager {
 			int mouseX = MyBotModule.Broodwar.getMousePosition().getX() + MyBotModule.Broodwar.getScreenPosition().getX();
 			int mouseY = MyBotModule.Broodwar.getMousePosition().getY() + MyBotModule.Broodwar.getScreenPosition().getY();
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/Config.TILE_SIZE) + ", " +  (int)(mouseY/Config.TILE_SIZE) + ")");
+			mouseY+=10;
+			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)mouseX + ", " +  (int)mouseY + ")");
+			//mouseY+=10;
+			//BaseLocation selfBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+			//double distanceFromSelfMainBase = (selfBaseLocation.getPosition()).getDistance(MyBotModule.Broodwar.getMousePosition());
+			//distanceFromSelfMainBase = MapTools.Instance().getGroundDistance(selfBaseLocation.getPosition(), MyBotModule.Broodwar.getMousePosition());
+			//MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)distanceFromSelfMainBase + ")");
 		}
 
 	}
@@ -160,9 +169,13 @@ public class UXManager {
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다
+	int maxAPM = 0;
 	public void drawAPM(int x, int y) {
 		int bwapiAPM = MyBotModule.Broodwar.getAPM();
-		MyBotModule.Broodwar.drawTextScreen(x, y, "APM : " + bwapiAPM);
+		if(MyBotModule.Broodwar.getFrameCount() > 24*10){
+			if(bwapiAPM > maxAPM) maxAPM = bwapiAPM;
+		}
+		MyBotModule.Broodwar.drawTextScreen(x, y, "APM : " + bwapiAPM + " (" + maxAPM + ")");
 	}
 
 	/// Players 정보를 Screen 에 표시합니다
