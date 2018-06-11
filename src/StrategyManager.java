@@ -23,33 +23,6 @@ import bwta.Chokepoint;
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
 public class StrategyManager {
 
-	///////////////////////////////////////////////////////////////////
-	/// 
-	/// 제목 : Kata2
-	///
-	/// 목표 : 사이오닉스톰 / 이라디에이트 / 다크스웜을 프로게이머처럼 써보자
-	///
-	/// 아이디어 : 방어를 튼튼히 갖추고 공격 유닛을 모으다가, 특수 유닛과 함께 진격하여 승리한다 
-	///
-	/// 제공 :
-	///         1. 종족별 방어형 빌드오더
-	///
-	///         2. 일꾼 훈련, 방어 건물 건설, 업그레이드, 리서치, 공격 유닛/특수유닛 생산, 방어형 배치, 적 Eliminate 시키기 메소드 
-	/// 
-	/// 참가자 구현 과제 :
-	///
-	///         TODO 1. 아군 특수 유닛을 공격 유닛들과 함께 이동시키는 로직   (예상 개발시간 10분)
-	/// 
-	///         TODO 2. 아군 특수 유닛이 기술을 적절히 사용하게 하는 로직     (예상 개발시간 20분)
-	///
-	///                 ※ 프로토스 : 사이오닉스톰, 할루시네이션
-	///                   테란     : 디펜시브매트릭스, 이라디에이트, 야마토건
-	///                   저그     : 다크스웜, 플레이그
-	/// 
-	/// 성공 조건 : 컴퓨터와 1대1로 싸워 승리한다
-	/// 
-	///////////////////////////////////////////////////////////////////
-	
 	private int countAttack;
 	private int countDefence;
 	
@@ -248,9 +221,9 @@ public class StrategyManager {
 
 			// 방어 건물 종류 및 건설 갯수 설정
 			myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
-			necessaryNumberOfDefenseBuilding1 = 3; 					
+			necessaryNumberOfDefenseBuilding1 = 2; 					
 			myDefenseBuildingType2 = UnitType.Zerg_Sunken_Colony;
-			necessaryNumberOfDefenseBuilding2 = 3; 					
+			necessaryNumberOfDefenseBuilding2 = 2; 					
 		
 			// 방어 건물 건설 위치 설정 
 			seedPositionStrategyOfMyInitialBuildingType
@@ -334,8 +307,8 @@ public class StrategyManager {
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-					seedPositionStrategyOfMyDefenseBuildingType);	//19
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+			//		seedPositionStrategyOfMyDefenseBuildingType);	//19
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//22
@@ -352,7 +325,7 @@ public class StrategyManager {
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//25
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
@@ -882,48 +855,64 @@ public class StrategyManager {
 	/**
 	 * combatWorker
 	 * 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다.
+	 * 단점, 본진이나, 멀티 중 한곳만 실행이 가능할 것이다, 단순히 공격일꾼 3마리만 카운트 하기 때문에
 	 * 
 	 * @author sc76.choi
 	 */
 	void combatWorker(){
-		// 1초에 1번만 실행합니다
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		// 1초에 4번만 실행합니다
+		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
 		
-		int countEnemyAroundWorker = 0;
-		int countselfCombatWorker = 0;
-		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
-			if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
-				countselfCombatWorker++;
-			}
-		}
+		boolean isEnemyAroundWorker = false;
 		
-		// 일꾼 공격 합세는 2마리만 한다.
-		if(countselfCombatWorker >= Config.COUNT_WORKERS_CANATTACK) return;
-			
 		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 			if(!commandUtil.IsValidSelfUnit(worker)) return;
 			
 			// 각 worker의 주변 DISTANCE_WORKER_CANATTACK을 살펴 본다.
-			Iterator iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), Config.DISTANCE_WORKER_CANATTACK).iterator();
+			Iterator<Unit> iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), Config.DISTANCE_WORKER_CANATTACK).iterator();
 			while(iter.hasNext()){
-				Unit unit = (Unit)iter.next();
+				Unit unit = iter.next();
+				
+				
 				// 지상공격이 가능한 적군이면 CombatWorker으로 변경한다.
 				if(commandUtil.IsValidEnemyGroundAttackUnit(unit)){
-					// 일꾼 공격 합세는 2마리만 한다.
-					if(countselfCombatWorker >= Config.COUNT_WORKERS_CANATTACK) return;
-					// 적군과 나와의 거리가 DISTANCE_WORKER_CANATTACK내에 있는 worker를 상태를 combat으로 변경한다.
+					
+					isEnemyAroundWorker = true; // 적군 카운트 증
+					//System.out.println("countEnemyAroundWorker : " + countEnemyAroundWorker);
+					//System.out.println("commandUtil.IsValidEnemyGroundAttackUnit(unit) : " + unit.getID() + ", " + commandUtil.IsValidEnemyGroundAttackUnit(unit));
+					
+					// 이미 공격일꾼이 있으면 (일꾼 공격 합세는 2마리만 한다.)
+					if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) break;
+					
+					// 적군과 나와의 거리가 DISTANCE_WORKER_CANATTACK내에 있는,
+					// worker(Job이 Mineral이고 체력이 온전한)를 상태를 combat으로 변경한다.
 					if(worker.getDistance(unit) < Config.DISTANCE_WORKER_CANATTACK){
+
+						// 공격 투입
 						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
 							WorkerManager.Instance().setCombatWorker(worker);
-							countEnemyAroundWorker++;
+							
+							//System.out.println("WorkerManager.Instance().getWorkerData().getNumCombatWorkers() : " + WorkerManager.Instance().getWorkerData().getNumCombatWorkers());
+							// 일꾼 공격 합세는 2마리만 한다.
+							if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) break;
 						}
+						
+						// 공격 해제
+						/*
+						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat
+								&& worker.getInitialHitPoints() > worker.getHitPoints()){
+							WorkerManager.Instance().setIdleWorker(worker);
+							
+							if(countSelfCombatWorker > 0) countSelfCombatWorker--;
+						}
+						*/
 					}
 				}
 			} // while
 		}
 		
 		// 적군이 없다면 idle로 변경하여, 다시 일을 할수 있게 한다.
-		if(countEnemyAroundWorker <= 0){
+		if(!isEnemyAroundWorker){
 			for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 				if(!commandUtil.IsValidSelfUnit(worker)) return;
 				if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
