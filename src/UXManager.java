@@ -153,8 +153,10 @@ public class UXManager {
 		//MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + MyBotModule.Broodwar.getFrameCount());
 		//MyBotModule.Broodwar.drawTextScreen(x + 90, y, "" + white + (int)(MyBotModule.Broodwar.getFrameCount() / (23.8 * 60)) + ":" + (int)((int)(MyBotModule.Broodwar.getFrameCount() / 23.8) % 60));
 		
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "A/D Counter : ");
-		MyBotModule.Broodwar.drawTextScreen(x + 60, y, "" + white + StrategyManager.Instance().getCountAttack() + "/" + StrategyManager.Instance().getCountDefence());
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "A/D : ");
+		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + StrategyManager.Instance().getCountAttack() + "/" + StrategyManager.Instance().getCountDefence());
+		y += 12;
+		drawAPM(x, 5);
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다
@@ -909,9 +911,10 @@ public class UXManager {
 	/// return 'X';
 	public void drawWorkerStateOnScreen(int x, int y) {
 		WorkerData  workerData = WorkerManager.Instance().getWorkerData();
-
+		int rowSpace = 10;
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<M W : " + workerData.getNumMineralWorkers() + ">");
-		MyBotModule.Broodwar.drawTextScreen(x, y+10, white + "<G W : " + workerData.getNumGasWorkers() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace, white + "<G W : " + workerData.getNumGasWorkers() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace*2, white + "<C W : " + workerData.getNumCombatWorkers() + ">");
 
 		int yspace = 0;
 
@@ -924,13 +927,13 @@ public class UXManager {
 				continue;
 			}
 
-			MyBotModule.Broodwar.drawTextScreen(x, y + 20 + ((yspace)* 10), white + " " + unit.getID());
+			MyBotModule.Broodwar.drawTextScreen(x, y + 40 + ((yspace)* 10), white + " " + unit.getID());
 
 			if (workerData.getJobCode(unit) == 'B') {
-				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 20 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit) + " " + unit.getBuildType() + " " + (unit.isConstructing() ? 'Y' : 'N') + " (" + unit.getTilePosition().getX() + ", " + unit.getTilePosition().getY() + ")");
+				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 40 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit) + " " + unit.getBuildType() + " " + (unit.isConstructing() ? 'Y' : 'N') + " (" + unit.getTilePosition().getX() + ", " + unit.getTilePosition().getY() + ")");
 			}
 			else {
-				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 20 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit));
+				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 40 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit));
 			}
 		}
 	}
