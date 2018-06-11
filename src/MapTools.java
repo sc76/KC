@@ -114,7 +114,7 @@ public class MapTools {
 	}
 
 	/// from 에서 to 까지 지상유닛이 이동할 경우의 거리 (walk distance)
-	private int getGroundDistance(Position origin,Position destination)
+	public int getGroundDistance(Position origin,Position destination)
 	{
 		// if we have too many maps, reset our stored maps in case we run out of memory
 		if (allMaps.size() > 20)
