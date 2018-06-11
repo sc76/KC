@@ -363,7 +363,7 @@ public class StrategyManager {
 		// 베이스 정보를 업데이트 합니다.
 		updateKCBaseInfo();
 		// 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다. 
-		combatWorker();
+		commandMyWorkerToAttack();
 		// sc76.choi end
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -859,7 +859,7 @@ public class StrategyManager {
 	 * 
 	 * @author sc76.choi
 	 */
-	void combatWorker(){
+	void commandMyWorkerToAttack(){
 		// 1초에 4번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
 		
