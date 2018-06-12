@@ -216,8 +216,8 @@ public class StrategyManager {
 			necessaryNumberOfSpecialUnitType2 = 1;	                 	 
 			
 			// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
-			maxNumberOfSpecialUnitType1 = 4;  
-			maxNumberOfSpecialUnitType2 = 2;  
+			maxNumberOfSpecialUnitType1 = 3; // 오버로드  
+			maxNumberOfSpecialUnitType2 = 2; // 디파일러
 
 			// 방어 건물 종류 및 건설 갯수 설정
 			myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
@@ -302,15 +302,15 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
 
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-					seedPositionStrategyOfMyDefenseBuildingType);	//20
-			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			
 			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 			//		seedPositionStrategyOfMyDefenseBuildingType);	//19
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+					seedPositionStrategyOfMyDefenseBuildingType);	//20
+			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//22
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 			
@@ -331,27 +331,28 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27			
 
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);
-			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber, false); //26
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 다섯번째 오버로드
+			
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//27
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//28
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//29
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//30
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//32
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 					BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
 			
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//34
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//35
 			
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//34
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//35
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
+			
+			//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);			
 		}
 	}
 
@@ -512,7 +513,7 @@ public class StrategyManager {
 				return true;
 			}
 			
-			if (myCombatUnitType4List.size() >= 8) {
+			if (myCombatUnitType2List.size() >= 12) {
 				countAttack++;
 				return true;
 			}
@@ -617,11 +618,11 @@ public class StrategyManager {
 		for (Unit unit : myAllCombatUnitList) {
 
 			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
-			if(unit.getType() == UnitType.Zerg_Overlord 
-				&& (OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X' || 
-				    OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'S')){
-				continue;
-			}
+			//if(unit.getType() == UnitType.Zerg_Overlord 
+			//	&& (OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X' || 
+			//	    OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'S')){
+			//	continue;
+			//}
 			
 			if (!commandUtil.IsValidUnit(unit)) continue;
 			
@@ -683,16 +684,18 @@ public class StrategyManager {
 			
 			// 모든 아군 공격유닛들로 하여금 targetPosition 을 향해 공격하게 한다
 			for (Unit unit : myAllCombatUnitList) {
-
 				
 				boolean hasCommanded = false;
 
 				if (unit.getType() == UnitType.Zerg_Lurker) {
 					hasCommanded = controlLurkerUnitType(unit);					
 				}
-				if (unit.getType() == mySpecialUnitType1) {					
+				
+				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
+				if (unit.getType() == mySpecialUnitType1) {		
 					hasCommanded = controlSpecialUnitType1(unit);
 				}
+				
 				if (unit.getType() == mySpecialUnitType2) {					
 					hasCommanded = controlSpecialUnitType2(unit);
 				}
@@ -701,14 +704,6 @@ public class StrategyManager {
 				if (hasCommanded == false) {
 
 					if (unit.isIdle()) {
-						
-						
-						// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.
-						if(unit.getType() == UnitType.Zerg_Overlord 
-								&& OverloadManager.Instance().getOverloadData().getJobCode(unit) != 'I'){
-							continue;
-						}  
-						
 						if (unit.canAttack() ) { 
 							commandUtil.attackMove(unit, targetPosition);
 							hasCommanded = true;
@@ -853,9 +848,10 @@ public class StrategyManager {
 	}
 
 	/**
-	 * combatWorker
+	 * 
 	 * 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다.
 	 * 단점, 본진이나, 멀티 중 한곳만 실행이 가능할 것이다, 단순히 공격일꾼 3마리만 카운트 하기 때문에
+	 * 이후에 여력이 있으면 수정하자!(확장하게 되면 고려를 해야 한다.)
 	 * 
 	 * @author sc76.choi
 	 */
@@ -863,56 +859,64 @@ public class StrategyManager {
 		// 1초에 4번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
 		
-		boolean isEnemyAroundWorker = false;
-		
+		boolean existEnemyAroundWorker = false;
+		double remainHitPoint = 0.0d;
+		// 전체 아군 유닛의 일꾼을 loop
 		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
-			if(!commandUtil.IsValidSelfUnit(worker)) return;
+			if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 			
 			// 각 worker의 주변 DISTANCE_WORKER_CANATTACK을 살펴 본다.
 			Iterator<Unit> iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), Config.DISTANCE_WORKER_CANATTACK).iterator();
 			while(iter.hasNext()){
 				Unit unit = iter.next();
 				
-				
 				// 지상공격이 가능한 적군이면 CombatWorker으로 변경한다.
 				if(commandUtil.IsValidEnemyGroundAttackUnit(unit)){
 					
-					isEnemyAroundWorker = true; // 적군 카운트 증
-					//System.out.println("countEnemyAroundWorker : " + countEnemyAroundWorker);
-					//System.out.println("commandUtil.IsValidEnemyGroundAttackUnit(unit) : " + unit.getID() + ", " + commandUtil.IsValidEnemyGroundAttackUnit(unit));
+					Unit enemyUnit = unit;
+					existEnemyAroundWorker = true; // 적군 카운트 증
+					
+					// 부실한 공격 유닛은 해제
+					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
+						remainHitPoint = (double)(worker.getHitPoints()*1.0/worker.getInitialHitPoints()*1.0);
+						//System.out.println("combat Unit remainHitPoint : " + worker.getHitPoints() + "[" +worker.getID()+ "]");
+						if(remainHitPoint <= .7){
+							System.out.println("remove Unit remainHitPoint : " + worker.getHitPoints()+ "/" + worker.getInitialHitPoints() + " " +remainHitPoint + "[" +worker.getID()+ "]");
+							WorkerManager.Instance().setIdleWorker(worker);
+						}
+					}
 					
 					// 이미 공격일꾼이 있으면 (일꾼 공격 합세는 2마리만 한다.)
-					if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) break;
+					if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK){
+						break;
+					}
 					
 					// 적군과 나와의 거리가 DISTANCE_WORKER_CANATTACK내에 있는,
 					// worker(Job이 Mineral이고 체력이 온전한)를 상태를 combat으로 변경한다.
-					if(worker.getDistance(unit) < Config.DISTANCE_WORKER_CANATTACK){
+					if(worker.getDistance(enemyUnit) < Config.DISTANCE_WORKER_CANATTACK){
 
 						// 공격 투입
 						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
-							WorkerManager.Instance().setCombatWorker(worker);
+							if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 							
-							//System.out.println("WorkerManager.Instance().getWorkerData().getNumCombatWorkers() : " + WorkerManager.Instance().getWorkerData().getNumCombatWorkers());
-							// 일꾼 공격 합세는 2마리만 한다.
-							if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) break;
+							remainHitPoint = (double)(worker.getHitPoints()*1.0/worker.getInitialHitPoints()*1.0);
+							if(worker.isCarryingMinerals() || worker.isAttacking()) continue; // 미네랄 운반 일꾼은 제외
+							if(remainHitPoint >= .8){
+								WorkerManager.Instance().setCombatWorker(worker);
+								System.out.println("add Unit remainHitPoint : " + remainHitPoint + "[" +worker.getID()+ "]");
+								// 일꾼 공격 합세는 2마리만 한다.
+								if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) { 
+									break;
+								}
+							}
 						}
-						
-						// 공격 해제
-						/*
-						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat
-								&& worker.getInitialHitPoints() > worker.getHitPoints()){
-							WorkerManager.Instance().setIdleWorker(worker);
-							
-							if(countSelfCombatWorker > 0) countSelfCombatWorker--;
-						}
-						*/
 					}
 				}
 			} // while
 		}
 		
 		// 적군이 없다면 idle로 변경하여, 다시 일을 할수 있게 한다.
-		if(!isEnemyAroundWorker){
+		if(!existEnemyAroundWorker){
 			for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 				if(!commandUtil.IsValidSelfUnit(worker)) return;
 				if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
@@ -1068,51 +1072,66 @@ public class StrategyManager {
 		///////////////////////////////////////////////////////////////////
 
 		boolean hasCommanded = false;		
-		if (unit.getType() == UnitType.Protoss_Observer) {
+//		if (unit.getType() == UnitType.Protoss_Observer) {
+//			
+//			Position targetPosition = null;
+//			
+//			// targetPosition 을 적절히 정해서 이동시켜보세요
+//			
+//		}
+//		else if (unit.getType() == UnitType.Terran_Science_Vessel) {
+//			
+//			Position targetPosition = null;
+//			
+//			// targetPosition 을 적절히 정해서 이동시켜보세요
+//			
+//			if (unit.getEnergy() >= TechType.Defensive_Matrix.energyCost()) {
+//
+//				Unit targetMyUnit = null;
+//				
+//				// targetMyUnit 을 적절히 정해보세요
+//				
+//				if (targetMyUnit != null) {
+//					unit.useTech(TechType.Defensive_Matrix, targetMyUnit);
+//					hasCommanded = true;
+//				}		
+//			}
+//			
+//			if (unit.getEnergy() >= TechType.Irradiate.energyCost() && myPlayer.hasResearched(TechType.Irradiate)) {
+//				
+//				Unit targetEnemyUnit = null;
+//				
+//				// targetEnemyUnit 을 적절히 정해보세요
+//				
+//				if (targetEnemyUnit != null) {
+//					unit.useTech(TechType.Irradiate, targetEnemyUnit);
+//					hasCommanded = true;
+//				}
+//			}	
+//			
+//		}
+//		else 
+		
+		// sc76.choi 기본적으로 myAllCombatUnitList에 담긴 오버로드만 대상이 된다. (즉 Idle인 오버로드)
+		// sc76.choi  오버로드는 hasCommanded는 항상 true
+		
+		if (unit.getType() == UnitType.Zerg_Overlord) {			
+			if (!commandUtil.IsValidUnit(unit)) return true;
 			
 			Position targetPosition = null;
-			
-			// targetPosition 을 적절히 정해서 이동시켜보세요
-			
-		}
-		else if (unit.getType() == UnitType.Terran_Science_Vessel) {
-			
-			Position targetPosition = null;
-			
-			// targetPosition 을 적절히 정해서 이동시켜보세요
-			
-			if (unit.getEnergy() >= TechType.Defensive_Matrix.energyCost()) {
-
-				Unit targetMyUnit = null;
-				
-				// targetMyUnit 을 적절히 정해보세요
-				
-				if (targetMyUnit != null) {
-					unit.useTech(TechType.Defensive_Matrix, targetMyUnit);
-					hasCommanded = true;
-				}		
+			if(combatState == CombatState.attackStarted){
+				targetPosition = enemyMainBaseLocation.getPosition();
+				commandUtil.move(unit, targetPosition);
+			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
+				targetPosition = myMainBaseLocation.getPosition();
+				//commandUtil.patrol(unit, mySecondChokePoint.getCenter());
+				unit.patrol(myFirstExpansionLocation.getPosition());
 			}
 			
-			if (unit.getEnergy() >= TechType.Irradiate.energyCost() && myPlayer.hasResearched(TechType.Irradiate)) {
-				
-				Unit targetEnemyUnit = null;
-				
-				// targetEnemyUnit 을 적절히 정해보세요
-				
-				if (targetEnemyUnit != null) {
-					unit.useTech(TechType.Irradiate, targetEnemyUnit);
-					hasCommanded = true;
-				}
-			}	
-			
-		}		
-		else if (unit.getType() == UnitType.Zerg_Overlord) {			
-
-			Position targetPosition = null;
-			
-			// targetPosition 을 적절히 정해서 이동시켜보세요
+			hasCommanded = true;
 		}
 		
+		//System.out.println("controlSpecialUnitType1(Unit) hasCommanded : " + hasCommanded);
 		return hasCommanded;
 	}
 	
@@ -1394,8 +1413,11 @@ public class StrategyManager {
 			else if (unit.getType() == mySpecialUnitType1) {
 				// maxNumberOfSpecialUnitType1 숫자까지만 특수유닛 부대에 포함시킨다 (저그 종족의 경우 오버로드가 전부 전투참여했다가 위험해질 수 있으므로)
 				if (mySpecialUnitType1List.size() < maxNumberOfSpecialUnitType1) {
-					mySpecialUnitType1List.add(unit); 
-					myAllCombatUnitList.add(unit);
+					// sc76.choi Idel인 오버로드만 추가 한다.
+					if(OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'I'){
+						mySpecialUnitType1List.add(unit); 
+						myAllCombatUnitList.add(unit);
+					}
 				}
 			}
 			else if (unit.getType() == mySpecialUnitType2) { 
@@ -1885,6 +1907,27 @@ public class StrategyManager {
 		else if (myRace == Race.Terran) {
 		}
 		else if (myRace == Race.Zerg) {
+			
+			// Lair
+			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lair) <= 0
+				&& myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) <= 0
+			    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
+				&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0) 
+			{
+				// Hive 진행 중이면 Lair를 또 가면 안된다.
+				if (myPlayer.allUnitCount(UnitType.Zerg_Hive) > 0
+						|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) > 0
+						|| ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) > 0)
+				{
+				}else{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, true);
+				}
+			}
+			
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
