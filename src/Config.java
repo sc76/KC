@@ -39,7 +39,7 @@ public class Config {
 	/// Fastest: 42 ms/frame.  1초에 24 frame. 일반적으로 1초에 24frame을 기준 게임속도로 합니다<br>
 	/// Normal: 67 ms/frame. 1초에 15 frame<br>
 	/// As fast as possible : 0 ms/frame. CPU가 할수있는 가장 빠른 속도.
-	public static int SetLocalSpeed = 80;
+	public static int SetLocalSpeed = 0;
 	
 	public static void setSetLocalSpeed(int setLocalSpeed) {
 		SetLocalSpeed = setLocalSpeed;
