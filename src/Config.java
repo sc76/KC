@@ -41,6 +41,9 @@ public class Config {
 	/// As fast as possible : 0 ms/frame. CPU가 할수있는 가장 빠른 속도.
 	public static int SetLocalSpeed = 0;
 	
+	public static int getSetLocalSpeed() {
+		return SetLocalSpeed;
+	}
 	/// 로컬에서 게임을 실행할 때 FrameSkip (코드 제출 후 서버에서 게임을 실행할 때는 서버 설정을 사용함)<br>
 	/// frameskip을 늘리면 화면 표시도 업데이트 안하므로 훨씬 빠릅니다
     public static int SetFrameSkip = 0;
