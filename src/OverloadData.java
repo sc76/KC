@@ -19,16 +19,14 @@ public class OverloadData {
 		Overload,		///< 수리. Terran_SCV 만 가능
 		Move,			///< 이동
 		Scout, 			///< 정찰. Move와 다름. 정찰지에 도착하면 이동이 없음
-		Detector,       ///<Detector 역활
 		MyMainBase,
+		MyMainBasePatrol,
 		MyExpansionBase,
 		MyFirstChoke,
 		MySecondChoke,
 		EnemyFirstChoke,
 		EnemySecondChoke,
-		best3MultiLocation,
-		attackWithCombat,
-		enemyBasePatrol,
+		EnemyBasePatrol,
 		Center,
 		Default 		///< 기본. 미설정 상태. 
 	};
@@ -205,6 +203,10 @@ public class OverloadData {
 		if (ol == OverloadData.OverloadJob.Idle) return 'I';
 		if (ol == OverloadData.OverloadJob.Move) return 'O';
 		if (ol == OverloadData.OverloadJob.Scout) return 'S';
+		if (ol == OverloadData.OverloadJob.MyFirstChoke) return 'S';
+		if (ol == OverloadData.OverloadJob.MySecondChoke) return 'S';
+		if (ol == OverloadData.OverloadJob.Center) return 'S';
+		if (ol == OverloadData.OverloadJob.EnemySecondChoke) return 'S';
 		return 'X';
 	}
 }
