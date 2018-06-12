@@ -1,3 +1,4 @@
+import bwapi.Mirror;
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TilePosition;
@@ -6,6 +7,8 @@ import bwapi.UnitType;
 
 /// 실제 봇프로그램의 본체가 되는 class<br>
 /// 스타크래프트 경기 도중 발생하는 이벤트들이 적절하게 처리되도록 해당 Manager 객체에게 이벤트를 전달하는 관리자 Controller 역할을 합니다
+
+
 public class GameCommander {
 
 	/// 디버깅용 플래그 : 어느 Manager 가 에러를 일으키는지 알기위한 플래그
@@ -14,6 +17,7 @@ public class GameCommander {
 	/// 경기가 시작될 때 일회적으로 발생하는 이벤트를 처리합니다
 	public void onStart() 
 	{
+		
 		TilePosition startLocation = MyBotModule.Broodwar.self().getStartLocation();
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
@@ -182,9 +186,13 @@ public class GameCommander {
 
 	/// 텍스트를 입력 후 엔터를 하여 다른 플레이어들에게 텍스트를 전달하려 할 때 발생하는 이벤트를 처리합니다
 	public void onSendText(String text){
+		int setSpeed = Integer.parseInt(text);
+		Config.setSetLocalSpeed(setSpeed); 
+		MyBotModule.Broodwar.setLocalSpeed(setSpeed);
 	}
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다
 	public void onReceiveText(Player player, String text){
+		System.out.println("onReceiveText : " + text);
 	}
 }

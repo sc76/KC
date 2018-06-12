@@ -166,6 +166,7 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + StrategyManager.Instance().getCountAttack() + "/" + StrategyManager.Instance().getCountDefence());
 		y += 12;
 		drawAPM(x, 5);
+		drawLocalSpeep(x + 100, 5);
 	}
 
 	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다
@@ -176,6 +177,11 @@ public class UXManager {
 			if(bwapiAPM > maxAPM) maxAPM = bwapiAPM;
 		}
 		MyBotModule.Broodwar.drawTextScreen(x, y, "APM : " + bwapiAPM + " (" + maxAPM + ")");
+	}
+	
+	public void drawLocalSpeep(int x, int y) {
+		int localSpeed = Config.getSetLocalSpeed();
+		MyBotModule.Broodwar.drawTextScreen(x, y, "Speed : " + localSpeed);
 	}
 
 	/// Players 정보를 Screen 에 표시합니다
