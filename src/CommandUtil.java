@@ -107,6 +107,38 @@ public class CommandUtil {
 	}
 
 	/**
+	 * 특정한 지역으로 단순 move합니다.
+	 * 
+	 * @param attacker
+	 * @param targetPosition
+	 */
+	public void patrol(Unit attacker, final Position targetPosition)
+	{
+		if (attacker == null || !targetPosition.isValid())
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (attacker.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || attacker.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = attacker.getLastCommand();
+
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Patrol) && (currentCommand.getTargetPosition().equals(targetPosition)) && attacker.isMoving())
+		{
+			return;
+		}
+
+		// if nothing prevents it, attack the target
+		attacker.patrol(targetPosition);
+	}
+	
+	/**
 	 * 특정한 unit에게 우 클릭 명령을 내립니다. 보통 move 명령과 비슷합니다.
 	 * 
 	 * @param unit

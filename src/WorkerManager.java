@@ -28,14 +28,14 @@ public class WorkerManager {
 	public void update() {
 
 		// 1초에 1번만 실행한다
-		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 
 		updateWorkerStatus();
 		handleGasWorkers();
 		handleIdleWorkers();
 		handleMoveWorkers();
 		handleCombatWorkers();
-		handleRepairWorkers();
+		//handleRepairWorkers();
 	}
 	
 	public void updateWorkerStatus() 

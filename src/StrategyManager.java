@@ -533,11 +533,12 @@ public class StrategyManager {
 		return false;
 	}
 
-	/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 리턴합니다 
+	/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 리턴합니다
+	// sc76.choi 잘 판단해야 한다. 경기가 끝나지 않을 수도 있다.
 	boolean isTimeToStartElimination(){
 
 		// 적군 유닛을 많이 죽였고, 아군 서플라이가 100 을 넘었으면
-		if (enemyKilledCombatUnitCount >= 20 && enemyKilledWorkerUnitCount >= 10) {
+		if (enemyKilledCombatUnitCount >= 15 && enemyKilledWorkerUnitCount >= 10) {
 
 			// 적군 본진에 아군 유닛이 10 이상 도착했으면 거의 게임 끝난 것
 			int myUnitCountAroundEnemyMainBaseLocation = 0;
@@ -549,6 +550,12 @@ public class StrategyManager {
 			if (myUnitCountAroundEnemyMainBaseLocation > 10) {
 				return true;
 			}
+		}
+		
+		// sc76.choi 일꾼만 20마리 죽여도 elimination한다.
+		// sc76.choi 그리고, frame count가 43200 = 24 * 60 * 30 (즉 30분이 지났으면)이면 eliminate를 시작한다.
+		if (enemyKilledWorkerUnitCount >= 20 && MyBotModule.Broodwar.getFrameCount() >= 43200) {
+			return true;
 		}
 		
 		return false;
@@ -1785,8 +1792,10 @@ public class StrategyManager {
 				isTimeToStartUpgradeType2 = true;
 			}			
 			// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
-			// 오버로드 속도업
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.hasResearched(TechType.Lurker_Aspect)) {
+			// sc76.choi 오버로드 속도업
+			// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
+			// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1) {
 				isTimeToStartUpgradeType3 = true;
 			}			
 			// 러커는 최우선으로 리서치한다
@@ -1870,22 +1879,23 @@ public class StrategyManager {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
 			}
 		}
 
-		// BWAPI 4.1.2 의 버그때문에, 오버로드 업그레이드를 위해서는 반드시 Zerg_Lair 가 있어야함		
-		if (myRace == Race.Zerg) {
-			if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
-				if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0 
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
-					&& (myPlayer.allUnitCount(UnitType.Zerg_Hive) < 1
-					|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) < 1)) 
-				{
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);					
-				}
-			}
-		}
+		// BWAPI 4.1.2 의 버그때문에, 오버로드 업그레이드를 위해서는 반드시 Zerg_Lair 가 있어야함	
+		// sc76.choi 오버로드 이동속도
+		//if (myRace == Race.Zerg) {
+		//	if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
+		//		if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0 
+		//			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
+		//			&& (myPlayer.allUnitCount(UnitType.Zerg_Hive) < 1
+		//			|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) < 1)) 
+		//		{
+		//			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);					
+		//		}
+		//	}
+		//}
 		
 	}
 
@@ -1908,12 +1918,15 @@ public class StrategyManager {
 		}
 		else if (myRace == Race.Zerg) {
 			
-			// Lair
+			// sc76.choi 기본 Spawning Pool 테크 작성예정
+			
+			
+			// sc76.choi 기본 Lair 테크
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Lair) <= 0
 				&& myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) <= 0
-			    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
+			    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
 				&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0) 
@@ -1928,15 +1941,21 @@ public class StrategyManager {
 				}
 			}
 			
+			// sc76.choi 빠른 Lair 테크(상황에 따라) 작성 예정
+			
+			// sc76.choi 기본 Queens_Nest
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 4
 				&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null) == 0) 
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Queens_Nest, true);
 			}
+			
+			// sc76.choi 빠른  Queens_Nest 테크(상황에 따라) 작성 예정
 			
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
@@ -1952,7 +1971,7 @@ public class StrategyManager {
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 4기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 6
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 16
 				&& myPlayer.allUnitCount(UnitType.Zerg_Defiler_Mound) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Defiler_Mound) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Defiler_Mound, null) == 0) 
