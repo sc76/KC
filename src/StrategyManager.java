@@ -42,6 +42,10 @@ public class StrategyManager {
 	// 아군 특수 유닛 첫번째, 두번째 타입
 	UnitType mySpecialUnitType1;			  	/// 옵저버       사이언스베쓸   오버로드
 	UnitType mySpecialUnitType2;				/// 하이템플러   배틀크루저     디파일러
+	UnitType mySpecialUnitType3;				///                    뮤탈
+	UnitType mySpecialUnitType4;				///                    스커지
+	UnitType mySpecialUnitType5;				///                    울트라
+	UnitType mySpecialUnitType6;				///                    퀸
 
 	// 업그레이드 / 리서치 할 것                                          프로토스           테란                    저그
 	UpgradeType 	necessaryUpgradeType1;		/// 드라군사정거리업    마린공격력업            히드라사정거리업
@@ -198,9 +202,9 @@ public class StrategyManager {
 			myCombatUnitType3 = UnitType.Zerg_Lurker;
 
 			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-			necessaryNumberOfCombatUnitType1 = 16;                     	// 공격을 시작하기위해 필요한 최소한의 저글링 유닛 숫자 
-			necessaryNumberOfCombatUnitType2 = 12;                     	// 공격을 시작하기위해 필요한 최소한의 히드라 유닛 숫자 
-			necessaryNumberOfCombatUnitType3 = 4;                     	// 공격을 시작하기위해 필요한 최소한의 러커 유닛 숫자 
+			necessaryNumberOfCombatUnitType1 = 6;                     	// 공격을 시작하기위해 필요한 최소한의 저글링 유닛 숫자 
+			necessaryNumberOfCombatUnitType2 = 8;                     	// 공격을 시작하기위해 필요한 최소한의 히드라 유닛 숫자 
+			necessaryNumberOfCombatUnitType3 = 0;                     	// 공격을 시작하기위해 필요한 최소한의 러커 유닛 숫자 
 			necessaryNumberOfCombatUnitType4 = 8;                     	// 공격을 시작하기위해 필요한 최소한의 러커 유닛 숫자 
 
 			// 공격 유닛 생산 순서 설정
@@ -210,6 +214,7 @@ public class StrategyManager {
 			// 특수 유닛 종류 설정 
 			mySpecialUnitType1 = UnitType.Zerg_Overlord;
 			mySpecialUnitType2 = UnitType.Zerg_Defiler;
+			mySpecialUnitType3 = UnitType.Zerg_Mutalisk;
 
 			// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 			necessaryNumberOfSpecialUnitType1 = 1;	                 	 
@@ -667,11 +672,11 @@ public class StrategyManager {
 				myDefenseBuildingPosition = myFirstChokePoint.getCenter(); 
 				break;
 			case FirstExpansionLocation: 
-				myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); 
+				myDefenseBuildingPosition = myFirstExpansionLocation.getPosition();
 				
 				// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
 				// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
-				Unit myDefenseBuildingUnit = commandUtil.GetClosestUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, myDefenseBuildingPosition);
+				Unit myDefenseBuildingUnit = commandUtil.GetClosestUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, new Position(2000, 2000));
 				if(myDefenseBuildingUnit != null){
 					myDefenseBuildingPosition = myDefenseBuildingUnit.getPosition();
 				}
@@ -1125,10 +1130,15 @@ public class StrategyManager {
 			
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
-				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
+				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다.	
 				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
-				
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
+				
+				// 적진과 가까이에 있으면 그냥 자유롭게 싸운다.
+				// TODO 단, 공격 타겟이 항상 enemyMainBaseLocation는 아니다, 수정 해야 한다. 메인 타켓 Position은 별도는 global하게 관리 되어야 한다.
+				if(unit.getDistance(enemyMainBaseLocation.getPosition()) <= Config.TILE_SIZE*35){
+					targetPosition = enemyMainBaseLocation.getPosition();
+				}
 				commandUtil.attackMove(unit, targetPosition);
 				
 				hasCommanded = true;
@@ -1875,7 +1885,8 @@ public class StrategyManager {
 			// sc76.choi 오버로드 속도업
 			// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 			// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1) {
+			// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.isResearching(necessaryTechType1) == true) {
 				isTimeToStartUpgradeType3 = true;
 			}			
 			// 러커는 최우선으로 리서치한다
@@ -2427,5 +2438,9 @@ public class StrategyManager {
 
 	public void setCountDefence(int countDefence) {
 		this.countDefence = countDefence;
+	}
+	
+	public ArrayList<Unit> getMyAllCombatUnitList() {
+		return myAllCombatUnitList;
 	}
 }
