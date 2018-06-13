@@ -1,4 +1,6 @@
 /bin/
+/bwapi-data/
+/lib/
 
 # sc ignore
 *.classpath
