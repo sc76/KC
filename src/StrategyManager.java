@@ -669,7 +669,7 @@ public class StrategyManager {
 			case FirstExpansionLocation: 
 				myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); 
 				
-				// sc76.choi 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
+				// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
 				// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
 				Unit myDefenseBuildingUnit = commandUtil.GetClosestUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, myDefenseBuildingPosition);
 				if(myDefenseBuildingUnit != null){
@@ -754,6 +754,11 @@ public class StrategyManager {
 
 				if (unit.getType() == UnitType.Zerg_Lurker) {
 					hasCommanded = controlLurkerUnitType(unit);					
+				}
+				
+				// sc76.choi 저글링도 히드라를 따라간다.
+				if (unit.getType() == myCombatUnitType1) {
+					hasCommanded = controlCombatUnitType1(unit);
 				}
 				
 				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
@@ -842,22 +847,15 @@ public class StrategyManager {
 			
 			boolean hasCommanded = false;
 			
-			if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
-				hasCommanded = controlSiegeTankUnitType(unit);					
-			}
 			if (unit.getType() == UnitType.Zerg_Lurker) {
 				hasCommanded = controlLurkerUnitType(unit);					
 			}
 			
-			// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
-			if (unit.getType() == mySpecialUnitType1) {		
+			if (unit.getType() == mySpecialUnitType1) {	// 오버로드				
 				hasCommanded = controlSpecialUnitType1(unit);
 			}
 			
-			if (unit.getType() == mySpecialUnitType1) {	// 저글링				
-				hasCommanded = controlSpecialUnitType1(unit);
-			}
-			if (unit.getType() == mySpecialUnitType2) {	// 럴커		
+			if (unit.getType() == mySpecialUnitType2) {	// 디파일러	
 				hasCommanded = controlSpecialUnitType2(unit);
 			}
 			
@@ -1117,30 +1115,35 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 
+	/// 첫번째 일반공격 유닛 타입의 유닛에 대해 컨트롤 명령을 입력합니다(저글링)
+	boolean controlCombatUnitType1(Unit unit) {
+		
+		boolean hasCommanded = false;
+		
+		if (unit.getType() == UnitType.Zerg_Zergling) {			
+			if (!commandUtil.IsValidUnit(unit)) return true;
+			
+			Position targetPosition = null;
+			if(combatState == CombatState.attackStarted){
+				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
+				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
+				
+				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
+				commandUtil.attackMove(unit, targetPosition);
+				
+				hasCommanded = true;
+			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
+				targetPosition = myMainBaseLocation.getPosition();
+				commandUtil.patrol(unit, myFirstExpansionLocation.getPosition());
+				hasCommanded = true;
+			}
+		}
+		
+		return hasCommanded;
+	}
+	
 	/// 첫번째 특수 유닛 타입의 유닛에 대해 컨트롤 명령을 입력합니다
 	boolean controlSpecialUnitType1(Unit unit) {
-
-		///////////////////////////////////////////////////////////////////
-		///////////////////////// 아래의 코드를 수정해보세요 ///////////////////////
-		//
-		// TODO 1. 아군 옵저버/사이언스베슬/오버로드를 공격 유닛들과 함께 이동하게 하는 로직  (예상 개발시간 10분)
-		//
-		// 목표 : 첫번째 특수유닛 타입은 적군 투명 유닛 탐지 능력이 있고 시야가 넓은 옵저버/사이언스베슬/오버로드 입니다. 
-		// 
-		//      현재는 아군 옵저버/사이언스베슬/오버로드에게 따로 컨트롤 명령을 입력하지 않으면 
-		//      다른 공격유닛들과 동일하게 적군 본진을 향해 이동하도록 되어있습니다.  
-		//
-		//      그러나 이렇게하면 적군 유닛들이 있는데도 무시하고 계속 이동하다가 사망하게 됩니다
-		//
-		//      아군 공격 유닛들의 목록 myCombatUnitType1List, myCombatUnitType2List, myCombatUnitType3List  
-		//		을 사용해서, 다른 아군 공격 유닛들과 함께 다니도록 해보세요
-		// 
-		//      return false = 유닛에게 따로 컨트롤 명령을 입력하지 않음  -> 다른 공격유닛과 동일하게 이동하도록 합니다 
-		//      return true = 유닛에게 따로 컨트롤 명령을 입력했음
-		// 
-		// Hint : myCombatUnitType1List 에서 랜덤하게 한 유닛을 선택해서 그 유닛을 따라다니게 하면 어떨까요?  
-		//
-		///////////////////////////////////////////////////////////////////
 
 		boolean hasCommanded = false;		
 //		if (unit.getType() == UnitType.Protoss_Observer) {
@@ -1184,7 +1187,8 @@ public class StrategyManager {
 //		else 
 		
 		// sc76.choi 기본적으로 myAllCombatUnitList에 담긴 오버로드만 대상이 된다. (즉 Idle인 오버로드)
-		// sc76.choi  오버로드는 hasCommanded는 항상 true
+		// sc76.choi 오버로드는 hasCommanded는 항상 true
+		// sc76.choi TODO 공격시에 가장 적진과 가까운 히드라를 따라 다니게 된다. 개선 필요
 		if (unit.getType() == UnitType.Zerg_Overlord) {			
 			if (!commandUtil.IsValidUnit(unit)) return true;
 			
