@@ -64,12 +64,14 @@
 10. 각종 업그레이트, 테크트리의 Type을 정리해야 한다.
 11. 적의 메인 베이스를 못찾았을때 를 대비 해야 한다.(모든 기능이 수행 안됨)
 12. 오버로드 회피
+
     for(Region region : BWTA.getRegions())
 		for(Chokepoint Chokepoint : region.getChokepoints())
 			List<Position> chokes.add(Chokepoint)
+			
 13. 본진, 앞마당 defence시에 활용
+
 	for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
-	
 		tempDistance = unit.getDistance(enemyUnit.getPosition());
 		if (tempDistance < 6 * Config.TILE_SIZE) {
 			nearEnemyUnitPosition = enemyUnit.getPosition();
