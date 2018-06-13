@@ -167,9 +167,11 @@ public class UXManager {
 		y += 12;
 		drawAPM(x, 5);
 		drawLocalSpeep(x + 100, 5);
+		
+		drawSightToSpecialUnits();
 	}
 
-	/// APM (Action Per Minute) 숫자를 Screen 에 표시합니다
+	// sc76.choi APM (Action Per Minute) 숫자를 Screen 에 표시합니다
 	int maxAPM = 0;
 	public void drawAPM(int x, int y) {
 		int bwapiAPM = MyBotModule.Broodwar.getAPM();
@@ -179,9 +181,33 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x, y, "APM : " + bwapiAPM + " (" + maxAPM + ")");
 	}
 	
+	// sc76.choi local speed를 표시 한다.
 	public void drawLocalSpeep(int x, int y) {
 		int localSpeed = Config.getSetLocalSpeed();
 		MyBotModule.Broodwar.drawTextScreen(x, y, "Speed : " + localSpeed);
+	}
+	
+	// sc76.choi 오버로드의 시야를 원을 Map 에 표시합니다
+	public void drawSightToSpecialUnits() {
+		// 오버로드 
+		for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){
+			MyBotModule.Broodwar.drawCircleMap(overload.getPosition(), 10 * Config.TILE_SIZE, Color.Purple);
+		}
+		
+		// 럴커, 디파일러, 뮤탈
+		for (Unit unit : StrategyManager.Instance().getMyAllCombatUnitList()) {
+			if(unit.getType() == UnitType.Zerg_Lurker){
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6 * Config.TILE_SIZE, Color.Red);
+			}
+			
+			if(unit.getType() == UnitType.Zerg_Defiler){
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6 * Config.TILE_SIZE, Color.Red);
+			}
+			
+			if(unit.getType() == UnitType.Zerg_Mutalisk){
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 3 * Config.TILE_SIZE, Color.Red);
+			}
+		}
 	}
 
 	/// Players 정보를 Screen 에 표시합니다
@@ -724,11 +750,11 @@ public class UXManager {
 		int	cols = MapGrid.Instance().getCols();
 		
 		for (int i = 0; i<cols; i++) {
-			MyBotModule.Broodwar.drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, Color.Blue);
+			MyBotModule.Broodwar.drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, Color.Grey);
 		}
 
 		for (int j = 0; j<rows; j++) {
-			MyBotModule.Broodwar.drawLineMap(0, j*cellSize, mapWidth, j*cellSize, Color.Blue);
+			MyBotModule.Broodwar.drawLineMap(0, j*cellSize, mapWidth, j*cellSize, Color.Grey);
 		}
 		
 		for (int r = 0; r < rows; r+=2)
@@ -937,7 +963,8 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace*2, white + "<C W : " + workerData.getNumCombatWorkers() + ">");
 
 		int yspace = 0;
-
+		
+		/*
 		for (Unit unit : workerData.getWorkers())
 		{
 			if (unit == null) continue;
@@ -956,6 +983,7 @@ public class UXManager {
 				MyBotModule.Broodwar.drawTextScreen(x + 30, y + 40 + ((yspace++) * 10), white + " " + workerData.getJobCode(unit));
 			}
 		}
+		*/
 	}
 
 	/// ResourceDepot 별 Worker 숫자를 Map 에 표시합니다
@@ -1016,7 +1044,7 @@ public class UXManager {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 
 		if (enemyBaseLocation != null) {
-			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ")");
+			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : " + enemyBaseLocation.getRegion() + " (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") (" + enemyBaseLocation.getPosition()+ ")");
 		}
 		else {
 			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
