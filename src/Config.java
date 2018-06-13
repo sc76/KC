@@ -80,7 +80,7 @@ public class Config {
 	/// 건물과 건물간 띄울 최소한의 간격 - Terran_Supply_Depot 건물의 경우
 	public static int BuildingSupplyDepotSpacing = 0;
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 3; // sc76.choi 0 -> 3 조정
+	public static int BuildingDefenseTowerSpacing = 1; // sc76.choi 0 -> 3 조정
 	
 	/// 화면 표시 여부 - 게임 정보
 	public static boolean DrawGameInfo = true;
@@ -109,8 +109,8 @@ public class Config {
 	/// 화면 표시 여부 - 건물 Construction 상황
 	public static boolean DrawBuildingInfo = false;
 	
-	/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황
-	public static boolean DrawReservedBuildingTiles = true;
+	/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황, 지을수 없는 곳 표시 
+	public static boolean DrawReservedBuildingTiles = false;
 	
 	/// 화면 표시 여부 - 정찰 상태
 	public static boolean DrawScoutInfo = true;
