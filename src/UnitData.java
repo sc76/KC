@@ -6,6 +6,8 @@ import java.util.Vector;
 import bwapi.Color;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwta.BaseLocation;
+import bwta.Chokepoint;
 
 public class UnitData {
 
@@ -37,6 +39,14 @@ public class UnitData {
 	/// unitAndUnitInfoMap 에서 제거해야할 데이터들
 	Vector<Integer> badUnitstoRemove = new Vector<Integer>();
 	
+	BaseLocation selfMainBaseLocation = null;
+	BaseLocation selfFirstExpansionLocation = null;
+	Chokepoint selfFirstChokePoint = null;
+	Chokepoint selfSecondChokePoint = null;	
+	BaseLocation enemyMainBaseLocation = null;
+	Chokepoint enemyFirstChokePoint = null;
+	Chokepoint enemySecondChokePoint = null;
+	
 	public UnitData() 
 	{
 		/*
@@ -56,7 +66,16 @@ public class UnitData {
 	public void updateUnitInfo(Unit unit)
 	{
 		if (unit == null) { return; }
-
+		
+		// sc76.choi 베이스 정보
+		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		selfFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+		selfFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		selfSecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+		
 		boolean firstSeen = false;
 		if (!unitAndUnitInfoMap.containsKey(unit.getID()))
 		{
@@ -73,6 +92,16 @@ public class UnitData {
 		ui.setUnitID(unit.getID());
 		ui.setType(unit.getType());
 		ui.setCompleted(unit.isCompleted());
+		
+		// sc76.choi 유닛에 아군, 적군의 본진으로부터의 거리 정보를 갱신한다.
+		int tempGroundDistFromSelfMainBase = MapTools.Instance().getGroundDistance(unit.getPosition(), selfMainBaseLocation.getPosition());
+		ui.setDistanceFromSelfMainBase(tempGroundDistFromSelfMainBase); // 해당 유닛과 아군본진으로부터의 거리
+		
+		// sc76.choi 적진의 메인베이스를 알고 있으면 
+		if(enemyMainBaseLocation != null){
+			int tempGroundDistFromEnemyMainBase = MapTools.Instance().getGroundDistance(unit.getPosition(), enemyMainBaseLocation.getPosition());
+			ui.setDistanceFromEnemyMainBase(tempGroundDistFromEnemyMainBase); // 해당 유닛과 적군본진으로부터의 거리
+		}
 		
 		//unitAndUnitInfoMap.put(unit, ui);
 		

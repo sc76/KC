@@ -3,8 +3,18 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 
-/// 해당 Unit의 ID, UnitType, 소속 Player, HitPoint, lastPosition, completed(건물이 완성된 것인지) 등을 저장해두는 자료구조<br>
-/// 적군 유닛의 경우 아군 시야 내에 있지 않아 invisible 상태가 되었을 때 정보를 조회할수도 없어지고 파악했던 정보도 유실되기 때문에 별도 자료구조가 필요합니다
+/**
+ * 
+ * 해당 Unit의 ID, UnitType, 소속 Player, HitPoint, lastPosition, completed(건물이 완성된 것인지) 등을 저장해두는 자료구조<br>
+ * 적군 유닛의 경우 아군 시야 내에 있지 않아 invisible 상태가 되었을 때 정보를 조회할수도 없어지고 파악했던 정보도 유실되기 때문에 별도 자료구조가 필요합니다
+ *  
+ * sc76.choi 쩌러 Bot의 fromEnemyMainDist, fromSelfMainDist를 가져온다.
+ *  
+ * @author csc
+ * 
+ */ 
+   
+
 public class UnitInfo {
 
 	private int unitID;
@@ -13,6 +23,8 @@ public class UnitInfo {
 	private Player player;
 	private Unit unit;
 	private Position lastPosition;
+	private int distanceFromEnemyMainBase;
+	private int distanceFromSelfMainBase;	
 	private UnitType type;
 	private boolean completed;
 
@@ -23,8 +35,26 @@ public class UnitInfo {
 		player = null;
 		unit = null;
 		lastPosition = Position.None;
+		distanceFromEnemyMainBase = 0;
+		distanceFromSelfMainBase = 0;
 		type = UnitType.None;
 		completed = false;
+	}
+
+	public int getDistanceFromEnemyMainBase() {
+		return distanceFromEnemyMainBase;
+	}
+
+	public void setDistanceFromEnemyMainBase(int distanceFromEnemyMainBase) {
+		this.distanceFromEnemyMainBase = distanceFromEnemyMainBase;
+	}
+
+	public int getDistanceFromSelfMainBase() {
+		return distanceFromSelfMainBase;
+	}
+
+	public void setDistanceFromSelfMainBase(int distanceFromSelfMainBase) {
+		this.distanceFromSelfMainBase = distanceFromSelfMainBase;
 	}
 
 	public UnitType getType() {
