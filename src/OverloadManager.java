@@ -43,12 +43,9 @@ public class OverloadManager {
 	private Unit centerChokeOverload;
 	private Unit enemyFirstChokeOverload;
 	private Unit enemySecondChokeOverload;
-	private Unit best3MultiLocationOverload;
 	private Unit enemyBasePatrolOverload;
 	
-	private Unit restSearchOverload;
 	private boolean isFinishedInitialScout = false;
-	private int firstTwoMoveScoutOverload = 0;	
 	
 	public enum ScoutStatus {
 		NoScout,						///< 정찰 유닛을 미지정한 상태
@@ -61,6 +58,7 @@ public class OverloadManager {
 	private int currentMainBaseScoutFreeToVertexIndex = -1;
 	private Position currentMainBaseScoutTargetPosition = Position.None;
 	
+	// sc76.choi 앞마당의 patrol 오버로드를 위한 변수	
 	private Vector<Position> selfExpansionBaseRegionVertices = new Vector<Position>();
 	private int currentExpansionBaseScoutFreeToVertexIndex = -1;
 	private Position currentExpansionBaseScoutTargetPosition = Position.None;
@@ -101,11 +99,12 @@ public class OverloadManager {
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
 		assignFirstScoutOverload(); // firstScoutOverload를 지정한다.
-		initialFirstScoutOverload(); // 지정된 오버로드를 정찰 시킨다.
-		//handleMoveOverloads();
 		
-		setMainBasePatrolOverload();
-		setMainExpansionBasePatrolOverload();
+		initialFirstScoutOverload(); // 지정된 오버로드를 정찰 시킨다.
+		
+		setMainBasePatrolOverload(); // 본진 patrol
+		
+		setMainExpansionBasePatrolOverload(); // 앞마당 patrol
 	}
 	
 	/// 게임 시작시에 정찰 오버로드을 필요하면 새로 지정합니다
@@ -150,8 +149,6 @@ public class OverloadManager {
 	 * 경기시작하자 말자, overload 정찰을 보낸다.
 	 */
 	public void initialFirstScoutOverload(){
-		
-		if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음
 		
 		// 정찰 유닛이 valid 하지 않으면 return
 		if (!commandUtil.IsValidUnit(firstScoutOverload)){
@@ -214,14 +211,20 @@ public class OverloadManager {
 //				commandUtil.move(firstScoutOverload, enemyMainLocation);
 //			}
 			
-			// 적진과 TilePosition 3개 정도의 가까이에 들어 왔으면, 두번째 적군의 chokepoint에 패트롤 한다.  
 			double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
+			System.out.println("distanceFromEnemyMainBaseLocation : " + distanceFromEnemyMainBaseLocation);
+			System.out.println("(double)TilePosition.SIZE_IN_PIXELS*3 : " + (double)TilePosition.SIZE_IN_PIXELS*3);
 			if(distanceFromEnemyMainBaseLocation <= (double)TilePosition.SIZE_IN_PIXELS*3){
 				firstScoutOverload.patrol(enemySecondChokePoint.getCenter());
+			}else{
+				
+				if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음
+				
+				commandUtil.move(firstScoutOverload, enemyMainBaseLocation.getPosition());
 				currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
 				isFinishedInitialScout = true; // 초반 정찰 끝
 			}
-			//setIdleOverload(firstScoutOverload); // 정찰 임무를 풀어준다. Scout Job 유지
+			overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.EnemyBase, (Unit)null);
 		}
 	}
 
@@ -335,6 +338,7 @@ public class OverloadManager {
 		overloadData.printOverloadJobMap();
 	}
 	
+	// sc76.choi 오버로드가 본진을 patrol 한다.
 	public void setMainBasePatrolOverload(){
 		if(myMainBasePatrolOverload != null){
 			
@@ -346,6 +350,7 @@ public class OverloadManager {
 		}
 	}
 
+	// sc76.choi 오버로드가 앞마당을 patrol 한다.
 	public void setMainExpansionBasePatrolOverload(){
 		if(myFirstChokePatrolOverload != null){
 			
@@ -424,12 +429,14 @@ public class OverloadManager {
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		} 
 		// 적의 두번째 choke position
+		/*
 		else if(enemySecondChokeOverload == null && enemyMainBaseLocation != null){
 			enemySecondChokeOverload = unit;
 					overloadData.setOverloadJob(enemySecondChokeOverload, OverloadData.OverloadJob.EnemySecondChoke, (Unit)null);
 					commandUtil.move(enemySecondChokeOverload, enemySecondChokePosition);
 					//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		}
+		*/
 	}
 	
 	// sc76.choi 추가하려면 별개로 함수를 둔다.

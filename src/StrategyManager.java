@@ -1179,7 +1179,7 @@ public class StrategyManager {
 			if(combatState == CombatState.attackStarted){
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
 				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
-				System.out.println("attackStarted targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
+				//System.out.println("attackStarted targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				commandUtil.move(unit, targetPosition);
 				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);
@@ -1190,7 +1190,7 @@ public class StrategyManager {
 			}else{
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
 				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
-				System.out.println("attackStarted targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
+				//System.out.println("eliminate targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				commandUtil.move(unit, targetPosition);
 				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);

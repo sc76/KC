@@ -26,6 +26,7 @@ public class OverloadData {
 		MyFirstChoke,
 		MyFirstChokePotrol,
 		MySecondChoke,
+		EnemyBase,
 		EnemyFirstChoke,
 		EnemySecondChoke,
 		EnemyBasePatrol,
@@ -205,11 +206,14 @@ public class OverloadData {
 		if (ol == OverloadData.OverloadJob.Idle) return 'I';
 		if (ol == OverloadData.OverloadJob.Move) return 'O';
 		if (ol == OverloadData.OverloadJob.AttackMove) return 'A';
+		if (ol == OverloadData.OverloadJob.MyFirstChokePotrol) return 'P';
+		if (ol == OverloadData.OverloadJob.MyMainBasePatrol) return 'P';
 		if (ol == OverloadData.OverloadJob.Scout) return 'S';
 		if (ol == OverloadData.OverloadJob.MyFirstChoke) return 'S';
 		if (ol == OverloadData.OverloadJob.MySecondChoke) return 'S';
 		if (ol == OverloadData.OverloadJob.Center) return 'S';
 		if (ol == OverloadData.OverloadJob.EnemySecondChoke) return 'S';
+		if (ol == OverloadData.OverloadJob.EnemyBase) return 'E';
 		return 'X';
 	}
 }
