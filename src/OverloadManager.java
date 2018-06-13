@@ -211,14 +211,13 @@ public class OverloadManager {
 //				commandUtil.move(firstScoutOverload, enemyMainLocation);
 //			}
 			
+			// sc76.choi 발견된 적진의 거리를 구해, patrol 할수 있도록 한다.
 			double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
-			System.out.println("distanceFromEnemyMainBaseLocation : " + distanceFromEnemyMainBaseLocation);
-			System.out.println("(double)TilePosition.SIZE_IN_PIXELS*3 : " + (double)TilePosition.SIZE_IN_PIXELS*3);
 			if(distanceFromEnemyMainBaseLocation <= (double)TilePosition.SIZE_IN_PIXELS*3){
-				firstScoutOverload.patrol(enemySecondChokePoint.getCenter());
+				commandUtil.patrol(firstScoutOverload, enemySecondChokePoint.getCenter());
 			}else{
 				
-				if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음
+				if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음, 
 				
 				commandUtil.move(firstScoutOverload, enemyMainBaseLocation.getPosition());
 				currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
