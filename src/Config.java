@@ -12,6 +12,7 @@ public class Config {
 	// 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
 	public static int DISTANCE_WORKER_CANATTACK = 32 * 7; // TILE_SIZE
 	public static int COUNT_WORKERS_CANATTACK = 3; // 일꾼 공격 합세는 2마리만 한다.
+	public static boolean DrawSightInfo = true; // 유닛의 사정거리 만큼 원을 그린다.
 
 	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
@@ -79,25 +80,26 @@ public class Config {
 	/// 건물과 건물간 띄울 최소한의 간격 - Terran_Supply_Depot 건물의 경우
 	public static int BuildingSupplyDepotSpacing = 0;
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 0; 
+	public static int BuildingDefenseTowerSpacing = 3; // sc76.choi 0 -> 3 조정
 	
-	
-	
-
 	/// 화면 표시 여부 - 게임 정보
 	public static boolean DrawGameInfo = true;
 	
 	/// 화면 표시 여부 - 미네랄, 가스
 	public static boolean DrawResourceInfo = true;
+	
 	/// 화면 표시 여부 - 지도
 	public static boolean DrawBWTAInfo = true;
+	
 	/// 화면 표시 여부 - 바둑판
 	public static boolean DrawMapGrid = false;
 
 	/// 화면 표시 여부 - 유닛 HitPoint
 	public static boolean DrawUnitHealthBars = true;
+	
 	/// 화면 표시 여부 - 유닛 통계
 	public static boolean DrawEnemyUnitInfo = false;
+	
 	/// 화면 표시 여부 - 유닛 ~ Target 간 직선
 	public static boolean DrawUnitTargetInfo = false;
 
@@ -106,11 +108,13 @@ public class Config {
 
 	/// 화면 표시 여부 - 건물 Construction 상황
 	public static boolean DrawBuildingInfo = false;
+	
 	/// 화면 표시 여부 - 건물 ConstructionPlace 예약 상황
-	public static boolean DrawReservedBuildingTiles = false;
+	public static boolean DrawReservedBuildingTiles = true;
 	
 	/// 화면 표시 여부 - 정찰 상태
 	public static boolean DrawScoutInfo = true;
+	
 	/// 화면 표시 여부 - 일꾼 목록
 	public static boolean DrawWorkerInfo = true;
 	
