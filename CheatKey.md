@@ -86,10 +86,57 @@ ophelia
 
 그밖에 잘 알려지지 않은 치트키 들입니다.
 
-5.PICKPOCKET 적 자원의 반을 가져옵니다 
-6.FART 적이 소유하고 있는 모든 개스를 날려버립니다. 
-7.MEDIEVAL MAN 유닛별로 업그레이드를 합니다. 
-8.WAR AINT WHAT IT USED TO BE 맵상의 안개를 걷히게 해줍니다. 
+5.PICKPOCKET 적 자원의 반을 가져옵니다
+
+6.FART 적이 소유하고 있는 모든 개스를 날려버립니다.
+ 
+7.MEDIEVAL MAN 유닛별로 업그레이드를 합니다.
+ 
+8.WAR AINT WHAT IT USED TO BE 맵상의 안개를 걷히게 해줍니다.
+ 
 9.SOMETHING FOR NOTHING 업그레이드를 단행합니다
-12.LONG LIVE THE QUEEN 모든 저그 유닛을 MK9 로 업그레이드 합니다. 13.ALE 해군 유닛을 MK9 으로 업그레이드 합니다. 14.I SMELL A RAT 모든 치트를 Off 합니다 15.IT'S A BIRD! A PLANE! IT'S DEAD! 맵상의 모든 공중에 떠다니는 유닛을 파괴합니다 20.GET IN SHAPE 모든 유닛을 업그레이드 합니다 21.CONTACTLENDS 맵상에 숨겨진 유닛을 그대로 봅니다 22.ON SCREEN 해당 레벨의 모든 맵을 보여줍니다. 23.DIG UP 잠복해 있는 저그 유닛을 화면상에 그대로 보여줍니다 25.TOMMYKNOCKERS 우주생물체를 불러냅니다 26.ARMEGEDDON 현재 레벨의 모든 유닛을 파괴합니다. 27.DIG DUG 묻혀있는 저그 유닛을 그대로 봅니다. 31.Whats mine is mine 미네랄 500얻음 32.Breathe Deep 가스를 500얻음. 34.Medieval Man 현재있는 유니트들의 업그래이드가 끝남. 35.radio free zerg 저그의 숨겨진 음악(오버마인드의 랩) 37.GET IN SHAPE 모든 유닛을 업그레이드 합니다. 38.CONTACTLENDS 맵상에 숨겨진 유닛을 그대로 봅니다. 39.ON SCREEN 해당 레벨의 모든 맵을 보여줍니다. 40.I GOT GAS 개스가 10,000 늘어납니다. 41.NUCULAR WINTER 모든 핵 발전소를 맵상의 불특정 지역으로 보내버립니다. 42.GET OUT OF MY WAY 유닛이 무적이 됩니다. 43.MODIFY THE PHASE VARIANCE 모든 건물을 만들 수 있는 능력이 생긴다. 
+
+12.LONG LIVE THE QUEEN 모든 저그 유닛을 MK9 로 업그레이드 합니다. 
+
+13.ALE 해군 유닛을 MK9 으로 업그레이드 합니다. 
+
+14.I SMELL A RAT 모든 치트를 Off 합니다 
+
+15.IT'S A BIRD! A PLANE! IT'S DEAD! 맵상의 모든 공중에 떠다니는 유닛을 파괴합니다 
+
+20.GET IN SHAPE 모든 유닛을 업그레이드 합니다 
+
+21.CONTACTLENDS 맵상에 숨겨진 유닛을 그대로 봅니다 
+
+22.ON SCREEN 해당 레벨의 모든 맵을 보여줍니다. 
+
+23.DIG UP 잠복해 있는 저그 유닛을 화면상에 그대로 보여줍니다 
+
+25.TOMMYKNOCKERS 우주생물체를 불러냅니다 
+
+26.ARMEGEDDON 현재 레벨의 모든 유닛을 파괴합니다. 
+
+27.DIG DUG 묻혀있는 저그 유닛을 그대로 봅니다. 
+
+31.Whats mine is mine 미네랄 500얻음 
+
+32.Breathe Deep 가스를 500얻음. 
+
+34.Medieval Man 현재있는 유니트들의 업그래이드가 끝남. 
+
+35.radio free zerg 저그의 숨겨진 음악(오버마인드의 랩) 
+
+37.GET IN SHAPE 모든 유닛을 업그레이드 합니다. 
+
+38.CONTACTLENDS 맵상에 숨겨진 유닛을 그대로 봅니다. 
+
+39.ON SCREEN 해당 레벨의 모든 맵을 보여줍니다. 
+
+40.I GOT GAS 개스가 10,000 늘어납니다. 
+
+41.NUCULAR WINTER 모든 핵 발전소를 맵상의 불특정 지역으로 보내버립니다. 
+
+42.GET OUT OF MY WAY 유닛이 무적이 됩니다. 
+
+43.MODIFY THE PHASE VARIANCE 모든 건물을 만들 수 있는 능력이 생긴다. 
 44.Modify the phase variance 모든 건물 생산 가능
