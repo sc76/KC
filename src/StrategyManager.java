@@ -598,8 +598,8 @@ public class StrategyManager {
 		}
 		
 		// sc76.choi 일꾼만 20마리 죽여도 elimination한다.
-		// sc76.choi 그리고, frame count가 43200 = 24 * 60 * 30 (즉 30분이 지났으면)이면 eliminate를 시작한다.
-		if (enemyKilledWorkerUnitCount >= 20 && MyBotModule.Broodwar.getFrameCount() >= 43200) {
+		// sc76.choi 그리고, frame count가 28800 = 24 * 60 * 20 (즉 20분이 지났으면)이면 eliminate를 시작한다.
+		if (enemyKilledWorkerUnitCount >= 20 && MyBotModule.Broodwar.getFrameCount() >= 28800) {
 			return true;
 		}
 		
@@ -835,6 +835,12 @@ public class StrategyManager {
 			if (unit.getType() == UnitType.Zerg_Lurker) {
 				hasCommanded = controlLurkerUnitType(unit);					
 			}
+			
+			// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
+			if (unit.getType() == mySpecialUnitType1) {		
+				hasCommanded = controlSpecialUnitType1(unit);
+			}
+			
 			if (unit.getType() == mySpecialUnitType1) {	// 저글링				
 				hasCommanded = controlSpecialUnitType1(unit);
 			}
@@ -1166,21 +1172,28 @@ public class StrategyManager {
 		
 		// sc76.choi 기본적으로 myAllCombatUnitList에 담긴 오버로드만 대상이 된다. (즉 Idle인 오버로드)
 		// sc76.choi  오버로드는 hasCommanded는 항상 true
-		
 		if (unit.getType() == UnitType.Zerg_Overlord) {			
 			if (!commandUtil.IsValidUnit(unit)) return true;
 			
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
-
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
 				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
-				System.out.println("closesAttackUnitFromEnemyMainBase : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
+				System.out.println("attackStarted targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				commandUtil.move(unit, targetPosition);
+				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);
 			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
 				targetPosition = myMainBaseLocation.getPosition();
 				commandUtil.patrol(unit, myFirstExpansionLocation.getPosition());
+				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Idle, (Unit)null);				
+			}else{
+				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
+				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
+				System.out.println("attackStarted targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
+				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
+				commandUtil.move(unit, targetPosition);
+				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);
 			}
 			
 			hasCommanded = true;
@@ -1467,9 +1480,11 @@ public class StrategyManager {
 			}
 			else if (unit.getType() == mySpecialUnitType1) {
 				// maxNumberOfSpecialUnitType1 숫자까지만 특수유닛 부대에 포함시킨다 (저그 종족의 경우 오버로드가 전부 전투참여했다가 위험해질 수 있으므로)
+				// sc76.choi defence 모드 시에 좀 애매 하다. 본진 으로 귀한하지 않는 유닛이 생길 수 있다.
 				if (mySpecialUnitType1List.size() < maxNumberOfSpecialUnitType1) {
 					// sc76.choi Idel인 오버로드만 추가 한다.
-					if(OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'I'){
+					if(OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'I' 
+						|| OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'A'){
 						mySpecialUnitType1List.add(unit); 
 						myAllCombatUnitList.add(unit);
 					}

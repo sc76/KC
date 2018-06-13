@@ -18,6 +18,7 @@ public class OverloadData {
 		Idle,			///< 하는 일 없음. 대기 상태. 
 		Overload,		///< 수리. Terran_SCV 만 가능
 		Move,			///< 이동
+		AttackMove,		///< 공격 유닛과 같이 이동
 		Scout, 			///< 정찰. Move와 다름. 정찰지에 도착하면 이동이 없음
 		MyMainBase,
 		MyMainBasePatrol,
@@ -202,6 +203,7 @@ public class OverloadData {
 		if (ol == OverloadData.OverloadJob.Default) return 'D';
 		if (ol == OverloadData.OverloadJob.Idle) return 'I';
 		if (ol == OverloadData.OverloadJob.Move) return 'O';
+		if (ol == OverloadData.OverloadJob.AttackMove) return 'A';
 		if (ol == OverloadData.OverloadJob.Scout) return 'S';
 		if (ol == OverloadData.OverloadJob.MyFirstChoke) return 'S';
 		if (ol == OverloadData.OverloadJob.MySecondChoke) return 'S';
