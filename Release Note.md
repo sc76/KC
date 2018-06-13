@@ -46,8 +46,12 @@
 				
 -------------------------------------------------------------------
 <TODO or Bug List>
+0. 공격, 방어 상태 정리
+	예를 들면, 한참 공격 가고 있는데, 앞마당에 적군 특공대 진입
+
 0. 사거리 정리
 	http://www.todayhumor.co.kr/board/view.php?table=humorbest&no=85755
+	
 1. handleGasWorkers의 가스 보정 분기 시점
 	- 가스 채취 드론 리밸런싱이 잘 안됨
 
