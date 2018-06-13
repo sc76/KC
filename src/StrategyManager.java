@@ -432,6 +432,8 @@ public class StrategyManager {
 		return closestUnit;
 	}
 	
+	
+	
 	public void printUintData(){
 		
 		int UnitAndUnitInfoMapSize = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().size();
@@ -655,27 +657,38 @@ public class StrategyManager {
 	void commandMyCombatUnitToDefense(){
 
 		// 아군 방어 건물이 세워져있는 위치
+		// sc76.choi setVariables에서 BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation 로 지정
 		Position myDefenseBuildingPosition = null;
 		switch (seedPositionStrategyOfMyDefenseBuildingType) {
-			case MainBaseLocation: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-			case FirstChokePoint: myDefenseBuildingPosition = myFirstChokePoint.getCenter(); break;
-			case FirstExpansionLocation: myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); break;
-			case SecondChokePoint: myDefenseBuildingPosition = mySecondChokePoint.getCenter(); break;
-			default: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
+			case MainBaseLocation: 
+				myDefenseBuildingPosition = myMainBaseLocation.getPosition(); 
+				break;
+			case FirstChokePoint: 
+				myDefenseBuildingPosition = myFirstChokePoint.getCenter(); 
+				break;
+			case FirstExpansionLocation: 
+				myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); 
+				
+				// sc76.choi 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
+				// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
+				Unit myDefenseBuildingUnit = commandUtil.GetClosestUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, myDefenseBuildingPosition);
+				if(myDefenseBuildingUnit != null){
+					myDefenseBuildingPosition = myDefenseBuildingUnit.getPosition();
+				}
+				break;
+			case SecondChokePoint: 
+				myDefenseBuildingPosition = mySecondChokePoint.getCenter(); 
+				break;
+			default: 
+				myDefenseBuildingPosition = myMainBaseLocation.getPosition(); 
+				break;
 		}
 
 		// 아군 공격유닛을 방어 건물이 세워져있는 위치로 배치시킵니다
 		// 아군 공격유닛을 아군 방어 건물 뒤쪽에 배치시켰다가 적들이 방어 건물을 공격하기 시작했을 때 다함께 싸우게하면 더 좋을 것입니다
-		// sc76.choi 단, 정찰 오버로드는 자기 할일이 있다.
+		// sc76.choi 단, 정찰 오버로드는 자기 할일이 있다. myAllCombatUnitList에 오버로드 add 되는 기준을 확인 할 것 
 		for (Unit unit : myAllCombatUnitList) {
 
-			// sc76.choi 따로 명령 받은 오버로드는 후퇴에서 제외 합니다.
-			//if(unit.getType() == UnitType.Zerg_Overlord 
-			//	&& (OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'X' || 
-			//	    OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'S')){
-			//	continue;
-			//}
-			
 			if (!commandUtil.IsValidUnit(unit)) continue;
 			
 			boolean hasCommanded = false;
