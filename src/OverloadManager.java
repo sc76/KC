@@ -32,15 +32,12 @@ import bwta.Region;
 public class OverloadManager {
 	public static Game Broodwar;
 	private int currentOverloadScoutStatus;
-	private int currentScoutStatus;
-	private int moveTogglingConut = 0;
-
 	
 	private Unit firstScoutOverload; // 게임 시작시에, 첫번째 정찰에 투입될 오버로드
-	
 	private Unit myMainLocationOverload;
 	private Unit myExpansionLocationOverload;
 	private Unit myFirstChokeOverload;
+	private Unit myFirstChokePatrolOverload;	
 	private Unit myMainBasePatrolOverload;
 	private Unit mySecondChokeOverload;
 	private Unit centerChokeOverload;
@@ -59,9 +56,13 @@ public class OverloadManager {
 		MoveAroundEnemyBaseLocation   	///< 적군의 BaseLocation 이 발견된 상태에서 정찰 유닛을 이동시키고 있는 상태
 	};
 	
-	private Vector<Position> selfBaseRegionVertices = new Vector<Position>();
-	private int currentScoutFreeToVertexIndex = -1;
+	// sc76.choi 본진의 patrol 오버로드를 위한 변수
+	private Vector<Position> selfMainBaseRegionVertices = new Vector<Position>();
+	private int currentMainBaseScoutFreeToVertexIndex = -1;
 	private Position currentMainBaseScoutTargetPosition = Position.None;
+	
+	private Vector<Position> selfExpansionBaseRegionVertices = new Vector<Position>();
+	private int currentExpansionBaseScoutFreeToVertexIndex = -1;
 	private Position currentExpansionBaseScoutTargetPosition = Position.None;
 	
 	/// 오버로드 목록
@@ -104,7 +105,7 @@ public class OverloadManager {
 		//handleMoveOverloads();
 		
 		setMainBasePatrolOverload();
-		//setMainExpansionBasePatrolOverload();
+		setMainExpansionBasePatrolOverload();
 	}
 	
 	/// 게임 시작시에 정찰 오버로드을 필요하면 새로 지정합니다
@@ -340,19 +341,19 @@ public class OverloadManager {
 			if(!commandUtil.IsValidUnit(myMainBasePatrolOverload)) return;
 			
 			overloadData.setOverloadJob(myMainBasePatrolOverload, OverloadData.OverloadJob.MyMainBasePatrol, (Unit)null);
-			currentMainBaseScoutTargetPosition = getScoutFleePositionFromSelfRegionVertices(selfMainBaseLocation, myMainBasePatrolOverload);
+			currentMainBaseScoutTargetPosition = getScoutFleePositionFromSelfMainBaseRegionVertices(selfMainBaseLocation, myMainBasePatrolOverload);
 			commandUtil.move(myMainBasePatrolOverload, currentMainBaseScoutTargetPosition);
 		}
 	}
 
 	public void setMainExpansionBasePatrolOverload(){
-		if(myFirstChokeOverload != null){
+		if(myFirstChokePatrolOverload != null){
 			
-			if(!commandUtil.IsValidUnit(myFirstChokeOverload)) return;
+			if(!commandUtil.IsValidUnit(myFirstChokePatrolOverload)) return;
 			
-			overloadData.setOverloadJob(myFirstChokeOverload, OverloadData.OverloadJob.MyFirstChoke, (Unit)null);
-			currentExpansionBaseScoutTargetPosition = getScoutFleePositionFromSelfRegionVertices(selfFirstExpansionLocation, myFirstChokeOverload);
-			commandUtil.move(myFirstChokeOverload, currentExpansionBaseScoutTargetPosition);
+			overloadData.setOverloadJob(myFirstChokePatrolOverload, OverloadData.OverloadJob.MyFirstChokePotrol, (Unit)null);
+			currentExpansionBaseScoutTargetPosition = getScoutFleePositionFromSelfExpansionBaseRegionVertices(selfFirstExpansionLocation, myFirstChokePatrolOverload);
+			commandUtil.move(myFirstChokePatrolOverload, currentExpansionBaseScoutTargetPosition);
 		}
 	}
 	
@@ -391,20 +392,21 @@ public class OverloadManager {
 		Position centerLocationPosition = new Position(2000, 2000);
 		Position enemyMainbaseLocationPosition = null;
 		Position enemySecondChokePosition = null;
+		
 		if(enemyMainBaseLocation != null){
 			enemyMainbaseLocationPosition = enemyMainBaseLocation.getPosition();
 			enemySecondChokePosition = enemySecondChokePoint.getCenter();
 		}
 		
+		// 나의 본진 patrol position
 		if(myMainBasePatrolOverload == null){
 			myMainBasePatrolOverload = unit;
-		}else
-		
+		}
 		// 나의 첫번째 choke position
-		if(myFirstChokeOverload == null){
-			myFirstChokeOverload = unit;
-			overloadData.setOverloadJob(myFirstChokeOverload, OverloadData.OverloadJob.MyFirstChoke, (Unit)null);
-			commandUtil.move(myFirstChokeOverload, selfFirstChokePosition);
+		else if(myFirstChokePatrolOverload == null){
+			myFirstChokePatrolOverload = unit;
+			//overloadData.setOverloadJob(myFirstChokeOverload, OverloadData.OverloadJob.MyFirstChoke, (Unit)null);
+			//commandUtil.move(myFirstChokeOverload, selfFirstChokePosition);
 			//if(Config.DEBUG) System.out.println("** myFirstChokeOverload : " + myFirstChokeOverload.getID());
 		}
 		// 나의 두번째 choke position
@@ -431,22 +433,23 @@ public class OverloadManager {
 	}
 	
 	// sc76.choi 추가하려면 별개로 함수를 둔다.
-	public Position getScoutFleePositionFromSelfRegionVertices(BaseLocation baseLocationParam, Unit overloadParam)
+	// 메인 patrol을 위한 매소드
+	public Position getScoutFleePositionFromSelfMainBaseRegionVertices(BaseLocation baseLocationParam, Unit overloadParam)
 	{
 		// calculate enemy region vertices if we haven't yet
-		if (selfBaseRegionVertices.isEmpty()) {
-			calculateSelfRegionVertices(baseLocationParam);
+		if (selfMainBaseRegionVertices.isEmpty()) {
+			calculateSelfMainBaseRegionVertices(baseLocationParam);
 		}
 
-		if (selfBaseRegionVertices.isEmpty()) {
+		if (selfMainBaseRegionVertices.isEmpty()) {
 			return MyBotModule.Broodwar.self().getStartLocation().toPosition();
 		}
 
 		// if this is the first flee, we will not have a previous perimeter index
-		if (currentScoutFreeToVertexIndex == -1)
+		if (currentMainBaseScoutFreeToVertexIndex == -1)
 		{
 			// so return the closest position in the polygon
-			int closestPolygonIndex = getClosestVertexIndex(overloadParam, selfBaseRegionVertices);
+			int closestPolygonIndex = getClosestVertexIndex(overloadParam, selfMainBaseRegionVertices);
 
 			if (closestPolygonIndex == -1)
 			{
@@ -455,29 +458,29 @@ public class OverloadManager {
 			else
 			{
 				// set the current index so we know how to iterate if we are still fleeing later
-				currentScoutFreeToVertexIndex = closestPolygonIndex;
-				return selfBaseRegionVertices.get(closestPolygonIndex);
+				currentMainBaseScoutFreeToVertexIndex = closestPolygonIndex;
+				return selfMainBaseRegionVertices.get(closestPolygonIndex);
 			}
 		}
 		// if we are still fleeing from the previous frame, get the next location if we are close enough
 		else
 		{
-			double distanceFromCurrentVertex = selfBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(overloadParam.getPosition());
+			double distanceFromCurrentVertex = selfMainBaseRegionVertices.get(currentMainBaseScoutFreeToVertexIndex).getDistance(overloadParam.getPosition());
 
 			// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
 			while (distanceFromCurrentVertex < 128)
 			{
-				currentScoutFreeToVertexIndex = (currentScoutFreeToVertexIndex + 1) % selfBaseRegionVertices.size();
-				distanceFromCurrentVertex = selfBaseRegionVertices.get(currentScoutFreeToVertexIndex).getDistance(overloadParam.getPosition());
+				currentMainBaseScoutFreeToVertexIndex = (currentMainBaseScoutFreeToVertexIndex + 1) % selfMainBaseRegionVertices.size();
+				distanceFromCurrentVertex = selfMainBaseRegionVertices.get(currentMainBaseScoutFreeToVertexIndex).getDistance(overloadParam.getPosition());
 			}
 
-			return selfBaseRegionVertices.get(currentScoutFreeToVertexIndex);
+			return selfMainBaseRegionVertices.get(currentMainBaseScoutFreeToVertexIndex);
 		}
 	}
 	
 	// 나의 MainBaseLocation 이 있는 Region 의 가장자리를  selfBaseRegionVertices 에 저장한다
 	// Region 내 모든 건물을 Eliminate 시키기 위한 지도 탐색 로직 작성시 참고할 수 있다
-	public void calculateSelfRegionVertices(BaseLocation baseLocation)
+	public void calculateSelfMainBaseRegionVertices(BaseLocation baseLocation)
 	{
 		if (baseLocation == null) {
 			return;
@@ -533,7 +536,7 @@ public class OverloadManager {
 
 		Vector<Position> sortedVertices = new Vector<Position>();
 		Position current = unsortedVertices.iterator().next();
-		selfBaseRegionVertices.add(current);
+		selfMainBaseRegionVertices.add(current);
 		unsortedVertices.remove(current);
 
 		// while we still have unsorted vertices left, find the closest one remaining to current
@@ -613,7 +616,192 @@ public class OverloadManager {
 			sortedVertices = temp;
 		}
 
-		selfBaseRegionVertices = sortedVertices;
+		selfMainBaseRegionVertices = sortedVertices;
+	}
+	
+	// sc76.choi 추가하려면 별개로 함수를 둔다.
+	// Expansion patrol을 위한 매소드
+	public Position getScoutFleePositionFromSelfExpansionBaseRegionVertices(BaseLocation baseLocationParam, Unit overloadParam)
+	{
+		// calculate enemy region vertices if we haven't yet
+		if (selfExpansionBaseRegionVertices.isEmpty()) {
+			calculateSelfExpansionBaseRegionVertices(baseLocationParam);
+		}
+
+		if (selfExpansionBaseRegionVertices.isEmpty()) {
+			return MyBotModule.Broodwar.self().getStartLocation().toPosition();
+		}
+
+		// if this is the first flee, we will not have a previous perimeter index
+		if (currentExpansionBaseScoutFreeToVertexIndex == -1)
+		{
+			// so return the closest position in the polygon
+			int closestPolygonIndex = getClosestVertexIndex(overloadParam, selfExpansionBaseRegionVertices);
+
+			if (closestPolygonIndex == -1)
+			{
+				return MyBotModule.Broodwar.self().getStartLocation().toPosition();
+			}
+			else
+			{
+				// set the current index so we know how to iterate if we are still fleeing later
+				currentExpansionBaseScoutFreeToVertexIndex = closestPolygonIndex;
+				return selfExpansionBaseRegionVertices.get(closestPolygonIndex);
+			}
+		}
+		// if we are still fleeing from the previous frame, get the next location if we are close enough
+		else
+		{
+			double distanceFromCurrentVertex = selfExpansionBaseRegionVertices.get(currentExpansionBaseScoutFreeToVertexIndex).getDistance(overloadParam.getPosition());
+
+			// keep going to the next vertex in the perimeter until we get to one we're far enough from to issue another move command
+			while (distanceFromCurrentVertex < 128)
+			{
+				currentExpansionBaseScoutFreeToVertexIndex = (currentExpansionBaseScoutFreeToVertexIndex + 1) % selfExpansionBaseRegionVertices.size();
+				distanceFromCurrentVertex = selfExpansionBaseRegionVertices.get(currentExpansionBaseScoutFreeToVertexIndex).getDistance(overloadParam.getPosition());
+			}
+
+			return selfExpansionBaseRegionVertices.get(currentExpansionBaseScoutFreeToVertexIndex);
+		}
+	}
+	
+	public void calculateSelfExpansionBaseRegionVertices(BaseLocation baseLocation)
+	{
+		if (baseLocation == null) {
+			return;
+		}
+		
+		Region selfRegion = baseLocation.getRegion();
+		if (selfRegion == null) {
+			return;
+		}
+		final Position basePosition = MyBotModule.Broodwar.self().getStartLocation().toPosition();
+		final Vector<TilePosition> closestTobase = MapTools.Instance().getClosestTilesTo(basePosition);
+		Set<Position> unsortedVertices = new HashSet<Position>();
+
+		// check each tile position
+		for (int i = 0; i < closestTobase.size(); ++i)
+		{
+			final TilePosition tp = closestTobase.get(i);
+
+			if (BWTA.getRegion(tp) != selfRegion)
+			{
+				continue;
+			}
+
+			// a tile is 'surrounded' if
+			// 1) in all 4 directions there's a tile position in the current region
+			// 2) in all 4 directions there's a buildable tile
+			boolean surrounded = true;
+			if (BWTA.getRegion(new TilePosition(tp.getX() + 1, tp.getY())) != selfRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX() + 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() + 1)) != selfRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() + 1))
+					|| BWTA.getRegion(new TilePosition(tp.getX() - 1, tp.getY())) != selfRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX() - 1, tp.getY()))
+					|| BWTA.getRegion(new TilePosition(tp.getX(), tp.getY() - 1)) != selfRegion || !MyBotModule.Broodwar.isBuildable(new TilePosition(tp.getX(), tp.getY() - 1)))
+			{
+				surrounded = false;
+			}
+
+			// push the tiles that aren't surrounded 
+			// Region의 가장자리 타일들만 추가한다
+			if (!surrounded && MyBotModule.Broodwar.isBuildable(tp))
+			{
+				if (Config.DrawScoutInfo)
+				{
+					int x1 = tp.getX() * 32 + 2;
+					int y1 = tp.getY() * 32 + 2;
+					int x2 = (tp.getX() + 1) * 32 - 2;
+					int y2 = (tp.getY() + 1) * 32 - 2;
+					MyBotModule.Broodwar.drawTextMap(x1 + 3, y1 + 2, "" + BWTA.getGroundDistance(tp, basePosition.toTilePosition()));
+					MyBotModule.Broodwar.drawBoxMap(x1, y1, x2, y2, Color.Green, false);
+				}
+
+				unsortedVertices.add(new Position(tp.toPosition().getX() + 16, tp.toPosition().getY() + 16));
+			}
+		}
+
+		Vector<Position> sortedVertices = new Vector<Position>();
+		Position current = unsortedVertices.iterator().next();
+		selfExpansionBaseRegionVertices.add(current);
+		unsortedVertices.remove(current);
+
+		// while we still have unsorted vertices left, find the closest one remaining to current
+		while (!unsortedVertices.isEmpty())
+		{
+			double bestDist = 1000000;
+			Position bestPos = null;
+
+			for (final Position pos : unsortedVertices)
+			{
+				double dist = pos.getDistance(current);
+
+				if (dist < bestDist)
+				{
+					bestDist = dist;
+					bestPos = pos;
+				}
+			}
+
+			current = bestPos;
+			sortedVertices.add(bestPos);
+			unsortedVertices.remove(bestPos);
+		}
+
+		// let's close loops on a threshold, eliminating death grooves
+		int distanceThreshold = 100;
+
+		while (true)
+		{
+			// find the largest index difference whose distance is less than the threshold
+			int maxFarthest = 0;
+			int maxFarthestStart = 0;
+			int maxFarthestEnd = 0;
+
+			// for each starting vertex
+			for (int i = 0; i < (int)sortedVertices.size(); ++i)
+			{
+				int farthest = 0;
+				int farthestIndex = 0;
+
+				// only test half way around because we'll find the other one on the way back
+				for (int j= 1; j < sortedVertices.size() / 2; ++j)
+				{
+					int jindex = (i + j) % sortedVertices.size();
+
+					if (sortedVertices.get(i).getDistance(sortedVertices.get(jindex)) < distanceThreshold)
+					{
+						farthest = j;
+						farthestIndex = jindex;
+					}
+				}
+
+				if (farthest > maxFarthest)
+				{
+					maxFarthest = farthest;
+					maxFarthestStart = i;
+					maxFarthestEnd = farthestIndex;
+				}
+			}
+
+			// stop when we have no long chains within the threshold
+			if (maxFarthest < 4)
+			{
+				break;
+			}
+
+			double dist = sortedVertices.get(maxFarthestStart).getDistance(sortedVertices.get(maxFarthestEnd));
+
+			Vector<Position> temp = new Vector<Position>();
+
+			for (int s = maxFarthestEnd; s != maxFarthestStart; s = (s + 1) % sortedVertices.size())
+			{
+				
+				temp.add(sortedVertices.get(s));
+			}
+
+			sortedVertices = temp;
+		}
+
+		selfExpansionBaseRegionVertices = sortedVertices;
 	}
 	
 	public int getClosestVertexIndex(Unit unit, Vector<Position> RegionVertices)
@@ -635,9 +823,9 @@ public class OverloadManager {
 	}
 	
 	/// 나의 Main Base Location 이 있는 Region 의 경계선에 해당하는 Vertex 들의 목록을 리턴합니다
-	public Vector<Position> getSelfRegionVertices()
+	public Vector<Position> getSelfMainBaseRegionVertices()
 	{
-		return selfBaseRegionVertices;
+		return selfMainBaseRegionVertices;
 	}
 	
 	/// 오버로드 유닛들의 상태를 저장하는 workerData 객체를 리턴합니다

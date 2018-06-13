@@ -24,6 +24,7 @@ public class OverloadData {
 		MyMainBasePatrol,
 		MyExpansionBase,
 		MyFirstChoke,
+		MyFirstChokePotrol,
 		MySecondChoke,
 		EnemyFirstChoke,
 		EnemySecondChoke,
