@@ -402,6 +402,51 @@ public class StrategyManager {
 		//saveGameLog();
 		
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
+		
+		//printUintData();
+	}
+	
+	/**
+	 * myAllCombatUnitList 중에 target으로 부터 가장 가까운 공격 유닛을 찾는다.
+	 * @param type
+	 * @param target
+	 * @return
+	 */
+	public Unit getClosestCanAttackUnitTypeToTarget(UnitType type, Position target){
+		Unit closestUnit = null;
+		double closestDist = 100000000;
+
+		for (Unit unit : myAllCombatUnitList)
+		{
+			if (unit.getType() == type)
+			{
+				double dist = unit.getDistance(target);
+				if (closestUnit == null || dist < closestDist)
+				{
+					closestUnit = unit;
+					closestDist = dist;
+				}
+			}
+		}
+
+		return closestUnit;
+	}
+	
+	public void printUintData(){
+		
+		int UnitAndUnitInfoMapSize = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().size();
+		Iterator<Integer> it = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		while (it.hasNext()) {
+			UnitInfo ui = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().get(it.next());
+			
+			if(ui.getType() != UnitType.Zerg_Zergling) continue;
+			
+			if (ui.getType().canAttack()){
+				if(ui.getType().isWorker()) continue;
+				System.out.println("["+ UnitAndUnitInfoMapSize + "]" + ui.getLastPosition() + ui.getUnitID() + " " + ui.getType() + " " + ui.getDistanceFromSelfMainBase() + " " + ui.getDistanceFromEnemyMainBase());
+			}
+		}
+		System.out.println();
 	}
 	
 	public void updateKCBaseInfo(){
@@ -1127,12 +1172,15 @@ public class StrategyManager {
 			
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
-				targetPosition = enemyMainBaseLocation.getPosition();
+
+				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
+				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
+				System.out.println("closesAttackUnitFromEnemyMainBase : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
+				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				commandUtil.move(unit, targetPosition);
 			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
 				targetPosition = myMainBaseLocation.getPosition();
-				//commandUtil.patrol(unit, mySecondChokePoint.getCenter());
-				unit.patrol(myFirstExpansionLocation.getPosition());
+				commandUtil.patrol(unit, myFirstExpansionLocation.getPosition());
 			}
 			
 			hasCommanded = true;
