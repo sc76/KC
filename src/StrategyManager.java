@@ -139,6 +139,9 @@ public class StrategyManager {
 		
 	CombatState combatState;				/// 전투 상황
 
+	// sc76.choi 공격을 위한 가장 가까운 아군 타겟 선정
+	Unit closesAttackUnitFromEnemyMainBase = null;
+	
 	public StrategyManager() {
 	}
 
@@ -370,6 +373,9 @@ public class StrategyManager {
 		updateKCBaseInfo();
 		// 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다. 
 		commandMyWorkerToAttack();
+		
+		// 공격 타겟 유닛 할당 
+		updateVariablesForAttackUnit();
 		// sc76.choi end
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -1131,7 +1137,7 @@ public class StrategyManager {
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
 				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다.	
-				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
+				
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				
 				// 적진과 가까이에 있으면 그냥 자유롭게 싸운다.
@@ -1205,7 +1211,6 @@ public class StrategyManager {
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
-				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
 				//System.out.println("attackStarted targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				commandUtil.move(unit, targetPosition);
@@ -1216,7 +1221,6 @@ public class StrategyManager {
 				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Idle, (Unit)null);				
 			}else{
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
-				Unit closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
 				//System.out.println("eliminate targetPosition : " + closesAttackUnitFromEnemyMainBase.getID() + " " + closesAttackUnitFromEnemyMainBase.getPosition());
 				targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				commandUtil.move(unit, targetPosition);
@@ -1530,6 +1534,22 @@ public class StrategyManager {
 			else if (unit.getType() == myDefenseBuildingType2) { 
 				myDefenseBuildingType2List.add(unit); 
 			}			
+		}
+		
+		
+	}
+	
+	void updateVariablesForAttackUnit(){
+		// 2초에 한번만 실행
+		if (MyBotModule.Broodwar.getFrameCount() % 24 * 2 != 0) {
+			return;
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 공격을 위한 아군 타겟 변수 할당
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if(enemyMainBaseLocation != null){
+			closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
 		}
 	}
 

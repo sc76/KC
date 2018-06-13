@@ -14,9 +14,11 @@ import bwapi.Color;
 import bwapi.Force;
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.TechType;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -144,6 +146,10 @@ public class UXManager {
 			//MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)distanceFromSelfMainBase + ")");
 		}
 
+		// sc76.choi 유닛의 사정거리 만큼 원을 그린다.
+		if (Config.DrawSightInfo) {
+			drawSightToSpecialUnits();
+		}
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
@@ -168,7 +174,7 @@ public class UXManager {
 		drawAPM(x, 5);
 		drawLocalSpeep(x + 100, 5);
 		
-		drawSightToSpecialUnits();
+		
 	}
 
 	// sc76.choi APM (Action Per Minute) 숫자를 Screen 에 표시합니다
@@ -196,6 +202,14 @@ public class UXManager {
 		
 		// 럴커, 디파일러, 뮤탈
 		for (Unit unit : StrategyManager.Instance().getMyAllCombatUnitList()) {
+			if(unit.getType() == UnitType.Zerg_Hydralisk){
+				if(MyBotModule.Broodwar.self().getUpgradeLevel(UpgradeType.Grooved_Spines) > 0){
+					MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 5 * Config.TILE_SIZE, Color.Grey);
+				}else{
+					MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 4 * Config.TILE_SIZE, Color.Grey);
+				}
+			}
+			
 			if(unit.getType() == UnitType.Zerg_Lurker){
 				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6 * Config.TILE_SIZE, Color.Red);
 			}
@@ -1044,7 +1058,7 @@ public class UXManager {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 
 		if (enemyBaseLocation != null) {
-			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : " + enemyBaseLocation.getRegion() + " (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") (" + enemyBaseLocation.getPosition()+ ")");
+			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") (" + enemyBaseLocation.getPosition()+ ")");
 		}
 		else {
 			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
