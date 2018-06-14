@@ -5,9 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-
-import com.sun.xml.internal.bind.v2.runtime.Location;
-
 import bwapi.Bullet;
 import bwapi.BulletType;
 import bwapi.Color;
