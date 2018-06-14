@@ -10,9 +10,9 @@ public class Config {
 	public static final boolean DEBUG = true; // debug show 여부를 판단할 boolean
 	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
 	// 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
-	public static int DISTANCE_WORKER_CANATTACK = 32 * 7; // TILE_SIZE
+	public static int DISTANCE_WORKER_CANATTACK = 32 * 3; // TILE_SIZE
 	public static int COUNT_WORKERS_CANATTACK = 3; // 일꾼 공격 합세는 2마리만 한다.
-	public static boolean DrawSightInfo = false; // 유닛의 사정거리 만큼 원을 그린다.
+	public static boolean DrawSightInfo = true; // 유닛의 사정거리 만큼 원을 그린다.
 
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경

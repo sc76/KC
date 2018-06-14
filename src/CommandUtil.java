@@ -492,7 +492,7 @@ public class CommandUtil {
 	 * @param target
 	 * @return
 	 */
-	public Unit GetClosestUnitTypeToTarget(UnitType type, Position target)
+	public Unit GetClosestSelfUnitTypeToTarget(UnitType type, Position target)
 	{
 		Unit closestUnit = null;
 		double closestDist = 100000000;

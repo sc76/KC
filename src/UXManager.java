@@ -940,13 +940,18 @@ public class UXManager {
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
 		{
 			MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 5, "" + white + unit.getID());
+			
 			if(unit.getType() == UnitType.Zerg_Overlord){
 				String OverloadJobTyep = OverloadManager.Instance().getOverloadData().getOverloadJob(unit).toString();
 				char OverloadSmallJobTyep = OverloadManager.Instance().getOverloadData().getJobCode(unit);
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + OverloadJobTyep + "(" + OverloadSmallJobTyep + ")");
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
 			}else if(unit.getType() == UnitType.Zerg_Drone){
 				String WorkerJobTyep = WorkerManager.Instance().getWorkerData().getWorkerJob(unit).toString();
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + WorkerJobTyep);
+			}else if(unit.getType() == UnitType.Zerg_Hydralisk){
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "CoolDown : " + white + unit.getGroundWeaponCooldown());
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
 			}
 		}
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
@@ -1055,7 +1060,7 @@ public class UXManager {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 
 		if (enemyBaseLocation != null) {
-			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") (" + enemyBaseLocation.getPosition()+ ")");
+			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") " + enemyBaseLocation.getPosition());
 		}
 		else {
 			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
