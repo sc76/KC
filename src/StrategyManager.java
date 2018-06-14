@@ -1172,8 +1172,7 @@ public class StrategyManager {
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
 				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다.	
-				
-				if(closesAttackUnitFromEnemyMainBase != null){
+				if(closesAttackUnitFromEnemyMainBase != null && unit.getDistance(enemyMainBaseLocation.getPoint()) < 1500){
 					targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
 				}else{
 					targetPosition = enemyMainBaseLocation.getPosition();
