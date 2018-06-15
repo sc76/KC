@@ -21,8 +21,6 @@ public class Config {
 	/// 봇 개발자 이름
 	public static final String BotAuthors = "KC";
 	
-	
-	
 	/// 로그 파일 이름
 	public static String LogFilename = BotName + "_LastGameLog.dat";
 	/// 읽기 파일 경로
@@ -31,9 +29,7 @@ public class Config {
 	public static String WriteDirectory = "bwapi-data\\write\\";		
 
 	// BasicBot 1.1 Patch End //////////////////////////////////////////////////
-
 	
-
 	/// 로컬에서 게임을 실행할 때 게임스피드 (코드 제출 후 서버에서 게임을 실행할 때는 서버 설정을 사용함)<br>
 	/// Speedups for automated play, sets the number of milliseconds bwapi spends in each frame<br>
 	/// Fastest: 42 ms/frame.  1초에 24 frame. 일반적으로 1초에 24frame을 기준 게임속도로 합니다<br>
@@ -57,7 +53,6 @@ public class Config {
     /// 로컬에서 게임을 실행할 때 전체 지도를 다 보이게 할 것인지 여부 (코드 제출 후 서버에서 게임을 실행할 때는 서버 설정을 사용함)
     // 사용하지 말것 sc76.choi : true로 변경 하지 말것(오버로드가 정찰을 못감)
 	//public static boolean EnableCompleteMapInformation = false;
-
 	
 	/// MapGrid 에서 한 개 GridCell 의 size
 	public static int MAP_GRID_SIZE = 32;
@@ -68,18 +63,24 @@ public class Config {
 
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
 	public static int WorkersPerRefinery = 3;
+	
 	/// 건물과 건물간 띄울 최소한의 간격 - 일반적인 건물의 경우
 	public static int BuildingSpacing = 2;
+	
 	/// 건물과 건물간 띄울 최소한의 간격 - ResourceDepot 건물의 경우 (Nexus, Hatchery, Command Center)
 	public static int BuildingResourceDepotSpacing = 0;
+	
 	/// 건물과 건물간 띄울 최소한의 간격 - Protoss_Pylon 건물의 경우 - 게임 초기에
 	public static int BuildingPylonEarlyStageSpacing = 4;
+	
 	/// 건물과 건물간 띄울 최소한의 간격 - Protoss_Pylon 건물의 경우 - 게임 초기 이후에
 	public static int BuildingPylonSpacing = 2;
+	
 	/// 건물과 건물간 띄울 최소한의 간격 - Terran_Supply_Depot 건물의 경우
 	public static int BuildingSupplyDepotSpacing = 0;
+	
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 1; // sc76.choi 0 -> 3 조정
+	public static int BuildingDefenseTowerSpacing = 0; // sc76.choi 0 -> 3 조정
 	
 	/// 화면 표시 여부 - 게임 정보
 	public static boolean DrawGameInfo = true;
@@ -100,7 +101,7 @@ public class Config {
 	public static boolean DrawEnemyUnitInfo = false;
 	
 	/// 화면 표시 여부 - 유닛 ~ Target 간 직선
-	public static boolean DrawUnitTargetInfo = false;
+	public static boolean DrawUnitTargetInfo = true;
 
 	/// 화면 표시 여부 - 빌드 큐
 	public static boolean DrawProductionInfo = true;

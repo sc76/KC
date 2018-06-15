@@ -290,7 +290,6 @@ public class StrategyManager {
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//12
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//13
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//14
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//15
 
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor); //19
@@ -310,7 +309,6 @@ public class StrategyManager {
 						
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//17
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//19
 			
 			
 			BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
@@ -1152,8 +1150,17 @@ public class StrategyManager {
 			}
 			else {
 				if (nearEnemyUnitPosition == null) {
-					unit.unburrow();
-					hasCommanded = true;
+					// sc76.choi Config.TILE_SIZE*5 거리 만큼 적이 있으면 unburrow를 하면 안된다.
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
+						if(who.getPlayer() == enemyPlayer && who.canAttack()){
+							unit.burrow();
+							hasCommanded = true;
+						}else{
+							unit.unburrow();
+							hasCommanded = true;
+						}
+					}
+					
 				}
 			}			
 		}
@@ -1173,17 +1180,34 @@ public class StrategyManager {
 			if(combatState == CombatState.attackStarted){
 				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다. 
 				if(closesAttackUnitFromEnemyMainBase != null 
-						&& unit.getDistance(new Position(2000, 2000)) < Config.TILE_SIZE*50){ 
-					targetPosition = enemyMainBaseLocation.getPosition(); 
-				}else{ 
+						&& unit.getDistance(enemyMainBaseLocation.getPosition()) > Config.TILE_SIZE*36){ // sc76.choi 36이면 서킷에서 다리를 양쪽으로 건널 수 있다. 
 					targetPosition = closesAttackUnitFromEnemyMainBase.getPosition(); 
+				}else{ 
+					targetPosition = enemyMainBaseLocation.getPosition(); 
 				}
 				
 				// 적진과 가까이에 있으면 그냥 자유롭게 싸운다.
 				// TODO 단, 공격 타겟이 항상 enemyMainBaseLocation는 아니다, 수정 해야 한다. 메인 타켓 Position은 별도는 global하게 관리 되어야 한다.
-				if(unit.getDistance(enemyMainBaseLocation.getPosition()) <= Config.TILE_SIZE*30){
-					targetPosition = enemyMainBaseLocation.getPosition();
+				//if(unit.getDistance(enemyMainBaseLocation.getPosition()) <= Config.TILE_SIZE*30){
+				//	targetPosition = enemyMainBaseLocation.getPosition();
+				//}
+				
+				if(unit.getID() % 4 == 0){
+					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*10);
 				}
+				// 3시
+				else if(unit.getID() % 4 == 1){
+					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*10, targetPosition.getY());
+				}
+				// 6시ㅣ
+				else if(unit.getID() % 4 == 2){
+					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*10);
+				}
+				// 9시
+				else{
+					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*10, targetPosition.getY());
+				}
+				
 				commandUtil.attackMove(unit, targetPosition);
 				
 				hasCommanded = true;

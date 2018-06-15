@@ -62,7 +62,7 @@ public class UXManager {
 	/// 경기 진행 중 매 프레임마다 추가 정보를 출력하고 사용자 입력을 처리합니다
 	public void update() {
 		
-		MyBotModule.Broodwar.drawCircleMap(new Position(2000, 2000), Config.TILE_SIZE * 50, Color.White);
+		MyBotModule.Broodwar.drawCircleMap(new Position(2000, 2000), Config.TILE_SIZE * 35, Color.White);
 		
 		drawGameInformationOnScreen(5, 15);
 
@@ -763,19 +763,29 @@ public class UXManager {
 		int	rows = MapGrid.Instance().getRows();
 		int	cols = MapGrid.Instance().getCols();
 		
-		for (int i = 0; i<cols; i++) {
-			MyBotModule.Broodwar.drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, Color.Grey);
+		for (int i = 0; i<cols; i+=2) {
+			//MyBotModule.Broodwar.drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, Color.Grey);
 		}
 
-		for (int j = 0; j<rows; j++) {
-			MyBotModule.Broodwar.drawLineMap(0, j*cellSize, mapWidth, j*cellSize, Color.Grey);
+		for (int j = 0; j<rows; j+=2) {
+			//MyBotModule.Broodwar.drawLineMap(0, j*cellSize, mapWidth, j*cellSize, Color.Grey);
 		}
 		
 		for (int r = 0; r < rows; r+=2)
 		{
 			for (int c = 0; c < cols; c+=2)
 			{
+				Position blackPosition = new TilePosition(c, r).toPosition();
+				TilePosition bt = new TilePosition(c, r);
+				
+				if(!bt.isValid()){
+					System.out.println("new TilePosition(c, r) [" + c + "," + r +"] " + bt.isValid());
+				}
+				//if(!blackPosition.makeValid()){
+				//	MyBotModule.Broodwar.drawCircleMap(blackPosition, Config.TILE_SIZE, Color.Black);
+				//}
 				MyBotModule.Broodwar.drawTextMap(c * 32, r * 32, c + "," + r);
+				System.out.println();
 			}
 		}		
 	}
