@@ -23,6 +23,9 @@ public class GameCommander {
 			return;
 		}
 		StrategyManager.Instance().onStart();
+		
+		// sc76.choi 맵에 필요한 부분에 표시를 한다.
+		UXManager.Instance().onStart();
 	}
 
 	/// 경기가 종료될 때 일회적으로 발생하는 이벤트를 처리합니다

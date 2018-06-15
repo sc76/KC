@@ -1171,11 +1171,12 @@ public class StrategyManager {
 			
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
-				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다.	
-				if(closesAttackUnitFromEnemyMainBase != null && unit.getDistance(enemyMainBaseLocation.getPoint()) < 1500){
-					targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
-				}else{
-					targetPosition = enemyMainBaseLocation.getPosition();
+				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다. 
+				if(closesAttackUnitFromEnemyMainBase != null 
+						&& unit.getDistance(new Position(2000, 2000)) < Config.TILE_SIZE*50){ 
+					targetPosition = enemyMainBaseLocation.getPosition(); 
+				}else{ 
+					targetPosition = closesAttackUnitFromEnemyMainBase.getPosition(); 
 				}
 				
 				// 적진과 가까이에 있으면 그냥 자유롭게 싸운다.
@@ -1196,23 +1197,76 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
-	boolean controlCombatUnitType2(Unit unit) {
-		boolean hasCommanded = false;
-		Position targetPosition = null;
-		
+	boolean controlCombatUnitType2(Unit unit) { 
+		boolean hasCommanded = false; Position targetPosition = null;
 		if (unit.getType() == UnitType.Zerg_Hydralisk) {
 			
 			if (combatState == CombatState.defenseMode) {
 				
-				
 			}else{
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
-				if(unit.getGroundWeaponCooldown() == 0 && unit.getHitPoints() > 10){
+				if(unit.getGroundWeaponCooldown() == 0 
+						&& unit.getHitPoints() > 10
+						){
 					targetPosition = enemyMainBaseLocation.getPosition();
+	
+					// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 도망갈때의 포지션 만큼 이동을 계속 한다.
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*3)){
+						if(who.getPlayer() == enemyPlayer
+								&& who.canAttack()){
+							return true;
+						}
+					}
+	
 					commandUtil.attackMove(unit, targetPosition);
-				}else{
+				}
+				// 도망 갈때는
+				else{
+					
+							
 					targetPosition = myFirstExpansionLocation.getPosition();
-					commandUtil.move(unit, targetPosition);
+					
+					// 적진에서 1300보다 안쪽에 있으면, 개활지가 아니다. 그래서 그냥 본진으로 뺀다.
+					if(unit.getDistance(enemyMainBaseLocation.getPoint()) < 1300){
+						commandUtil.move(unit, targetPosition);
+					}else{
+					
+						// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
+						// 12시
+						Position calPosition = myFirstExpansionLocation.getPosition();
+						
+						if(unit.getID() % 4 == 0){
+							calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
+							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 12");
+						}
+						// 3시
+						else if(unit.getID() % 4 == 1){
+							calPosition = new Position(unit.getPosition().getX() + Config.TILE_SIZE*4, unit.getPosition().getY());
+							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 3");
+						}
+						// 6시ㅣ
+						else if(unit.getID() % 4 == 2){
+							calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*4);
+							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 6");
+						}
+						// 9시
+						else{
+							calPosition = new Position(unit.getPosition().getX()  - Config.TILE_SIZE*4, unit.getPosition().getY());
+							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 9");
+						}
+						
+						double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
+						double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
+						
+						// 가야할 곳이 전진과 더 가깝다면, 그냥 본진 방향
+						if(d1 > d2){
+							targetPosition = myFirstExpansionLocation.getPosition();
+						}else{
+							targetPosition = calPosition;;
+						}
+						
+						commandUtil.move(unit, targetPosition);
+					}
 				}
 				hasCommanded = true;
 			}

@@ -61,6 +61,9 @@ public class UXManager {
 
 	/// 경기 진행 중 매 프레임마다 추가 정보를 출력하고 사용자 입력을 처리합니다
 	public void update() {
+		
+		MyBotModule.Broodwar.drawCircleMap(new Position(2000, 2000), Config.TILE_SIZE * 50, Color.White);
+		
 		drawGameInformationOnScreen(5, 15);
 
 		if (Config.DrawEnemyUnitInfo) {
@@ -945,13 +948,15 @@ public class UXManager {
 				String OverloadJobTyep = OverloadManager.Instance().getOverloadData().getOverloadJob(unit).toString();
 				char OverloadSmallJobTyep = OverloadManager.Instance().getOverloadData().getJobCode(unit);
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + OverloadJobTyep + "(" + OverloadSmallJobTyep + ")");
-				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
+				if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null)
+					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
 			}else if(unit.getType() == UnitType.Zerg_Drone){
 				String WorkerJobTyep = WorkerManager.Instance().getWorkerData().getWorkerJob(unit).toString();
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + WorkerJobTyep);
 			}else if(unit.getType() == UnitType.Zerg_Hydralisk){
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "CoolDown : " + white + unit.getGroundWeaponCooldown());
-				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
+				if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null)
+					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
 			}
 		}
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
