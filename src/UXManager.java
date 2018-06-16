@@ -195,6 +195,10 @@ public class UXManager {
 	
 	// sc76.choi 오버로드의 시야를 원을 Map 에 표시합니다
 	public void drawSightToSpecialUnits() {
+		
+		// 가장 앞선 히드라
+		MyBotModule.Broodwar.drawTextScreen(220, 330 + 10 + 10, "Cloest Hydra : " + StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase().getID());
+		
 		// 오버로드 
 		for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){
 			MyBotModule.Broodwar.drawCircleMap(overload.getPosition(), 10 * Config.TILE_SIZE, Color.Purple);
