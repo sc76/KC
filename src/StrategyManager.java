@@ -49,15 +49,6 @@ public class StrategyManager {
 	UnitType mySpecialUnitType5;				///                    울트라
 	UnitType mySpecialUnitType6;				///                    퀸
 
-	// 업그레이드 / 리서치 할 것                                          프로토스           테란                    저그
-	UpgradeType 	necessaryUpgradeType1;		/// 드라군사정거리업    마린공격력업            히드라사정거리업
-	UpgradeType 	necessaryUpgradeType2;		/// 질럿발업            마린사정거리업          히드라발업
-	UpgradeType 	necessaryUpgradeType3;		/// 하이템플러에너지업  사이언스베슬에너지업    오버로드속도업
-
-	TechType 		necessaryTechType1;			/// 사이오닉스톰        시즈모드                러커
-	TechType 		necessaryTechType2;			/// 할루시네이션        이라디에이트           컨슘           
-	TechType 		necessaryTechType3;			///              야마토건                플레이그       
-
 	// 아군 공격 유닛 생산 순서 
 	int[] buildOrderArrayOfMyCombatUnitType;	/// 아군 공격 유닛 첫번째 타입, 두번째 타입 생산 순서
 	int nextTargetIndexOfBuildOrderArray;	/// buildOrderArrayMyCombatUnitType 에서 다음 생산대상 아군 공격 유닛
@@ -236,14 +227,6 @@ public class StrategyManager {
 			seedPositionStrategyOfMyInitialBuildingType = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;	// 본진
 			seedPositionStrategyOfMyDefenseBuildingType = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;	// 첫번째 choke point
 			seedPositionStrategyOfMyCombatUnitTrainingBuildingType = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;	// 앞마당
-		
-			// 업그레이드 및 리서치 대상 설정
-			necessaryUpgradeType1 = UpgradeType.Grooved_Spines; // 히드라 사정업
-			necessaryUpgradeType2 = UpgradeType.Muscular_Augments; // 히드라 발업
-			necessaryUpgradeType3 = UpgradeType.Pneumatized_Carapace; // 오버로드 속도업
-			necessaryTechType1 = TechType.Lurker_Aspect; // 럴커
-			necessaryTechType2 = TechType.Consume; // 컨슘
-			necessaryTechType3 = TechType.Plague; // 플레이그
 		}
 		
 		if(enemyRace != null && enemyRace == Race.Protoss){
@@ -2008,7 +1991,7 @@ public class StrategyManager {
 	}
 
 	/// 업그레이드 및 테크 리서치를 실행합니다
-	private KCUpgradeAndTech upgradeAndTech = new KCUpgradeAndTech();
+	private KCUpgradeAndTech upGradeAndTech = new KCUpgradeAndTech();
 	void executeUpgradeAndTechResearch() {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
@@ -2020,19 +2003,18 @@ public class StrategyManager {
 		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) {
 			return;
 		}
-		
 
 		// 적군의 종족에 따라
 		if (enemyRace == Race.Protoss) {
-			upgradeAndTech.upGradeAndTechAgainstProtoss();
+		//	upgradeAndTech.upGradeAndTechAgainstProtoss();
 		}
 		else if (enemyRace == Race.Terran) {
-			upgradeAndTech.upGradeAndTechAgainstTerran();
+			//upgradeAndTech.upGradeAndTechAgainstTerran();
 		}
 		else if (enemyRace == Race.Zerg) {
-			upgradeAndTech.upGradeAndTechAgainstZerg();
+			//upgradeAndTech.upGradeAndTechAgainstZerg();
 		}else{
-			upgradeAndTech.upGradeAndTechAgainstProtoss();
+			//upgradeAndTech.upGradeAndTechAgainstProtoss();
 		}
 	}
 
@@ -2459,52 +2441,4 @@ public class StrategyManager {
 	public BuildOrderItem.SeedPositionStrategy getSeedPositionStrategyOfMyCombatUnitTrainingBuildingType() {
 		return seedPositionStrategyOfMyCombatUnitTrainingBuildingType;
 	}
-	
-	public UpgradeType getNecessaryUpgradeType1() {
-		return necessaryUpgradeType1;
-	}
-
-	public void setNecessaryUpgradeType1(UpgradeType necessaryUpgradeType1) {
-		this.necessaryUpgradeType1 = necessaryUpgradeType1;
-	}
-
-	public UpgradeType getNecessaryUpgradeType2() {
-		return necessaryUpgradeType2;
-	}
-
-	public void setNecessaryUpgradeType2(UpgradeType necessaryUpgradeType2) {
-		this.necessaryUpgradeType2 = necessaryUpgradeType2;
-	}
-
-	public UpgradeType getNecessaryUpgradeType3() {
-		return necessaryUpgradeType3;
-	}
-
-	public void setNecessaryUpgradeType3(UpgradeType necessaryUpgradeType3) {
-		this.necessaryUpgradeType3 = necessaryUpgradeType3;
-	}
-
-	public TechType getNecessaryTechType1() {
-		return necessaryTechType1;
-	}
-
-	public void setNecessaryTechType1(TechType necessaryTechType1) {
-		this.necessaryTechType1 = necessaryTechType1;
-	}
-
-	public TechType getNecessaryTechType2() {
-		return necessaryTechType2;
-	}
-
-	public void setNecessaryTechType2(TechType necessaryTechType2) {
-		this.necessaryTechType2 = necessaryTechType2;
-	}
-
-	public TechType getNecessaryTechType3() {
-		return necessaryTechType3;
-	}
-
-	public void setNecessaryTechType3(TechType necessaryTechType3) {
-		this.necessaryTechType3 = necessaryTechType3;
-	}	
 }
