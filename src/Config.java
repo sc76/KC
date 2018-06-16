@@ -8,11 +8,52 @@ public class Config {
 	
 	/// KC custom start
 	public static final boolean DEBUG = true; // debug show 여부를 판단할 boolean
+	
+	// sc76.choi 추가 정보를 화면에 그린다.
+	public static boolean DrawSightInfo = true; 
+	
 	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
-	// 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
-	public static int DISTANCE_WORKER_CANATTACK = 32 * 3; // TILE_SIZE
-	public static int COUNT_WORKERS_CANATTACK = 7; // 일꾼 공격 합세는 2마리만 한다.
-	public static boolean DrawSightInfo = true; // 유닛의 사정거리 만큼 원을 그린다.
+	
+	// sc76.choi 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
+	public static int DISTANCE_WORKER_CANATTACK = 32 * 7; // TILE_SIZE
+	
+	// sc76.choi 일꾼 공격 합세숫자
+	public static int COUNT_WORKERS_CANATTACK = 3; 
+	
+	// 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
+	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
+	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 4; // 히드라
+	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
+	
+	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
+	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 4; // 히드라
+	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 0; // 럴커
+	
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
+	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
+	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
+	
+	// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
+	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 8; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 12;  // 히드라
+	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 2;  // 럴커
+	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
+	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
+	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 1; // 디파일러
+	
+	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12;  // 히드라
+	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
+	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
+	public static int necessaryNumberOfSpecialCombatUnitType1AgainstProtoss = 1; // 오버로드
+	public static int necessaryNumberOfSpecialCombatUnitType2AgainstProtoss = 1; // 디파일러
+	
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 8; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 12;  // 히드라
+	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
+	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
+	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
+	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 1; // 디파일러	
 
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
@@ -101,7 +142,7 @@ public class Config {
 	public static boolean DrawEnemyUnitInfo = false;
 	
 	/// 화면 표시 여부 - 유닛 ~ Target 간 직선
-	public static boolean DrawUnitTargetInfo = true;
+	public static boolean DrawUnitTargetInfo = false;
 
 	/// 화면 표시 여부 - 빌드 큐
 	public static boolean DrawProductionInfo = true;
@@ -125,6 +166,4 @@ public class Config {
 	public static final Color ColorLineMineral = Color.Cyan;
 	public static final Color ColorUnitNearEnemy = Color.Red;
 	public static final Color ColorUnitNotNearEnemy = Color.Green;
-	
-	
 }

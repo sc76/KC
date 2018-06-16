@@ -63,6 +63,16 @@ public class StrategyManager {
 	int nextTargetIndexOfBuildOrderArray;	/// buildOrderArrayMyCombatUnitType 에서 다음 생산대상 아군 공격 유닛
 
 	// 아군의 공격유닛 숫자
+	int necessaryNumberOfCombatUnitType1;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 
+	int necessaryNumberOfCombatUnitType2;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 
+	int necessaryNumberOfCombatUnitType3;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자
+	
+	// 아군의 공격유닛 숫자
+	int necessaryNumberOfDefenceUnitType1;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자 
+	int necessaryNumberOfDefenceUnitType2;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자 
+	int necessaryNumberOfDefenceUnitType3;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자	
+
+	// 아군의 공격유닛 숫자
 	int myKilledCombatUnitCount1;				/// 첫번째 유닛 타입의 사망자 숫자 누적값
 	int myKilledCombatUnitCount2;				/// 두번째 유닛 타입의 사망자 숫자 누적값
 	int myKilledCombatUnitCount3;				/// 세번째 유닛 타입의 사망자 숫자 누적값
@@ -191,6 +201,7 @@ public class StrategyManager {
 		isInitialBuildOrderFinished = false;
 		combatState = CombatState.initialMode;
 		
+		// 나의 유닛
 		if (myRace == Race.Protoss) {
 		}
 		else if (myRace == Race.Terran) {
@@ -233,6 +244,41 @@ public class StrategyManager {
 			necessaryTechType1 = TechType.Lurker_Aspect; // 럴커
 			necessaryTechType2 = TechType.Consume; // 컨슘
 			necessaryTechType3 = TechType.Plague; // 플레이그
+		}
+		
+		if(enemyRace != null && enemyRace == Race.Protoss){
+			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss;
+			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstProtoss;
+			necessaryNumberOfDefenceUnitType3 = Config.necessaryNumberOfDefenceUnitType3AgainstProtoss;
+			
+			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstProtoss;
+			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstProtoss;
+			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstProtoss;
+			
+		}else if(enemyRace != null && enemyRace == Race.Zerg){
+			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstZerg;
+			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstZerg;
+			necessaryNumberOfDefenceUnitType3 = Config.necessaryNumberOfDefenceUnitType3AgainstZerg;
+			
+			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstZerg;
+			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstZerg;
+			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstZerg;
+		}else if(enemyRace != null && enemyRace == Race.Terran){
+			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstTerran;
+			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstTerran;
+			necessaryNumberOfDefenceUnitType3 = Config.necessaryNumberOfDefenceUnitType3AgainstTerran;
+			
+			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstTerran;
+			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstTerran;
+			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstTerran;
+		}else{
+			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss;
+			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstProtoss;
+			necessaryNumberOfDefenceUnitType3 = Config.necessaryNumberOfDefenceUnitType3AgainstProtoss;
+			
+			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstProtoss;
+			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstProtoss;
+			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstProtoss;
 		}
 	}
 
@@ -460,24 +506,23 @@ public class StrategyManager {
 	boolean isTimeToStartAttack(){
 
 		// sc76.choi 최소방어 유닛보다 많고
-		if (
-			myCombatUnitType1List.size() >= Config.necessaryNumberOfDefenceUnitType1 // 저글링
-			|| myCombatUnitType2List.size() >= Config.necessaryNumberOfDefenceUnitType2 // 히드라
-			|| myCombatUnitType3List.size() >= Config.necessaryNumberOfDefenceUnitType3 // 럴커
-		) 
+		if (myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1 // 저글링
+			|| myCombatUnitType2List.size() >= necessaryNumberOfDefenceUnitType2 // 히드라
+			|| myCombatUnitType3List.size() >= necessaryNumberOfDefenceUnitType3 // 럴커
+		)
 		{
 			//////////////////////////////////////////////////////////////////////////////
 			// sc76.choi 공격 유닛수가 충족하면
 			// 1. 저글링이 12마리이상, 럴커가 2마리 이상
 			// 2. 히드라가 8마리이상, 럴커가 1마리 이상
 			//////////////////////////////////////////////////////////////////////////////
-			if ((myCombatUnitType2List.size() >= Config.necessaryNumberOfCombatUnitType2) ||
+			if ((myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2) ||
 					
-				(myCombatUnitType1List.size() >= Config.necessaryNumberOfCombatUnitType1 
-				&& myCombatUnitType3List.size() >= Config.necessaryNumberOfCombatUnitType3) ||
+				(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1 
+				&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) ||
 				
-				(myCombatUnitType2List.size() >= Config.necessaryNumberOfCombatUnitType2
-				&& myCombatUnitType3List.size() >= Config.necessaryNumberOfCombatUnitType3)
+				(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2
+				&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
 			) {
 				
 				// 에너지 100 이상 갖고있는 특수 유닛이 존재하면 
@@ -501,7 +546,7 @@ public class StrategyManager {
 				return true;
 			}
 			
-			if (myCombatUnitType2List.size() >= 8) {
+			if (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2) {
 				countAttack++;
 				return true;
 			}
@@ -516,7 +561,7 @@ public class StrategyManager {
 		// myCombatUnitType1 : 저글링 
 		// myCombatUnitType2 : 히드라 
 		// myCombatUnitType3 : 럴커 
-		if (myCombatUnitType2List.size() < Config.necessaryNumberOfDefenceUnitType2){
+		if (myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
 			countDefence++;
 			return true;
 		}
