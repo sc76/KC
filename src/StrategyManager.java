@@ -715,7 +715,7 @@ public class StrategyManager {
 			}
 			
 			if (unit.getType() == UnitType.Zerg_Lurker) {
-				hasCommanded = controlLurkerUnitType(unit);
+				hasCommanded = controCombatUnitType3(unit);
 			}
 			if (unit.getType() == mySpecialUnitType1) {					
 				hasCommanded = controlSpecialUnitType1(unit);
@@ -773,7 +773,7 @@ public class StrategyManager {
 				
 				// 럴커
 				if (unit.getType() == myCombatUnitType3) {
-					hasCommanded = controlLurkerUnitType(unit);					
+					hasCommanded = controCombatUnitType3(unit);					
 				}
 				
 				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
@@ -842,8 +842,8 @@ public class StrategyManager {
 			
 			boolean hasCommanded = false;
 			
-			if (unit.getType() == UnitType.Zerg_Lurker) { // 럴커
-				hasCommanded = controlLurkerUnitType(unit);					
+			if (unit.getType() == myCombatUnitType3) { // 럴커
+				hasCommanded = controCombatUnitType3(unit);					
 			}
 			
 			if (unit.getType() == mySpecialUnitType1) {	// 오버로드				
@@ -968,66 +968,9 @@ public class StrategyManager {
 		}
 	}
 	
-	/// 시즈탱크 유닛에 대해 컨트롤 명령을 내립니다
-	boolean controlSiegeTankUnitType(Unit unit){
-		
-		boolean hasCommanded = false;
-
-		// defenseMode 일 경우
-		if (combatState == CombatState.defenseMode) {
-			
-			// 아군 방어 건물이 세워져있는 위치 주위에 시즈모드 시켜놓는다
-			Position myDefenseBuildingPosition = null;
-			switch (seedPositionStrategyOfMyDefenseBuildingType) {
-				case MainBaseLocation: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-				case FirstChokePoint: myDefenseBuildingPosition = myFirstChokePoint.getCenter(); break;
-				case FirstExpansionLocation: myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); break;
-				case SecondChokePoint: myDefenseBuildingPosition = mySecondChokePoint.getCenter(); break;
-				default: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-			}
-
-			if (myDefenseBuildingPosition != null) {		
-				if (unit.isSieged() == false) {			
-					if (unit.getDistance(myDefenseBuildingPosition) < 5 * Config.TILE_SIZE) {
-						unit.siege();
-						hasCommanded = true;
-					}
-				}
-			}
-		}
-		else {
-			// 적이 근처에 있으면 시즈모드 시키고, 없으면 시즈모드를 해제한다
-			Position nearEnemyUnitPosition = null;			
-			double tempDistance = 0;
-			for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
-				
-				if (enemyUnit.isFlying() || enemyUnit.exists() == false) continue;
-
-				tempDistance = unit.getDistance(enemyUnit.getPosition());
-				if (tempDistance < 12 * Config.TILE_SIZE) {
-					nearEnemyUnitPosition = enemyUnit.getPosition();
-				}
-			}
-				
-			if (unit.isSieged() == false) {			
-				if (nearEnemyUnitPosition != null) {
-					unit.siege();
-					hasCommanded = true;
-				}
-			}
-			else {						
-				if (nearEnemyUnitPosition == null) {
-					unit.unsiege();
-					hasCommanded = true;
-				}
-			}
-		}
-		
-		return hasCommanded;
-	}
 
 	/// 러커 유닛에 대해 컨트롤 명령을 내립니다
-	boolean controlLurkerUnitType(Unit unit){
+	boolean controCombatUnitType3(Unit unit){
 		
 		boolean hasCommanded = false;
 		
@@ -1123,19 +1066,19 @@ public class StrategyManager {
 				//}
 				
 				if(unit.getID() % 4 == 0){
-					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*9);
+					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*10);
 				}
 				// 3시
 				else if(unit.getID() % 4 == 1){
-					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*9, targetPosition.getY());
+					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*10, targetPosition.getY());
 				}
 				// 6시ㅣ
 				else if(unit.getID() % 4 == 2){
-					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*9);
+					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*10);
 				}
 				// 9시
 				else{
-					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*9, targetPosition.getY());
+					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*10, targetPosition.getY());
 				}
 				
 				// 4방향의 포지션 중, valid지역이 아니면 그냥 적진을 targetPosition으로 지정한다.
@@ -2188,6 +2131,7 @@ public class StrategyManager {
 	}
 
 	/// 특수 유닛을 생산할 수 있도록 테크트리에 따라 건설을 실시합니다
+	private KCTechTreeUp techTreeUp = new KCTechTreeUp();
 	void executeTechTreeUpConstruction() {
 
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
@@ -2207,8 +2151,6 @@ public class StrategyManager {
 		else if (myRace == Race.Zerg) {
 			
 			// sc76.choi 기본 Spawning Pool 테크 작성예정
-			
-			
 			// sc76.choi 기본 Lair 테크
 			// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
@@ -2266,6 +2208,19 @@ public class StrategyManager {
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Defiler_Mound, true);
 			}
+		}
+		
+		// 적군의 종족에 따라
+		if (enemyRace == Race.Protoss) {
+			techTreeUp.techTreeupAgainstProtoss();
+		}
+		else if (enemyRace == Race.Terran) {
+			techTreeUp.techTreeupAgainstTerran();
+		}
+		else if (enemyRace == Race.Zerg) {
+			techTreeUp.techTreeupAgainstZerg();
+		}else{
+			techTreeUp.techTreeupAgainstProtoss();
 		}
 	}
 
