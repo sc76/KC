@@ -449,7 +449,7 @@ public class StrategyManager {
 			}
 		}
 		
-		System.out.println("unitListByType.size() : " + unitListByType.size());
+		//System.out.println("unitListByType.size() : " + unitListByType.size());
 		if(unitListByType.isEmpty()){
 			return closestUnitForAttack;
 		}
@@ -587,7 +587,7 @@ public class StrategyManager {
 			// 1. 저글링이 12마리이상, 럴커가 2마리 이상
 			// 2. 히드라가 8마리이상, 럴커가 1마리 이상
 			//////////////////////////////////////////////////////////////////////////////
-			if ((myCombatUnitType1List.size() >= 12 && myCombatUnitType3List.size() >= 2)
+			if ((myCombatUnitType1List.size() >= 6 && myCombatUnitType3List.size() >= 2)
 				|| (myCombatUnitType2List.size() >= 8 && myCombatUnitType3List.size() >= 1)
 			) {
 				
@@ -612,7 +612,7 @@ public class StrategyManager {
 				return true;
 			}
 			
-			if (myCombatUnitType2List.size() >= 12) {
+			if (myCombatUnitType2List.size() >= 8) {
 				countAttack++;
 				return true;
 			}
@@ -641,10 +641,17 @@ public class StrategyManager {
 
 			// 적군 본진에 아군 유닛이 10 이상 도착했으면 거의 게임 끝난 것
 			int myUnitCountAroundEnemyMainBaseLocation = 0;
+			int enemyUnitCountAroundEnemyMainBaseLocation = 0;
 			for(Unit unit : MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE)) {
 				if (unit.getPlayer() == myPlayer) {
 					myUnitCountAroundEnemyMainBaseLocation ++;
-				}				
+				}
+				
+				if(myUnitCountAroundEnemyMainBaseLocation > 10){
+					if(unit.getPlayer() == enemyPlayer) {
+						enemyUnitCountAroundEnemyMainBaseLocation ++ ;
+					}
+				}
 			}
 			if (myUnitCountAroundEnemyMainBaseLocation > 10) {
 				return true;
@@ -653,7 +660,12 @@ public class StrategyManager {
 		
 		// sc76.choi 일꾼만 20마리 죽여도 elimination한다.
 		// sc76.choi 그리고, frame count가 28800 = 24 * 60 * 20 (즉 20분이 지났으면)이면 eliminate를 시작한다.
-		if (enemyKilledWorkerUnitCount >= 20 && MyBotModule.Broodwar.getFrameCount() >= 28800) {
+		if (enemyKilledWorkerUnitCount >= 20 && MyBotModule.Broodwar.getFrameCount() >= 20000) {
+			return true;
+		}
+		
+		// sc76.choi 일꾼만 25마리 죽여도 elimination한다.
+		if (enemyKilledWorkerUnitCount >= 25){
 			return true;
 		}
 		
@@ -1179,8 +1191,9 @@ public class StrategyManager {
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
 				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다. 
+				// sc76.choi 36이면 서킷에서 다리를 양쪽으로 건널 수 있다.
 				if(closesAttackUnitFromEnemyMainBase != null 
-						&& unit.getDistance(enemyMainBaseLocation.getPosition()) > Config.TILE_SIZE*36){ // sc76.choi 36이면 서킷에서 다리를 양쪽으로 건널 수 있다. 
+						&& unit.getDistance(enemyMainBaseLocation.getPosition()) > Config.TILE_SIZE*38){  
 					targetPosition = closesAttackUnitFromEnemyMainBase.getPosition(); 
 				}else{ 
 					targetPosition = enemyMainBaseLocation.getPosition(); 
@@ -1193,19 +1206,19 @@ public class StrategyManager {
 				//}
 				
 				if(unit.getID() % 4 == 0){
-					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*10);
+					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*9);
 				}
 				// 3시
 				else if(unit.getID() % 4 == 1){
-					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*10, targetPosition.getY());
+					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*9, targetPosition.getY());
 				}
 				// 6시ㅣ
 				else if(unit.getID() % 4 == 2){
-					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*10);
+					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*9);
 				}
 				// 9시
 				else{
-					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*10, targetPosition.getY());
+					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*9, targetPosition.getY());
 				}
 				
 				commandUtil.attackMove(unit, targetPosition);
@@ -1226,7 +1239,7 @@ public class StrategyManager {
 		if (unit.getType() == UnitType.Zerg_Hydralisk) {
 			
 			if (combatState == CombatState.defenseMode) {
-				
+				hasCommanded = false;
 			}else{
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
 				if(unit.getGroundWeaponCooldown() == 0 
@@ -1235,8 +1248,9 @@ public class StrategyManager {
 					targetPosition = enemyMainBaseLocation.getPosition();
 	
 					// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 도망갈때의 포지션 만큼 이동을 계속 한다.
-					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*3)){
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*4)){
 						if(who.getPlayer() == enemyPlayer
+								&& who.getType().isBuilding() == false
 								&& who.canAttack()){
 							return true;
 						}
@@ -1247,49 +1261,72 @@ public class StrategyManager {
 				// 도망 갈때는
 				else{
 					
-							
-					targetPosition = myFirstExpansionLocation.getPosition();
+					// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 
+					// 건물만 있으면, 그냥 계속 공격하도록 한다.
+					int checkAroundCanAttakUnit = 0;
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*4)){
+						if(who.getPlayer() == enemyPlayer){
+							System.out.println("who ID ["+who.getID()+"] : " + who.getPlayer() + ", " + who.getType().canAttack());
+							if(who.getType().canAttack()){
+								checkAroundCanAttakUnit++;
+							}
+						}
+					}
+					System.out.println("checkAroundCanAttakUnit["+unit.getID()+"] : " + checkAroundCanAttakUnit);
 					
-					// 적진에서 1300보다 안쪽에 있으면, 개활지가 아니다. 그래서 그냥 본진으로 뺀다.
-					if(unit.getDistance(enemyMainBaseLocation.getPoint()) < 1300){
-						commandUtil.move(unit, targetPosition);
-					}else{
+					// 주변에 빌딩밖에 없으면 전진 공격만 한다.
+					if(checkAroundCanAttakUnit == 0){
+						targetPosition = enemyMainBaseLocation.getPosition();
+						commandUtil.attackMove(unit, targetPosition);
+						hasCommanded = true;
+						return hasCommanded;
+					}
+					// 주변에 공격 대상이 있으면 그대로 뺀다.
+					else{
 					
-						// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
-						// 12시
-						Position calPosition = myFirstExpansionLocation.getPosition();
+						targetPosition = myFirstExpansionLocation.getPosition();
 						
-						if(unit.getID() % 4 == 0){
-							calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
-							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 12");
-						}
-						// 3시
-						else if(unit.getID() % 4 == 1){
-							calPosition = new Position(unit.getPosition().getX() + Config.TILE_SIZE*4, unit.getPosition().getY());
-							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 3");
-						}
-						// 6시ㅣ
-						else if(unit.getID() % 4 == 2){
-							calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*4);
-							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 6");
-						}
-						// 9시
-						else{
-							calPosition = new Position(unit.getPosition().getX()  - Config.TILE_SIZE*4, unit.getPosition().getY());
-							System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 9");
-						}
-						
-						double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
-						double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
-						
-						// 가야할 곳이 전진과 더 가깝다면, 그냥 본진 방향
-						if(d1 > d2){
-							targetPosition = myFirstExpansionLocation.getPosition();
+						// 적진에서 1300보다 안쪽에 있으면, 개활지가 아니다. 그래서 그냥 본진으로 뺀다.
+						if(unit.getDistance(enemyMainBaseLocation.getPoint()) < 1300){
+							commandUtil.move(unit, targetPosition);
 						}else{
-							targetPosition = calPosition;;
-						}
 						
-						commandUtil.move(unit, targetPosition);
+							// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
+							// 12시
+							Position calPosition = myFirstExpansionLocation.getPosition();
+							
+							if(unit.getID() % 4 == 0){
+								calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
+								System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 12");
+							}
+							// 3시
+							else if(unit.getID() % 4 == 1){
+								calPosition = new Position(unit.getPosition().getX() + Config.TILE_SIZE*4, unit.getPosition().getY());
+								System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 3");
+							}
+							// 6시ㅣ
+							else if(unit.getID() % 4 == 2){
+								calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*4);
+								System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 6");
+							}
+							// 9시
+							else{
+								calPosition = new Position(unit.getPosition().getX()  - Config.TILE_SIZE*4, unit.getPosition().getY());
+								System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 9");
+							}
+							
+							double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
+							double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
+							
+							// 가야할 곳이 전진과 더 가깝다면, 그냥 본진 방향
+							if(d1 > d2){
+								targetPosition = myFirstExpansionLocation.getPosition();
+							}else{
+								targetPosition = calPosition;;
+							}
+							
+							commandUtil.move(unit, targetPosition);
+						}
 					}
 				}
 				hasCommanded = true;
