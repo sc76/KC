@@ -715,7 +715,7 @@ public class StrategyManager {
 			}
 			
 			if (unit.getType() == UnitType.Zerg_Lurker) {
-				hasCommanded = controCombatUnitType3(unit);
+				hasCommanded = controlCombatUnitType3(unit);
 			}
 			if (unit.getType() == mySpecialUnitType1) {					
 				hasCommanded = controlSpecialUnitType1(unit);
@@ -773,7 +773,7 @@ public class StrategyManager {
 				
 				// 럴커
 				if (unit.getType() == myCombatUnitType3) {
-					hasCommanded = controCombatUnitType3(unit);					
+					hasCommanded = controlCombatUnitType3(unit);					
 				}
 				
 				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
@@ -843,7 +843,7 @@ public class StrategyManager {
 			boolean hasCommanded = false;
 			
 			if (unit.getType() == myCombatUnitType3) { // 럴커
-				hasCommanded = controCombatUnitType3(unit);					
+				hasCommanded = controlCombatUnitType3(unit);					
 			}
 			
 			if (unit.getType() == mySpecialUnitType1) {	// 오버로드				
@@ -969,76 +969,6 @@ public class StrategyManager {
 	}
 	
 
-	/// 러커 유닛에 대해 컨트롤 명령을 내립니다
-	boolean controCombatUnitType3(Unit unit){
-		
-		boolean hasCommanded = false;
-		
-		// defenseMode 일 경우
-		if (combatState == CombatState.defenseMode) {
-			
-			// 아군 방어 건물이 세워져있는 위치 주위에 버로우시켜놓는다
-			Position myDefenseBuildingPosition = null;
-			switch (seedPositionStrategyOfMyDefenseBuildingType) {
-				case MainBaseLocation: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-				case FirstChokePoint: myDefenseBuildingPosition = myFirstChokePoint.getCenter(); break;
-				case FirstExpansionLocation: myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); break;
-				case SecondChokePoint: myDefenseBuildingPosition = mySecondChokePoint.getCenter(); break;
-				default: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-			}
-
-			// sc76.choi, defenseMode이지만, 적진에 깊이 박혀 있으면, 그대로 둔다.
-			if (myDefenseBuildingPosition != null) {
-				if (unit.isBurrowed() == false) {			
-					if (unit.getDistance(myDefenseBuildingPosition) < 5 * Config.TILE_SIZE) {
-						unit.burrow();
-						hasCommanded = true;
-					}
-				}
-			}
-		}
-		// defenseMode 가 아닐 경우
-		else {
-			
-			// 근처에 적 유닛이 있으면 버로우 시키고, 없으면 언버로우 시킨다
-			Position nearEnemyUnitPosition = null;
-			double tempDistance = 0;
-			for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
-				
-				if (enemyUnit.isFlying()) continue;
-
-				tempDistance = unit.getDistance(enemyUnit.getPosition());
-				if (tempDistance < 6 * Config.TILE_SIZE) {
-					nearEnemyUnitPosition = enemyUnit.getPosition();
-				}
-			}
-			
-			if (unit.isBurrowed() == false) {				
-				
-				if (nearEnemyUnitPosition != null) {
-					unit.burrow();
-					hasCommanded = true;
-				}
-			}
-			else {
-				if (nearEnemyUnitPosition == null) {
-					// sc76.choi Config.TILE_SIZE*5 거리 만큼 적이 있으면 unburrow를 하면 안된다.
-					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
-						if(who.getPlayer() == enemyPlayer && who.canAttack()){
-							unit.burrow();
-							hasCommanded = true;
-						}else{
-							unit.unburrow();
-							hasCommanded = true;
-						}
-					}
-					
-				}
-			}			
-		}
-
-		return hasCommanded;
-	}
 
 	/// 첫번째 일반공격 유닛 타입의 유닛에 대해 컨트롤 명령을 입력합니다(저글링)
 	boolean controlCombatUnitType1(Unit unit) {
@@ -1065,24 +995,46 @@ public class StrategyManager {
 				//	targetPosition = enemyMainBaseLocation.getPosition();
 				//}
 				
+				// 12시
 				if(unit.getID() % 4 == 0){
 					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*10);
+					
+					// 12시가 invalid이면 6시
+					if(!targetPosition.isValid()){
+						targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*10);
+					}
 				}
 				// 3시
 				else if(unit.getID() % 4 == 1){
 					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*10, targetPosition.getY());
+					
+					// 3시가 invalid이면 9시
+					if(!targetPosition.isValid()){
+						targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*10, targetPosition.getY());
+					}					
 				}
-				// 6시ㅣ
+				// 6시
 				else if(unit.getID() % 4 == 2){
 					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*10);
+					
+					// 6시가 invalid이면 12시
+					if(!targetPosition.isValid()){
+						targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*10);
+					}
 				}
 				// 9시
 				else{
 					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*10, targetPosition.getY());
+					// 9시가 invalid이면 3시
+					if(!targetPosition.isValid()){
+						targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*10, targetPosition.getY());
+					}										
 				}
 				
 				// 4방향의 포지션 중, valid지역이 아니면 그냥 적진을 targetPosition으로 지정한다.
-				if(!targetPosition.isValid()) targetPosition = enemyMainBaseLocation.getPosition();
+				if(!targetPosition.isValid()){
+					targetPosition = enemyMainBaseLocation.getPosition();
+				}
 				
 				commandUtil.attackMove(unit, targetPosition);
 				
@@ -1269,6 +1221,77 @@ public class StrategyManager {
 				hasCommanded = true;
 			}
 		}
+		return hasCommanded;
+	}
+	
+	/// 러커 유닛에 대해 컨트롤 명령을 내립니다
+	boolean controlCombatUnitType3(Unit unit){
+		
+		boolean hasCommanded = false;
+		
+		// defenseMode 일 경우
+		if (combatState == CombatState.defenseMode) {
+			
+			// 아군 방어 건물이 세워져있는 위치 주위에 버로우시켜놓는다
+			Position myDefenseBuildingPosition = null;
+			switch (seedPositionStrategyOfMyDefenseBuildingType) {
+				case MainBaseLocation: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
+				case FirstChokePoint: myDefenseBuildingPosition = myFirstChokePoint.getCenter(); break;
+				case FirstExpansionLocation: myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); break;
+				case SecondChokePoint: myDefenseBuildingPosition = mySecondChokePoint.getCenter(); break;
+				default: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
+			}
+
+			// sc76.choi, defenseMode이지만, 적진에 깊이 박혀 있으면, 그대로 둔다.
+			if (myDefenseBuildingPosition != null) {
+				if (unit.isBurrowed() == false) {			
+					if (unit.getDistance(myDefenseBuildingPosition) < 5 * Config.TILE_SIZE) {
+						unit.burrow();
+						hasCommanded = true;
+					}
+				}
+			}
+		}
+		// defenseMode 가 아닐 경우
+		else {
+			
+			// 근처에 적 유닛이 있으면 버로우 시키고, 없으면 언버로우 시킨다
+			Position nearEnemyUnitPosition = null;
+			double tempDistance = 0;
+			for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
+				
+				if (enemyUnit.isFlying()) continue;
+
+				tempDistance = unit.getDistance(enemyUnit.getPosition());
+				if (tempDistance < 6 * Config.TILE_SIZE) {
+					nearEnemyUnitPosition = enemyUnit.getPosition();
+				}
+			}
+			
+			if (unit.isBurrowed() == false) {				
+				
+				if (nearEnemyUnitPosition != null) {
+					unit.burrow();
+					hasCommanded = true;
+				}
+			}
+			else {
+				if (nearEnemyUnitPosition == null) {
+					// sc76.choi Config.TILE_SIZE*5 거리 만큼 적이 있으면 unburrow를 하면 안된다.
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
+						if(who.getPlayer() == enemyPlayer && who.canAttack()){
+							unit.burrow();
+							hasCommanded = true;
+						}else{
+							unit.unburrow();
+							hasCommanded = true;
+						}
+					}
+					
+				}
+			}			
+		}
+
 		return hasCommanded;
 	}
 	
