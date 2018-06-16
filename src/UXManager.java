@@ -197,7 +197,9 @@ public class UXManager {
 	public void drawSightToSpecialUnits() {
 		
 		// 가장 앞선 히드라
-		MyBotModule.Broodwar.drawTextScreen(220, 330 + 10 + 10, "Cloest Hydra : " + StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase().getID());
+		if(StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase() != null){
+			MyBotModule.Broodwar.drawTextScreen(220, 330 + 10 + 10, "Cloest Hydra : " + StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase().getID());
+		}
 		
 		// 오버로드 
 		for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){

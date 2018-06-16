@@ -11,6 +11,8 @@ public class KCTechTreeUp {
 
 		
 		// sc76.choi 기본 Spawning Pool 테크 작성예정
+		
+		
 		// sc76.choi 기본 Lair 테크
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
@@ -32,6 +34,20 @@ public class KCTechTreeUp {
 		}
 		
 		// sc76.choi 빠른 Lair 테크(상황에 따라) 작성 예정
+		
+		// sc76.choi 기본 spire 테크 작성예정
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1
+				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
+			{
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire, true);
+			}
+		
+		// sc76.choi 기본 spire 테크 작성예정					
+		
 		
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
