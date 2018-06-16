@@ -1,4 +1,5 @@
 import bwapi.Color;
+import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TilePosition;
@@ -9,6 +10,8 @@ import bwta.BWTA;
 /// 일꾼 유닛들의 상태를 관리하고 컨트롤하는 class
 public class WorkerManager {
 
+	Player myPlayer = MyBotModule.Broodwar.self();
+	
 	/// 각 Worker 에 대한 WorkerJob 상황을 저장하는 자료구조 객체
 	private WorkerData workerData = new WorkerData();
 	
@@ -119,9 +122,11 @@ public class WorkerManager {
 						}
 					}
 				}
-				// 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 400 이하이면 skip
+				// sc76.choi 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 400 이하이면 skip
+				// sc76.choi 하지만, Lair 이후 테크이면, 가스가 많이 필요하다
 				else{
-					if(selfGas <= 400) return;
+					if(selfGas <= 400  
+						|| (myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive))  > 0) return;
 					for (Unit changeMineralWorker : MyBotModule.Broodwar.self().getUnits()){
 						if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
 							setIdleWorker(changeMineralWorker);
