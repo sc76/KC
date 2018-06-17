@@ -204,7 +204,7 @@ public class UXManager {
 		if(StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase() != null){
 			iClosestHydra = StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase().getID(); 
 		}
-		MyBotModule.Broodwar.drawTextScreen(310, 330 + 20, "Closest Hydra : " + iClosestHydra);
+		MyBotModule.Broodwar.drawTextScreen(310, 330, "Closest Hydra : " + iClosestHydra);
 		
 		
 		// 오버로드 
@@ -1105,13 +1105,13 @@ public class UXManager {
 		}
 
 		if (currentScoutStatus == ScoutManager.ScoutStatus.NoScout.ordinal()) {
-			MyBotModule.Broodwar.drawTextScreen(x-30, y + 20, "No Scout Unit");
+			MyBotModule.Broodwar.drawTextScreen(x-30, y, "No Scout Unit");
 		}
 		else {
 			
 			Unit scoutUnit = ScoutManager.Instance().getScoutUnit();
 			if (scoutUnit != null) {
-				MyBotModule.Broodwar.drawTextScreen(x-30, y + 20, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
+				MyBotModule.Broodwar.drawTextScreen(x-30, y, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
 	
 				Position scoutMoveTo = scoutUnit.getTargetPosition();
 	
