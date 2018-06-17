@@ -53,9 +53,9 @@ public class KCUpgradeAndTech {
 		}			
 		// 러커는 최우선으로 리서치한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
-				&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
-					myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
-					myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
+			  && (myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+				  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
 		// 컨슘은 최우선으로 리서치한다
@@ -187,7 +187,10 @@ public class KCUpgradeAndTech {
 			isTimeToStartUpgradeType3 = true;
 		}			
 		// 러커는 최우선으로 리서치한다
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 && myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+			  && (myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
 		// 컨슘은 최우선으로 리서치한다
@@ -318,7 +321,10 @@ public class KCUpgradeAndTech {
 			isTimeToStartUpgradeType3 = true;
 		}			
 		// 러커는 최우선으로 리서치한다
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 && myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+			  && (myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
 		// 컨슘은 최우선으로 리서치한다
@@ -335,6 +341,10 @@ public class KCUpgradeAndTech {
 		
 		// 테크 리서치는 높은 우선순위로 우선적으로 실행
 		// 럴커
+		System.out.println(" isTimeToStartResearchTech1 :  " + isTimeToStartResearchTech1);
+		System.out.println(" myPlayer.isResearching(necessaryTechType1) :  " + myPlayer.isResearching(necessaryTechType1));
+		System.out.println(" myPlayer.hasResearched(necessaryTechType1) :  " + myPlayer.hasResearched(necessaryTechType1));
+		System.out.println(" BuildManager.Instance().buildQueue.getItemCount(necessaryTechType1) :  " + BuildManager.Instance().buildQueue.getItemCount(necessaryTechType1));
 		if (isTimeToStartResearchTech1) 
 		{
 			if (myPlayer.isResearching(necessaryTechType1) == false
