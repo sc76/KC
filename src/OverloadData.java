@@ -216,4 +216,56 @@ public class OverloadData {
 		if (ol == OverloadData.OverloadJob.EnemyBase) return 'E';
 		return 'X';
 	}
+	
+	// 각 타입별 오버로드 갯수
+	public final int getNumIdleOverloads(){
+		int num = 0;
+		for (Unit unit : overloads){
+			if (getJobCode(unit) == 'I'){
+				num++;
+			}
+		}
+		return num;
+	}
+	
+	public final int getNumScoutOverloads(){
+		int num = 0;
+		for (Unit unit : overloads){
+			if (getJobCode(unit) == 'S'){
+				num++;
+			}
+		}
+		return num;
+	}
+
+	public final int getNumAttackMoveOverloads(){
+		int num = 0;
+		for (Unit unit : overloads){
+			if (getJobCode(unit) == 'A'){
+				num++;
+			}
+		}
+		return num;
+	}
+
+	public final int getNumPatrolOverloads(){
+		int num = 0;
+		for (Unit unit : overloads){
+			if (getJobCode(unit) == 'P'){
+				num++;
+			}
+		}
+		return num;
+	}
+	
+	public final int getNumEnemyBaseOverloads(){
+		int num = 0;
+		for (Unit unit : overloads){
+			if (getJobCode(unit) == 'E'){
+				num++;
+			}
+		}
+		return num;
+	}
+
 }
