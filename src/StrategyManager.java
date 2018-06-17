@@ -69,6 +69,7 @@ public class StrategyManager {
 	int myKilledCombatUnitCount2;				/// 두번째 유닛 타입의 사망자 숫자 누적값 // 히드라
 	int myKilledCombatUnitCount3;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 럴커
 	int myKilledCombatUnitCount4;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 뮤탈
+	int myKilledCombatUnitCount5;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 울트라
 
 	// 아군의 특수유닛 숫자
 	int maxNumberOfSpecialUnitType1;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 오버로드
@@ -1429,7 +1430,7 @@ public class StrategyManager {
 	/// StrategyManager 의 수행상황을 표시합니다
 	private void drawStrategyManagerStatus() {
 		
-		int y = 200;
+		int y = 190;
 		int t = 240;
 		// 아군 공격유닛 숫자 및 적군 공격유닛 숫자
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType1.toString().replaceAll("Zerg_", ""));
@@ -1439,10 +1440,22 @@ public class StrategyManager {
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType2.toString().replaceAll("Zerg_", ""));
 		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType2List.size());
 		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount2);
+		
 		y += 10;
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType3.toString().replaceAll("Zerg_", ""));
 		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType3List.size());
 		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount3);
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType4.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType4List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount4);
+
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType5.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType5List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount5);		
+		
 		y += 10;
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType1.toString().replaceAll("Zerg_", ""));
 		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType1List.size());
@@ -1474,10 +1487,10 @@ public class StrategyManager {
 		y += 20;
 
 		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
-		MyBotModule.Broodwar.drawTextScreen(200, y, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
+		MyBotModule.Broodwar.drawTextScreen(190, y, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
 		y += 10;
 		// 전투 상황
-		MyBotModule.Broodwar.drawTextScreen(200, y, "combatState " + combatState.toString());
+		MyBotModule.Broodwar.drawTextScreen(190, y+10, "combatState " + combatState.toString());
 	}
 	
 	
@@ -1660,14 +1673,21 @@ public class StrategyManager {
 	 */
 	void updatebuildOrderArray(){
 		
-		// 공격 유닛 생산 순서 설정
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) {
-			buildOrderArrayOfMyCombatUnitType = new int[]{1,2,4,4}; 	// 저글링 저글링 히드라 뮤탈 뮤탈 스커지 
-		}else if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) {
-				buildOrderArrayOfMyCombatUnitType = new int[]{1,1,2,5,5}; 	// 저글링 저글링 히드라 울트라 울트라 
+		// sc76.choi 공격 유닛 생산 순서 설정
+		// sc76.choi 단, 배열의 length는 동일하게 가야 한다. 에러 방지
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
+			
+			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 4, 4}; 	// 저글링 저글링 저글링 히드라 뮤탈 뮤탈
+			
+		}else if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
+			
+			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 5, 5, 2, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
+			
 		}else{
-			buildOrderArrayOfMyCombatUnitType = new int[]{1,1,2,2,2,3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			
+			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			
 		}
 	}
 	
@@ -1703,6 +1723,14 @@ public class StrategyManager {
 			// 럴커
 			else if (unit.getType() == myCombatUnitType3 ) {
 				myKilledCombatUnitCount3 ++;		
+			} 
+			// 뮤탈
+			else if (unit.getType() == myCombatUnitType4 ) {
+				myKilledCombatUnitCount4 ++;		
+			} 
+			// 울트라
+			else if (unit.getType() == myCombatUnitType5 ) {
+				myKilledCombatUnitCount5 ++;		
 			} 
 			else if (myCombatUnitType3 == UnitType.Terran_Siege_Tank_Tank_Mode && unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode) {
 				myKilledCombatUnitCount3 ++;		
@@ -2264,8 +2292,8 @@ public class StrategyManager {
 	public UnitType getNextCombatUnitTypeToTrain() {
 		
 		UnitType nextUnitTypeToTrain = null;
-		System.out.println("getNextCombatUnitTypeToTrain buildOrderArrayOfMyCombatUnitType.length : " + buildOrderArrayOfMyCombatUnitType.length);
-		System.out.println("getNextCombatUnitTypeToTrain nextTargetIndexOfBuildOrderArray : " + nextTargetIndexOfBuildOrderArray);
+		//System.out.println("getNextCombatUnitTypeToTrain buildOrderArrayOfMyCombatUnitType.length : " + buildOrderArrayOfMyCombatUnitType.length);
+		//System.out.println("getNextCombatUnitTypeToTrain nextTargetIndexOfBuildOrderArray : " + nextTargetIndexOfBuildOrderArray);
 		try{
 			
 			if (buildOrderArrayOfMyCombatUnitType[nextTargetIndexOfBuildOrderArray] == 1) {
