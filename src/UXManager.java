@@ -109,6 +109,9 @@ public class UXManager {
 		if (Config.DrawWorkerInfo) {
 			// 각 일꾼들의 임무 상황
 			drawWorkerStateOnScreen(5, 60);
+			
+			// 각 오버로드들의 임무 상황
+			drawOverloadStateOnScreen(5, 100);
 
 			// 베이스캠프당 일꾼 수
 			drawWorkerCountOnMap();
@@ -197,9 +200,12 @@ public class UXManager {
 	public void drawSightToSpecialUnits() {
 		
 		// 가장 앞선 히드라
+		int iClosestHydra = 0;
 		if(StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase() != null){
-			MyBotModule.Broodwar.drawTextScreen(220, 330 + 10 + 10, "Cloest Hydra : " + StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase().getID());
+			iClosestHydra = StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase().getID(); 
 		}
+		MyBotModule.Broodwar.drawTextScreen(310, 330 + 20, "Closest Hydra : " + iClosestHydra);
+		
 		
 		// 오버로드 
 		for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){
@@ -968,7 +974,7 @@ public class UXManager {
 					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
 			}else if(unit.getType() == UnitType.Zerg_Drone){
 				String WorkerJobTyep = WorkerManager.Instance().getWorkerData().getWorkerJob(unit).toString();
-				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + WorkerJobTyep);
+				//MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + WorkerJobTyep);
 			}else if(unit.getType() == UnitType.Zerg_Hydralisk){
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "CoolDown : " + white + unit.getGroundWeaponCooldown());
 				if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null)
@@ -1021,6 +1027,17 @@ public class UXManager {
 			}
 		}
 		*/
+	}
+	
+	public void drawOverloadStateOnScreen(int x, int y){
+		OverloadData  overloadData = OverloadManager.Instance().getOverloadData();
+		int rowSpace = 10;
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<O S : " + overloadData.getNumScoutOverloads() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace, white + "<O P : " + overloadData.getNumPatrolOverloads() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace*2, white + "<O I : " + overloadData.getNumIdleOverloads() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace*3, white + "<O A : " + overloadData.getNumAttackMoveOverloads() + ">");		
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace*4, white + "<O E : " + overloadData.getNumEnemyBaseOverloads() + ">");
+		
 	}
 
 	/// ResourceDepot 별 Worker 숫자를 Map 에 표시합니다
@@ -1081,20 +1098,20 @@ public class UXManager {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 
 		if (enemyBaseLocation != null) {
-			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") " + enemyBaseLocation.getPosition());
+			MyBotModule.Broodwar.drawTextScreen(x-30, y, "Enemy MainBase : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") " + enemyBaseLocation.getPosition());
 		}
 		else {
-			MyBotModule.Broodwar.drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
+			MyBotModule.Broodwar.drawTextScreen(x-30, y, "Enemy MainBase : Unknown");
 		}
 
 		if (currentScoutStatus == ScoutManager.ScoutStatus.NoScout.ordinal()) {
-			MyBotModule.Broodwar.drawTextScreen(x, y + 10, "No Scout Unit");
+			MyBotModule.Broodwar.drawTextScreen(x-30, y + 20, "No Scout Unit");
 		}
 		else {
 			
 			Unit scoutUnit = ScoutManager.Instance().getScoutUnit();
 			if (scoutUnit != null) {
-				MyBotModule.Broodwar.drawTextScreen(x, y + 10, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
+				MyBotModule.Broodwar.drawTextScreen(x-30, y + 20, "Scout Unit : " + scoutUnit.getType() + " " + scoutUnit.getID() + " (" + scoutUnit.getTilePosition().getX() + ", " + scoutUnit.getTilePosition().getY() + ")");
 	
 				Position scoutMoveTo = scoutUnit.getTargetPosition();
 	
