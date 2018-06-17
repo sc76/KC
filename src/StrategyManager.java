@@ -721,11 +721,14 @@ public class StrategyManager {
 			
 			boolean hasCommanded = false;
 
+			// sc76.choi Patrol한다.
+			//if (unit.getType() == myCombatUnitType1) {
+			//	hasCommanded = controlCombatUnitType1(unit);
+			//}
 			// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기 구현
 			if (unit.getType() == myCombatUnitType2) {
 				hasCommanded = controlCombatUnitType2(unit);
 			}
-			
 			if (unit.getType() == myCombatUnitType3) {
 				hasCommanded = controlCombatUnitType3(unit);
 			}
@@ -1051,9 +1054,26 @@ public class StrategyManager {
 				commandUtil.attackMove(unit, targetPosition);
 				
 				hasCommanded = true;
-			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
-				targetPosition = myMainBaseLocation.getPosition();
-				commandUtil.patrol(unit, myFirstExpansionLocation.getPosition());
+			}else if(combatState == CombatState.defenseMode){
+				
+				//targetPosition = myMainBaseLocation.getPosition();
+				//commandUtil.patrol(unit, myFirstChokePoint.getCenter());
+				
+				if(unit.getDistance(myFirstExpansionLocation.getPosition()) > Config.TILE_SIZE*9){
+					System.out.println("CombatState.defenseMode 1 : " + unit.getID());
+					commandUtil.attackMove(unit, myFirstExpansionLocation.getPosition());
+				}
+				
+				if(unit.getDistance(myFirstExpansionLocation.getPosition()) < Config.TILE_SIZE*3){
+					System.out.println("CombatState.defenseMode 1 : " + unit.getID());
+					commandUtil.attackMove(unit, myFirstChokePoint.getCenter());
+				}
+				
+				if(unit.getDistance(myFirstChokePoint.getCenter()) < Config.TILE_SIZE*1){
+					System.out.println("CombatState.defenseMode 2 : " + unit.getID());
+					commandUtil.attackMove(unit, myFirstExpansionLocation.getPosition());
+				}
+				
 				hasCommanded = true;
 			}
 		}
@@ -1458,7 +1478,7 @@ public class StrategyManager {
 	private final char white = '';
 	private void drawStrategyManagerStatus() {
 		
-		int y = 190;
+		int y = 180;
 		int t = 240;
 		// 아군 공격유닛 숫자 및 적군 공격유닛 숫자
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType1.toString().replaceAll("Zerg_", ""));
@@ -1520,7 +1540,7 @@ public class StrategyManager {
 		y += 20;
 
 		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
-		MyBotModule.Broodwar.drawTextScreen(190, y, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
+		MyBotModule.Broodwar.drawTextScreen(190, y-10, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
 		y += 10;
 		
 		// 전투 상황
