@@ -55,6 +55,7 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0

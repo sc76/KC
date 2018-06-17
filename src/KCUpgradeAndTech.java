@@ -36,7 +36,8 @@ public class KCUpgradeAndTech {
 		}
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 사정거리 업그레이드 후 업그레이드한다
 		// 히드라 발업
-		if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
+		if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType2 = true;
 		}			
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
@@ -45,7 +46,7 @@ public class KCUpgradeAndTech {
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
 		// sc76.choi Lair 갯수를 체크 할때는 Hive(completedUnitCount, incompleteUnitCount)도 같이 체크를 해야 한다.
-		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 				&& myPlayer.isResearching(necessaryTechType1) == true) {
@@ -89,7 +90,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.hasResearched(necessaryTechType2) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType2) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType2, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType2, false);
 			}
 		}
 		
@@ -100,31 +101,38 @@ public class KCUpgradeAndTech {
 				&& myPlayer.hasResearched(necessaryTechType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType3, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType3, false);
 			}
 		}		
 		
 		// 업그레이드는 낮은 우선순위로 실행
 		// sc76.choi 히드라 사정 업그레이드
+		// sc76.choi 챔버 방어 업그레이드
+		// Zerg_Carapace 방어 업그레이드
+		// Zerg_Missile_Attacks 히드라 공격 업그레이드
+		// Zerg_Melee_Attacks 저글링 공격 업그레이드
 		if (isTimeToStartUpgradeType1) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 0 
 				&& myPlayer.isUpgrading(necessaryUpgradeType1) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, false);
 			}
 		}
 		
 		
 		// 히드라 발업
+		// sc76.choi 챔버 공격 업그레이드		
 		if (isTimeToStartUpgradeType2) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 0 
 				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false);				
 			}
 		}
 
@@ -137,6 +145,7 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, false);
 			}
 		}
 
