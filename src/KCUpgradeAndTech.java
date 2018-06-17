@@ -44,11 +44,18 @@ public class KCUpgradeAndTech {
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.isResearching(necessaryTechType1) == true) {
+		// sc76.choi Lair 갯수를 체크 할때는 Hive(completedUnitCount, incompleteUnitCount)도 같이 체크를 해야 한다.
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				&& myPlayer.isResearching(necessaryTechType1) == true) {
 			isTimeToStartUpgradeType3 = true;
 		}			
 		// 러커는 최우선으로 리서치한다
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 && myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0) {
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+				&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+					myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+					myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
 		// 컨슘은 최우선으로 리서치한다
@@ -121,7 +128,8 @@ public class KCUpgradeAndTech {
 			}
 		}
 
-		// 오버로드 속도업
+		// 오버로드 속도업 
+		// sc76.choi necessaryUpgradeType3 : Pneumatized_Carapace
 		if (isTimeToStartUpgradeType3) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) == 0 
@@ -172,7 +180,10 @@ public class KCUpgradeAndTech {
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.isResearching(necessaryTechType1) == true) {
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				&& myPlayer.isResearching(necessaryTechType1) == true) {
 			isTimeToStartUpgradeType3 = true;
 		}			
 		// 러커는 최우선으로 리서치한다
@@ -300,7 +311,10 @@ public class KCUpgradeAndTech {
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0 && myPlayer.isResearching(necessaryTechType1) == true) {
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				&& myPlayer.isResearching(necessaryTechType1) == true) {
 			isTimeToStartUpgradeType3 = true;
 		}			
 		// 러커는 최우선으로 리서치한다
