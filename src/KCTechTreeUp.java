@@ -1,6 +1,7 @@
 import bwapi.Player;
 import bwapi.Race;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 
 public class KCTechTreeUp {
 
@@ -15,8 +16,8 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 Lair 테크
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Lair) <= 0
-			&& myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) <= 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 || myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
 		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
@@ -26,7 +27,8 @@ public class KCTechTreeUp {
 			if (myPlayer.allUnitCount(UnitType.Zerg_Hive) > 0 ||
 				(myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 ||
 				BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) > 0 ||
-				ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null) > 0)
+				ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null) > 0
+				)
 			{
 			}else{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, true);
@@ -71,6 +73,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 0 || myPlayer.incompleteUnitCount(UnitType.Zerg_Hive) == 0)
 			&& myPlayer.allUnitCount(UnitType.Zerg_Hive) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null) == 0) 

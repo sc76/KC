@@ -108,9 +108,6 @@ public class KCUpgradeAndTech {
 		// 업그레이드는 낮은 우선순위로 실행
 		// sc76.choi 히드라 사정 업그레이드
 		// sc76.choi 챔버 방어 업그레이드
-		// Zerg_Carapace 방어 업그레이드
-		// Zerg_Missile_Attacks 히드라 공격 업그레이드
-		// Zerg_Melee_Attacks 저글링 공격 업그레이드
 		if (isTimeToStartUpgradeType1) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 0 
@@ -118,7 +115,6 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, false);
 			}
 		}
 		
@@ -132,7 +128,6 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false);				
 			}
 		}
 
@@ -145,7 +140,6 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, false);
 			}
 		}
 
@@ -162,6 +156,114 @@ public class KCUpgradeAndTech {
 		//		}
 		//	}
 		//}
+	}
+	
+	/**
+	 * sc76.choi Evolution Chamber의 기본 업그레이드를 컨트롤 한다.
+	 * 
+	 * @author sc76.choi
+	 */
+	// Zerg_Carapace 방어 업그레이드
+	// Zerg_Missile_Attacks 히드라 공격 업그레이드
+	// Zerg_Melee_Attacks 저글링 공격 업그레이드
+	public void chamberUpgradeAgainstProtoss(){
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////
+		// Zerg_Carapace 지상 갑피 업그레이드 1 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Zerg_Carapace, false);
+		}
+		
+		// Zerg_Carapace 지상 갑피 업그레이드  2 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 1
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, false);
+		}
+		
+		// Zerg_Carapace 지상 갑피 업그레이드 3 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 2
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Carapace, false);
+		}
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////		
+		// Zerg_Missile_Attacks 원거리 공격 업그레이드 1 단계 (히드라리스크, 러커)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false);
+		}
+		
+		// Zerg_Missile_Attacks 원거리 공격 업그레이드 2 단계 (히드라리스크, 러커)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 1
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false);
+		}
+		
+		// Zerg_Missile_Attacks 원거리 공격 업그레이드 3 단계 (히드라리스크, 러커)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 2
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false);
+		}
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////		
+		// Zerg_Melee_Attacks 근접 공격 업그레이드 1 단계 (저글링, 울트라리스크, 브루들링)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, false);
+		}
+		
+		// Zerg_Melee_Attacks 근접 공격 업그레이드 2 단계 (저글링, 울트라리스크, 브루들링)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 1
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, false);
+		}
+		
+		// Zerg_Melee_Attacks 근접 공격 업그레이드 3 단계 (저글링, 울트라리스크, 브루들링)
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 2
+			&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false
+			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Melee_Attacks) == 0)
+		{
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Melee_Attacks, false);
+		}		
+				
 	}
 
 	public void upGradeAndTechAgainstZerg(){
@@ -296,6 +398,10 @@ public class KCUpgradeAndTech {
 		//		}
 		//	}
 		//}
+	}
+	
+	public void chamberUpgradeAgainstZerg(){
+		
 	}
 	
 	public void upGradeAndTechAgainstTerran(){
@@ -434,5 +540,9 @@ public class KCUpgradeAndTech {
 		//		}
 		//	}
 		//}
+	}
+	
+	public void chamberUpgradeAgainstTerran(){
+		
 	}
 }
