@@ -47,8 +47,8 @@ public class StrategyManager {
 	UnitType mySpecialUnitType1;			  	/// 옵저버       사이언스베쓸   오버로드
 	UnitType mySpecialUnitType2;				/// 하이템플러   배틀크루저     디파일러
 	UnitType mySpecialUnitType3;				///                    스커지
-	UnitType mySpecialUnitType4;				///                    울트라
-	UnitType mySpecialUnitType5;				///                    퀸
+	UnitType mySpecialUnitType4;				///                    퀸
+
 
 	// 아군 공격 유닛 생산 순서 
 	int[] buildOrderArrayOfMyCombatUnitType;	/// 아군 공격 유닛 첫번째 타입, 두번째 타입 생산 순서
@@ -58,11 +58,15 @@ public class StrategyManager {
 	int necessaryNumberOfCombatUnitType1;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 // 저글링
 	int necessaryNumberOfCombatUnitType2;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 // 히드라
 	int necessaryNumberOfCombatUnitType3;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 // 럴커
+	int necessaryNumberOfCombatUnitType4;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 // 뮤탈
+	int necessaryNumberOfCombatUnitType5;		/// 공격을 시작하기위해 필요한 최소한의 유닛 숫자 // 울트라
 	
 	// 아군의 공격유닛 숫자
 	int necessaryNumberOfDefenceUnitType1;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자 // 저글링 
 	int necessaryNumberOfDefenceUnitType2;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자 // 히드라
 	int necessaryNumberOfDefenceUnitType3;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자	// 럴커
+	int necessaryNumberOfDefenceUnitType4;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자	// 뮤탈
+	int necessaryNumberOfDefenceUnitType5;		/// 방어을 시작하기위해 필요한 최소한의 유닛 숫자	// 울트라
 
 	// 아군의 공격유닛 숫자
 	int myKilledCombatUnitCount1;				/// 첫번째 유닛 타입의 사망자 숫자 누적값 // 저글링
@@ -75,10 +79,13 @@ public class StrategyManager {
 	int maxNumberOfSpecialUnitType1;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 오버로드
 	int maxNumberOfSpecialUnitType2;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 디파일러
 	int maxNumberOfSpecialUnitType3;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 스커지
+	int maxNumberOfSpecialUnitType4;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 퀸 
+
 	
-	int myKilledSpecialUnitCount1;				/// 첫번째 특수 유닛 타입의 사망자 숫자 누적값
-	int myKilledSpecialUnitCount2;				/// 두번째 특수 유닛 타입의 사망자 숫자 누적값
-	int myKilledSpecialUnitCount3;				/// 두번째 특수 유닛 타입의 사망자 숫자 누적값
+	int myKilledSpecialUnitCount1;				/// 첫번째 특수 유닛 타입의 사망자 숫자 누적값 // 오버로드
+	int myKilledSpecialUnitCount2;				/// 두번째 특수 유닛 타입의 사망자 숫자 누적값 // 디파일러
+	int myKilledSpecialUnitCount3;				/// 두번째 특수 유닛 타입의 사망자 숫자 누적값  // 스커지
+	int myKilledSpecialUnitCount4;				/// 두번째 특수 유닛 타입의 사망자 숫자 누적값  // 퀸
 	
 	// 아군 공격 전체 유닛 목록	
 	ArrayList<Unit> myAllCombatUnitList = new ArrayList<Unit>();      
@@ -92,6 +99,7 @@ public class StrategyManager {
 	ArrayList<Unit> mySpecialUnitType1List = new ArrayList<Unit>(); // 오버로드       
 	ArrayList<Unit> mySpecialUnitType2List = new ArrayList<Unit>(); // 디파일러
 	ArrayList<Unit> mySpecialUnitType3List = new ArrayList<Unit>(); // 스커지
+	ArrayList<Unit> mySpecialUnitType4List = new ArrayList<Unit>(); // 퀸
 	
 	// 아군 방어 건물 첫번째, 두번째 타입
 	UnitType myDefenseBuildingType1;			/// 파일런 벙커 크립콜로니
@@ -145,6 +153,10 @@ public class StrategyManager {
 
 	// sc76.choi 공격을 위한 가장 가까운 아군 타겟 선정
 	Unit closesAttackUnitFromEnemyMainBase = null;
+	
+	// 가스, 미네럴 양
+	int selfMinerals = 0;
+	int selfGas = 0;
 
 	// target으로 부터 가장 가까운 공격 유닛을 찾기 위한 변수
 	ArrayList<UnitInfo> unitListByType = new ArrayList<UnitInfo>();
@@ -221,11 +233,13 @@ public class StrategyManager {
 			mySpecialUnitType1 = UnitType.Zerg_Overlord;
 			mySpecialUnitType2 = UnitType.Zerg_Defiler;
 			mySpecialUnitType3 = UnitType.Zerg_Scourge;
+			mySpecialUnitType4 = UnitType.Zerg_Queen;
 
 			// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
 			maxNumberOfSpecialUnitType1 = 3; // 오버로드  
 			maxNumberOfSpecialUnitType2 = 2; // 디파일러
 			maxNumberOfSpecialUnitType3 = 6; // 스커지
+			maxNumberOfSpecialUnitType4 = 2; // 퀸
 
 			// 방어 건물 종류 및 건설 갯수 설정
 			myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
@@ -247,6 +261,8 @@ public class StrategyManager {
 			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstProtoss;
 			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstProtoss;
 			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstProtoss;
+			necessaryNumberOfCombatUnitType4 = Config.necessaryNumberOfCombatUnitType4AgainstProtoss;
+			necessaryNumberOfCombatUnitType5 = Config.necessaryNumberOfCombatUnitType5AgainstProtoss;
 			
 		}else if(enemyRace != null && enemyRace == Race.Zerg){
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstZerg;
@@ -256,6 +272,8 @@ public class StrategyManager {
 			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstZerg;
 			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstZerg;
 			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstZerg;
+			necessaryNumberOfCombatUnitType4 = Config.necessaryNumberOfCombatUnitType4AgainstZerg;
+			necessaryNumberOfCombatUnitType5 = Config.necessaryNumberOfCombatUnitType5AgainstZerg;
 		}else if(enemyRace != null && enemyRace == Race.Terran){
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstTerran;
 			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstTerran;
@@ -264,6 +282,8 @@ public class StrategyManager {
 			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstTerran;
 			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstTerran;
 			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstTerran;
+			necessaryNumberOfCombatUnitType4 = Config.necessaryNumberOfCombatUnitType4AgainstTerran;
+			necessaryNumberOfCombatUnitType5 = Config.necessaryNumberOfCombatUnitType5AgainstTerran;
 		}else{
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss;
 			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstProtoss;
@@ -272,6 +292,8 @@ public class StrategyManager {
 			necessaryNumberOfCombatUnitType1 = Config.necessaryNumberOfCombatUnitType1AgainstProtoss;
 			necessaryNumberOfCombatUnitType2 = Config.necessaryNumberOfCombatUnitType2AgainstProtoss;
 			necessaryNumberOfCombatUnitType3 = Config.necessaryNumberOfCombatUnitType3AgainstProtoss;
+			necessaryNumberOfCombatUnitType4 = Config.necessaryNumberOfCombatUnitType4AgainstProtoss;
+			necessaryNumberOfCombatUnitType5 = Config.necessaryNumberOfCombatUnitType5AgainstProtoss;
 		}
 	}
 
@@ -519,7 +541,9 @@ public class StrategyManager {
 				&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) ||  // 럴커 
 				
 				(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2        // 히드라
-				&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)     // 럴커
+				&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) ||     // 럴커
+				
+				(myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)  // 울트라
 			) {
 				
 				// 에너지 100 이상 갖고있는 특수 유닛이 존재하면 
@@ -542,11 +566,6 @@ public class StrategyManager {
 				countAttack++;
 				return true;
 			}
-			
-//			if (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2) {
-//				countAttack++;
-//				return true;
-//			}
 		}
 		
 		return false;
@@ -556,10 +575,13 @@ public class StrategyManager {
 	boolean isTimeToStartDefense() {
 		// sc76.choi myCombatUnitType1 : 저글링 
 		// sc76.choi myCombatUnitType2 : 히드라 
-		// sc76.choi myCombatUnitType3 : 럴커 
+		// sc76.choi myCombatUnitType3 : 럴커
+		// sc76.choi myCombatUnitType4 : 뮤탈 
+		// sc76.choi myCombatUnitType5 : 울트라 		
 		// sc76.choi AND 조건으로 체크 한다.
 		if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1        // 저글링
-				&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2 // 히드라
+			  && myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
+			  && myCombatUnitType5List.size() < necessaryNumberOfCombatUnitType5   // 울트라
 		)
 		{
 			countDefence++;
@@ -1428,6 +1450,12 @@ public class StrategyManager {
 	
 	
 	/// StrategyManager 의 수행상황을 표시합니다
+	private final Character brown = '';
+	private final char red = '';
+	private final char teal = '';
+	private final char blue = '';
+	private final char purple = '';
+	private final char white = '';
 	private void drawStrategyManagerStatus() {
 		
 		int y = 190;
@@ -1470,6 +1498,11 @@ public class StrategyManager {
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType3.toString().replaceAll("Zerg_", ""));
 		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType3List.size());
 		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount3);
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType4.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType4List.size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount4);
 
 		y += 10;
 		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My Worker");
@@ -1489,8 +1522,12 @@ public class StrategyManager {
 		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
 		MyBotModule.Broodwar.drawTextScreen(190, y, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
 		y += 10;
+		
 		// 전투 상황
-		MyBotModule.Broodwar.drawTextScreen(190, y+10, "combatState " + combatState.toString());
+		MyBotModule.Broodwar.drawTextScreen(440, 20, red + "CombatState " + combatState.toString());
+		MyBotModule.Broodwar.drawTextScreen(440, 30, red + "BuildState " + "normal");
+		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "Attak Pos. " + "normal");
+		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Defence Pos. " + "normal");
 	}
 	
 	
@@ -1602,6 +1639,7 @@ public class StrategyManager {
 		mySpecialUnitType1List.clear(); // 오버로드
 		mySpecialUnitType2List.clear(); // 디파일러
 		mySpecialUnitType3List.clear(); // 스커지
+		mySpecialUnitType4List.clear(); // 퀸
 		
 		// target으로 부터 가장 가까운 공격 유닛을 찾기 위한 변수
 		unitListByType.clear();
@@ -1655,6 +1693,14 @@ public class StrategyManager {
 					myAllCombatUnitList.add(unit);
 				}
 			}
+			// 퀸
+			else if (unit.getType() == mySpecialUnitType4) { 
+				// maxNumberOfSpecialUnitType2 숫자까지만 특수유닛 부대에 포함시킨다
+				if (mySpecialUnitType4List.size() < maxNumberOfSpecialUnitType4) {
+					mySpecialUnitType4List.add(unit); 
+					myAllCombatUnitList.add(unit);
+				}
+			}
 			else if (unit.getType() == myDefenseBuildingType1) { 
 				myDefenseBuildingType1List.add(unit); 
 			}
@@ -1663,7 +1709,8 @@ public class StrategyManager {
 			}			
 		}
 		
-		
+		selfMinerals = InformationManager.Instance().selfPlayer.minerals();
+		selfGas = InformationManager.Instance().selfPlayer.gas();
 	}
 	
 	/**
@@ -1678,11 +1725,15 @@ public class StrategyManager {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
-			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 4, 4}; 	// 저글링 저글링 저글링 히드라 뮤탈 뮤탈
+			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 3, 2, 4, 4}; 	// 저글링 저글링 저글링 히드라 뮤탈 뮤탈
 			
 		}else if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 5, 5, 2, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
+			if(selfGas < 200){
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 3, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
+			}else{
+				buildOrderArrayOfMyCombatUnitType = new int[]{5, 5, 1, 1, 3, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
+			}
 			
 		}else{
 			
@@ -1743,6 +1794,9 @@ public class StrategyManager {
 			} 
 			else if (unit.getType() == mySpecialUnitType3 ) {
 				myKilledSpecialUnitCount3 ++;		
+			}
+			else if (unit.getType() == mySpecialUnitType4 ) {
+				myKilledSpecialUnitCount4 ++;		
 			}
 			
 			/// 적군 일꾼 유닛타입의 사망 유닛 숫자 누적값
@@ -2095,14 +2149,17 @@ public class StrategyManager {
 						if (BuildManager.Instance().buildQueue.getItemCount(nextUnitTypeToTrain) == 0) {	
 
 							boolean isPossibleToTrain = false;
+							boolean isLowestPriority = false; // sc76.choi Priority를 조정한다.
 							if (nextUnitTypeToTrain == UnitType.Zerg_Zergling ) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
 									isPossibleToTrain = true;
+									isLowestPriority = false;
 								}							
 							}
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Hydralisk) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0) {
 									isPossibleToTrain = true;
+									isLowestPriority = false;
 								}							
 							}
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Lurker) {
@@ -2110,19 +2167,22 @@ public class StrategyManager {
 									&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
 									&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true) {
 									isPossibleToTrain = true;
+									isLowestPriority = false;
 								}							
 							}else if (nextUnitTypeToTrain == UnitType.Zerg_Mutalisk) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0) {
 									isPossibleToTrain = true;
+									isLowestPriority = false;
 								}							
 							}else if (nextUnitTypeToTrain == UnitType.Zerg_Ultralisk) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) {
 									isPossibleToTrain = true;
+									isLowestPriority = true;
 								}							
 							}
 							
 							if (isPossibleToTrain) {
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, false);
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, isLowestPriority);
 							}
 							
 							nextTargetIndexOfBuildOrderArray++;
@@ -2136,7 +2196,7 @@ public class StrategyManager {
 				}
 			}
 			
-			// 특수 유닛 생산 - 오버로드		
+			// 특수 유닛 생산 - 1 오버로드		
 			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType1) == 0) {	
 				
 				boolean isPossibleToTrain = false;
@@ -2177,7 +2237,7 @@ public class StrategyManager {
 				}
 			}
 
-			// 특수 유닛 생산 - 디파일러
+			// 특수 유닛 생산 - 2 디파일러
 			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType2) == 0) {	
 				
 				boolean isPossibleToTrain = false;
@@ -2238,7 +2298,7 @@ public class StrategyManager {
 				}
 			}
 			
-			// 특수 유닛 생산 - 스커지
+			// 특수 유닛 생산 - 3 스커지
 			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType3) == 0) {	
 				
 				boolean isPossibleToTrain = false;
@@ -2285,6 +2345,54 @@ public class StrategyManager {
 					}
 				}
 			}
+			
+			// 특수 유닛 생산 - 4 퀸
+			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType4) == 0) {	
+				
+				boolean isPossibleToTrain = false;
+				if (mySpecialUnitType4 == UnitType.Zerg_Queen) {
+					if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0) {
+						isPossibleToTrain = true;
+					}							
+				}
+				
+				boolean isNecessaryToTrainMore = false;
+				
+				// 저그 종족의 경우, Egg 안에 있는 것까지 카운트 해야함 
+				int allCountOfSpecialUnitType4 = myPlayer.allUnitCount(mySpecialUnitType4) + BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType4);
+				if (mySpecialUnitType4.getRace() == Race.Zerg) {
+					for(Unit unit : myPlayer.getUnits()) {
+
+						if (unit.getType() == UnitType.Zerg_Egg && unit.getBuildType() == mySpecialUnitType4) {
+							allCountOfSpecialUnitType4++;
+						}
+						// 갓태어난 유닛은 아직 반영안되어있을 수 있어서, 추가 카운트를 해줘야함
+						//if (unit.getType() == mySpecialUnitType2 && unit.isConstructing()) {
+						//	allCountOfSpecialUnitType2++;
+						//}
+					}
+					  
+				}
+				if (allCountOfSpecialUnitType4 < maxNumberOfSpecialUnitType4) {
+					isNecessaryToTrainMore = true;
+				}							
+				
+				if (isPossibleToTrain && isNecessaryToTrainMore) {
+					
+					producerType = (new MetaType(mySpecialUnitType3)).whatBuilds();
+					
+					for(Unit unit : myPlayer.getUnits()) {
+						if (unit.getType() == producerType) {
+							if (unit.isTraining() == false && unit.isMorphing() == false) {
+		
+								BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType4, true);
+								break;
+							}
+							
+						}
+					}
+				}
+			} // 특수 유닛 생산 - 4 퀸			
 		}
 	}
 
