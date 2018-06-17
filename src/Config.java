@@ -20,7 +20,7 @@ public class Config {
 	// sc76.choi 일꾼 공격 합세숫자
 	public static int COUNT_WORKERS_CANATTACK = 3; 
 	
-	// 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
+	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 0; // 럴커
@@ -33,11 +33,12 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
 	
-	// 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12;  // 히드라
+	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
+	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
+	public static int necessaryNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstProtoss = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstProtoss = 1; // 디파일러
 	
@@ -45,6 +46,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 12;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
+	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 1; // 디파일러
 	
@@ -52,6 +54,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 12;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 1;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
+	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 1; // 디파일러	
 
