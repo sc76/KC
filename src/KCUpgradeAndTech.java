@@ -181,9 +181,11 @@ public class KCUpgradeAndTech {
 		}
 		
 		// Zerg_Carapace 지상 갑피 업그레이드  2 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+		if((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive)) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) > 0 // 다른 업그레이드가 1레벨 올라왔으면
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) > 0  // 다른 업그레이드가 1레벨 올라왔으면
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 1
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -195,6 +197,8 @@ public class KCUpgradeAndTech {
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) > 1 // 다른 업그레이드가 2레벨 올라왔으면
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) > 1  // 다른 업그레이드가 2레벨 올라왔으면			
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 2
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -215,10 +219,11 @@ public class KCUpgradeAndTech {
 		}
 		
 		// Zerg_Missile_Attacks 원거리 공격 업그레이드 2 단계 (히드라리스크, 러커)
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+		if((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive)) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) > 1
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) > 1 // 다른 업그레이드가 1레벨 올라왔으면
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) > 0  // 다른 업그레이드가 1레벨 올라왔으면
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 1
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
@@ -231,6 +236,7 @@ public class KCUpgradeAndTech {
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) > 2
+			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) > 1
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 2
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
@@ -251,7 +257,7 @@ public class KCUpgradeAndTech {
 		}
 		
 		// Zerg_Melee_Attacks 근접 공격 업그레이드 2 단계 (저글링, 울트라리스크, 브루들링)
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+		if((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive)) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) > 1
