@@ -22,6 +22,9 @@ public class WorkerManager {
 	
 	private static WorkerManager instance = new WorkerManager();
 	
+	int selfMinerals = 0; //InformationManager.Instance().selfPlayer.minerals();
+	int selfGas = 0 ; //InformationManager.Instance().selfPlayer.gas();
+	
 	/// static singleton 객체를 리턴합니다
 	public static WorkerManager Instance() {
 		return instance;
@@ -30,6 +33,9 @@ public class WorkerManager {
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 업데이트하고, 일꾼 유닛들이 자원 채취 등 임무 수행을 하도록 합니다
 	public void update() {
 
+		selfMinerals = InformationManager.Instance().selfPlayer.minerals();
+		selfGas = InformationManager.Instance().selfPlayer.gas();
+		
 		// 1초에 1번만 실행한다
 		//if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 
@@ -100,36 +106,38 @@ public class WorkerManager {
 	 */
 	public void handleGasWorkers(){
 		
-		int selfMinerals = InformationManager.Instance().selfPlayer.minerals();
-		int selfGas = InformationManager.Instance().selfPlayer.gas();
-		
 		// for each unit we have
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
 			// refinery 가 건설 completed 되었으면,
 			if (unit.getType().isRefinery() && unit.isCompleted() )	{
 				
-				// 미네랄*3이 가스보다 많으면
-				if(selfMinerals*3 >= selfGas){
-					// get the number of workers currently assigned to it
-					int numAssigned = workerData.getNumAssignedWorkers(unit);
+				// 미네랄3이 가스보다 많고 현재 미네랄이 200 이상이 있으면 가스를 계속 캔다. 
+				if(selfMinerals*3 >= selfGas || selfMinerals >= 200){ 
+					// get the number of workers currently assigned to it 
+					int numAssigned = workerData.getNumAssignedWorkers(unit);;
 	
 					// if it's less than we want it to be, fill 'er up
 					// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
 					for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i){
 						Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
-						if (gasWorker != null){
+						if (commandUtil.IsValidSelfUnit(gasWorker)){
+							if(gasWorker.isCarryingMinerals()) continue;
 							workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
 						}
 					}
 				}
-				// sc76.choi 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 400 이하이면 skip
+				// sc76.choi 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 500 이하이면 skip
 				// sc76.choi 하지만, Lair 이후 테크이면, 가스가 많이 필요하다
 				else{
-					if(selfGas <= 400  
-						|| (myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive))  > 0) return;
+					if(selfMinerals <= 100 && selfGas <= 500) return;
+					
 					for (Unit changeMineralWorker : MyBotModule.Broodwar.self().getUnits()){
 						if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
-							setIdleWorker(changeMineralWorker);
+							if (commandUtil.IsValidSelfUnit(changeMineralWorker)){
+								if(changeMineralWorker.isCarryingGas()) continue;
+								//setIdleWorker(changeMineralWorker);
+								setMineralWorker(changeMineralWorker);
+							}
 						}
 					}
 				}
