@@ -18,7 +18,7 @@ public class Config {
 	public static int DISTANCE_WORKER_CANATTACK = 32 * 7; // TILE_SIZE
 	
 	// sc76.choi 일꾼 공격 합세숫자
-	public static int COUNT_WORKERS_CANATTACK = 3; 
+	public static int COUNT_WORKERS_CANATTACK = 2; 
 	
 	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
@@ -58,6 +58,40 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 1; // 디파일러	
 
+	// 아군의 일반 유닛 최대 전투참가 제한 수
+	public static int maxNumberOfCombatUnitType1AgainstProtoss = 12;  // 저글링
+	public static int maxNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
+	public static int maxNumberOfCombatUnitType3AgainstProtoss = 4;  // 럴커
+	public static int maxNumberOfCombatUnitType4AgainstProtoss = 8;  // 뮤탈
+	public static int maxNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
+	
+	public static int maxNumberOfSpecialUnitType1AgainstProtoss = 3;  // 오버로드
+	public static int maxNumberOfSpecialUnitType2AgainstProtoss = 12; // 디파일러
+	public static int maxNumberOfSpecialUnitType3AgainstProtoss = 4;  // 스커지
+	public static int maxNumberOfSpecialUnitType4AgainstProtoss = 0;  // 퀸
+	
+	public static int maxNumberOfCombatUnitType1AgainstZerg = 12;  // 저글링
+	public static int maxNumberOfCombatUnitType2AgainstZerg = 12; // 히드라
+	public static int maxNumberOfCombatUnitType3AgainstZerg = 4;  // 럴커
+	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈
+	public static int maxNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
+	
+	public static int maxNumberOfSpecialUnitType1AgainstZerg = 3;  // 오버로드
+	public static int maxNumberOfSpecialUnitType2AgainstZerg = 12; // 디파일러
+	public static int maxNumberOfSpecialUnitType3AgainstZerg = 4;  // 스커지
+	public static int maxNumberOfSpecialUnitType4AgainstZerg = 0;  // 퀸
+	
+	public static int maxNumberOfCombatUnitType1AgainstTerran = 12;  // 저글링
+	public static int maxNumberOfCombatUnitType2AgainstTerran = 12; // 히드라
+	public static int maxNumberOfCombatUnitType3AgainstTerran = 4;  // 럴커
+	public static int maxNumberOfCombatUnitType4AgainstTerran = 8;  // 뮤탈
+	public static int maxNumberOfCombatUnitType5AgainstTerran = 3;  // 울트라
+	
+	public static int maxNumberOfSpecialUnitType1AgainstTerran = 3;  // 오버로드
+	public static int maxNumberOfSpecialUnitType2AgainstTerran = 12; // 디파일러
+	public static int maxNumberOfSpecialUnitType3AgainstTerran = 4;  // 스커지
+	public static int maxNumberOfSpecialUnitType4AgainstTerran = 2;  // 퀸	
+	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
 	/// 봇 이름
