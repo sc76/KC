@@ -37,6 +37,20 @@ public class StrategyManager {
 	Player enemyPlayer;
 	Race enemyRace;
 	
+	// 아군 개체 수
+	int numCombatUnitType1 = 0;
+	int numCombatUnitType2 = 0;
+	int numCombatUnitType3 = 0;
+	int numCombatUnitType4 = 0;
+	int numCombatUnitType5 = 0;
+	
+	int numSpecialUnitType1 = 0;
+	int numSpecialUnitType2 = 0;
+	int numSpecialUnitType3 = 0;
+	int numSpecialUnitType4 = 0;
+	
+	
+	
 	// 아군 공격 유닛 첫번째, 두번째, 세번째 타입                       프로토스     테란            저그
 	UnitType myCombatUnitType1;					/// 질럿         마린           저글링
 	UnitType myCombatUnitType2;			  		/// 드라군       메딕           히드라리스크
@@ -76,12 +90,19 @@ public class StrategyManager {
 	int myKilledCombatUnitCount4;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 뮤탈
 	int myKilledCombatUnitCount5;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 울트라
 
+
+	// 아군의 일반 유닛 최대 생산 제한 수
+	int maxNumberOfCombatUnitType1; 
+	int maxNumberOfCombatUnitType2; 
+	int maxNumberOfCombatUnitType3; 
+	int maxNumberOfCombatUnitType4; 
+	int maxNumberOfCombatUnitType5; 
+	
 	// 아군의 특수유닛 숫자
 	int maxNumberOfSpecialUnitType1;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 오버로드
 	int maxNumberOfSpecialUnitType2;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 디파일러
 	int maxNumberOfSpecialUnitType3;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 스커지
 	int maxNumberOfSpecialUnitType4;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 퀸 
-
 	
 	int myKilledSpecialUnitCount1;				/// 첫번째 특수 유닛 타입의 사망자 숫자 누적값 // 오버로드
 	int myKilledSpecialUnitCount2;				/// 두번째 특수 유닛 타입의 사망자 숫자 누적값 // 디파일러
@@ -165,7 +186,8 @@ public class StrategyManager {
 	BuildState buildState;     				// sc76.choi 상황에 맞는 빌드 모드 설정
 
 	// sc76.choi 공격을 위한 가장 가까운 아군 타겟 선정
-	Unit closesAttackUnitFromEnemyMainBase = null;
+	Unit closesAttackUnitFromEnemyMainBase;
+	Position closesAttackUnitPositionFromEnemyMainBase;
 	
 	// 가스, 미네럴 양
 	int selfMinerals = 0;
@@ -248,11 +270,17 @@ public class StrategyManager {
 		mySpecialUnitType3 = UnitType.Zerg_Scourge;
 		mySpecialUnitType4 = UnitType.Zerg_Queen;
 
-		// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
-		maxNumberOfSpecialUnitType1 = 3; // 오버로드  
-		maxNumberOfSpecialUnitType2 = 2; // 디파일러
-		maxNumberOfSpecialUnitType3 = 6; // 스커지
-		maxNumberOfSpecialUnitType4 = 2; // 퀸
+		// 일반 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
+		maxNumberOfCombatUnitType1 = Config.maxNumberOfCombatUnitType1AgainstProtoss;  // 저글링 
+		maxNumberOfCombatUnitType2 = Config.maxNumberOfCombatUnitType2AgainstProtoss; // 히드라
+		maxNumberOfCombatUnitType3 = Config.maxNumberOfCombatUnitType3AgainstProtoss;  // 럴커
+		maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType4AgainstProtoss;  // 뮤탈
+		maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType5AgainstProtoss;  // 울트라
+		
+		maxNumberOfSpecialUnitType1 = Config.maxNumberOfSpecialUnitType1AgainstProtoss; // 오버로드  
+		maxNumberOfSpecialUnitType2 = Config.maxNumberOfSpecialUnitType2AgainstProtoss; // 디파일러
+		maxNumberOfSpecialUnitType3 = Config.maxNumberOfSpecialUnitType3AgainstProtoss; // 스커지
+		maxNumberOfSpecialUnitType4 = Config.maxNumberOfSpecialUnitType4AgainstProtoss; // 퀸
 
 		// 방어 건물 종류 및 건설 갯수 설정
 		myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
@@ -431,58 +459,58 @@ public class StrategyManager {
 	 * @param target
 	 * @return
 	 */
-	public Unit getClosestCanAttackUnitTypeToTarget(UnitType type, Position target){
-		
-		Unit closestUnitForAttack = null;
-
-		Iterator<Integer> it = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().keySet().iterator();
-		while (it.hasNext()) {
-			UnitInfo ui = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().get(it.next());
-			if(ui.getType() == type){
-				// sc76.choi BBE 죽은 유닛도 쌓이는 것 같다.
-				if(!commandUtil.IsValidSelfUnit(ui.getUnit())) {
-		        	continue;
-		        }
-				unitListByType.add(ui);
-			}
-		}
-		
-		//System.out.println("unitListByType.size() : " + unitListByType.size());
-		if(unitListByType.isEmpty()){
-			return closestUnitForAttack;
-		}
-		
-		// 적진에 가까운 순으로 오름차순
-        Collections.sort(unitListByType,new CompareSeqAsc());
-
-        //for (UnitInfo rtnUnitInfo : unitListByType){
-       	//	closestUnitForAttack = rtnUnitInfo.getUnit();
-       	//	//System.out.println(" getClosestCanAttackUnitTypeToTarget : " + j++ + " " + closestUnitForAttack.getID());
-       	//	break;
-        //}
-        
-        if(!commandUtil.IsValidSelfUnit(unitListByType.get(0).getUnit())) {
-        	return closestUnitForAttack;
-        }
-        closestUnitForAttack = unitListByType.get(0).getUnit();
-        //System.out.println("getClosestCanAttackUnitTypeToTarget : " + closestUnitForAttack.getID());
-   		return closestUnitForAttack;       	
-	}
-	
-	//내림차순(Desc) 정렬
-	static class CompareSeqDesc implements Comparator<UnitInfo>{
-        @Override
-        public int compare(UnitInfo o1, UnitInfo o2) {
-            return o1.getDistanceFromEnemyMainBase() > o2.getDistanceFromEnemyMainBase() ? -1 : o1.getDistanceFromEnemyMainBase() < o2.getDistanceFromEnemyMainBase() ? 1:0;
-        }  
-	}
-	
-	static class CompareSeqAsc implements Comparator<UnitInfo>{
-        @Override
-        public int compare(UnitInfo o1, UnitInfo o2) {
-            return o1.getDistanceFromEnemyMainBase() < o2.getDistanceFromEnemyMainBase() ? -1 : o1.getDistanceFromEnemyMainBase() > o2.getDistanceFromEnemyMainBase() ? 1:0;
-        }  
-	}
+//	public Unit getClosestCanAttackUnitTypeToTarget(Player whoPlayer, UnitType type, Position target){
+//		
+//		Unit closestUnitForAttack = null;
+//
+//		Iterator<Integer> it = InformationManager.Instance().getUnitData(whoPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+//		while (it.hasNext()) {
+//			UnitInfo ui = InformationManager.Instance().getUnitData(whoPlayer).getUnitAndUnitInfoMap().get(it.next());
+//			if(ui.getType() == type){
+//				// sc76.choi BBE 죽은 유닛도 쌓이는 것 같다.
+//				if(!commandUtil.IsValidSelfUnit(ui.getUnit())) {
+//		        	continue;
+//		        }
+//				unitListByType.add(ui);
+//			}
+//		}
+//		
+//		//System.out.println("unitListByType.size() : " + unitListByType.size());
+//		if(unitListByType.isEmpty()){
+//			return closestUnitForAttack;
+//		}
+//		
+//		// 적진에 가까운 순으로 오름차순
+//        Collections.sort(unitListByType,new CompareSeqAsc());
+//
+//        //for (UnitInfo rtnUnitInfo : unitListByType){
+//       	//	closestUnitForAttack = rtnUnitInfo.getUnit();
+//       	//	//System.out.println(" getClosestCanAttackUnitTypeToTarget : " + j++ + " " + closestUnitForAttack.getID());
+//       	//	break;
+//        //}
+//        
+//        if(!commandUtil.IsValidSelfUnit(unitListByType.get(0).getUnit())) {
+//        	return closestUnitForAttack;
+//        }
+//        closestUnitForAttack = unitListByType.get(0).getUnit();
+//        //System.out.println("getClosestCanAttackUnitTypeToTarget : " + closestUnitForAttack.getID());
+//   		return closestUnitForAttack;       	
+//	}
+//	
+//	//내림차순(Desc) 정렬
+//	static class CompareSeqDesc implements Comparator<UnitInfo>{
+//        @Override
+//        public int compare(UnitInfo o1, UnitInfo o2) {
+//            return o1.getDistanceFromEnemyMainBase() > o2.getDistanceFromEnemyMainBase() ? -1 : o1.getDistanceFromEnemyMainBase() < o2.getDistanceFromEnemyMainBase() ? 1:0;
+//        }  
+//	}
+//	
+//	static class CompareSeqAsc implements Comparator<UnitInfo>{
+//        @Override
+//        public int compare(UnitInfo o1, UnitInfo o2) {
+//            return o1.getDistanceFromEnemyMainBase() < o2.getDistanceFromEnemyMainBase() ? -1 : o1.getDistanceFromEnemyMainBase() > o2.getDistanceFromEnemyMainBase() ? 1:0;
+//        }  
+//	}
 
 	public void printUintData(){
 		
@@ -848,7 +876,7 @@ public class StrategyManager {
 				
 				// 럴커
 				if (unit.getType() == myCombatUnitType3) {
-					hasCommanded = controlCombatUnitType3(unit);					
+					hasCommanded = controlCombatUnitType3(unit);
 				}
 				
 				// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
@@ -1407,6 +1435,7 @@ public class StrategyManager {
 			
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
+				
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
 				if(closesAttackUnitFromEnemyMainBase != null){
 					targetPosition = closesAttackUnitFromEnemyMainBase.getPosition();
@@ -1417,11 +1446,12 @@ public class StrategyManager {
 				}
 				commandUtil.move(unit, targetPosition);
 				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);
+				
 			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
 				targetPosition = myMainBaseLocation.getPosition();
 				// TODO idle인것 중 멀리 있는것만 리턴 시켜야 한다.
 				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Idle, (Unit)null);				
-				commandUtil.patrol(unit, myFirstExpansionLocation.getPosition());
+				commandUtil.move(unit, myFirstExpansionLocation.getPosition());
 			}else{
 				
 			}
@@ -1537,6 +1567,13 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
+	public int getTotalHatcheryCount(){
+		return (myPlayer.completedUnitCount(UnitType.Zerg_Hatchery)
+                + myPlayer.completedUnitCount(UnitType.Zerg_Lair)
+                + myPlayer.incompleteUnitCount(UnitType.Zerg_Lair)
+                + myPlayer.completedUnitCount(UnitType.Zerg_Hive)
+                + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive));
+	}
 	
 	/// StrategyManager 의 수행상황을 표시합니다
 	private final Character brown = '';
@@ -1545,99 +1582,7 @@ public class StrategyManager {
 	private final char blue = '';
 	private final char purple = '';
 	private final char white = '';
-	private void drawStrategyManagerStatus() {
-		
-		int y = 180;
-		int t = 240;
-		// 아군 공격유닛 숫자 및 적군 공격유닛 숫자
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType1.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType1List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount1);
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType2.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType2List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount2);
-		
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType3.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType3List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount3);
-		
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType4.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType4List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount4);
 
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType5.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + myCombatUnitType5List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount5);		
-		
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType1.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType1List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount1);
-		
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType2.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType2List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount2);
-
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType3.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType3List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount3);
-		
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType4.toString().replaceAll("Zerg_", ""));
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + mySpecialUnitType4List.size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount4);
-
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My Worker");
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + WorkerManager.Instance().getWorkerData().getWorkers().size());
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + selfKilledWorkerUnitCount);
-
-		y += 20;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "Enemy CombatUnit");
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + numberOfCompletedEnemyCombatUnit);
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + enemyKilledCombatUnitCount);
-		y += 10;
-		MyBotModule.Broodwar.drawTextScreen(200+t, y, "Enemy WorkerUnit");
-		MyBotModule.Broodwar.drawTextScreen(300+t, y, "alive " + numberOfCompletedEnemyWorkerUnit);
-		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + enemyKilledWorkerUnitCount);
-		y += 20;
-
-		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
-		MyBotModule.Broodwar.drawTextScreen(190, y-10, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
-		y += 10;
-		
-		// 전투 상황
-		MyBotModule.Broodwar.drawTextScreen(440, 20, red + "CombatState " + combatState.toString());
-		MyBotModule.Broodwar.drawTextScreen(440, 30, red + "BuildState " + "normal");
-		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "Attak Pos. " + TARGET_POSITION);
-		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Defence Pos. " + "normal");
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	private static StrategyManager instance = new StrategyManager();
@@ -1733,29 +1678,127 @@ public class StrategyManager {
 		// target으로 부터 가장 가까운 공격 유닛을 찾기 위한 변수
 		unitListByType.clear();
 		
-		for(Unit unit : myPlayer.getUnits()) {		
+		// 일반 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
+		if(enemyRace == Race.Protoss){
+			maxNumberOfCombatUnitType1 = Config.maxNumberOfCombatUnitType1AgainstProtoss;  // 저글링 
+			maxNumberOfCombatUnitType2 = Config.maxNumberOfCombatUnitType2AgainstProtoss;  // 히드라
+			maxNumberOfCombatUnitType3 = Config.maxNumberOfCombatUnitType3AgainstProtoss;  // 럴커
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType4AgainstProtoss;  // 뮤탈
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType5AgainstProtoss;  // 울트라
+			
+			maxNumberOfSpecialUnitType1 = Config.maxNumberOfSpecialUnitType1AgainstProtoss; // 오버로드  
+			maxNumberOfSpecialUnitType2 = Config.maxNumberOfSpecialUnitType2AgainstProtoss; // 디파일러
+			maxNumberOfSpecialUnitType3 = Config.maxNumberOfSpecialUnitType3AgainstProtoss; // 스커지
+			maxNumberOfSpecialUnitType4 = Config.maxNumberOfSpecialUnitType4AgainstProtoss; // 퀸
+		}else if(enemyRace == Race.Zerg){
+			maxNumberOfCombatUnitType1 = Config.maxNumberOfCombatUnitType1AgainstZerg;  // 저글링 
+			maxNumberOfCombatUnitType2 = Config.maxNumberOfCombatUnitType2AgainstZerg;  // 히드라
+			maxNumberOfCombatUnitType3 = Config.maxNumberOfCombatUnitType3AgainstZerg;  // 럴커
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType4AgainstZerg;  // 뮤탈
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType5AgainstZerg;  // 울트라
+			
+			maxNumberOfSpecialUnitType1 = Config.maxNumberOfSpecialUnitType1AgainstZerg; // 오버로드  
+			maxNumberOfSpecialUnitType2 = Config.maxNumberOfSpecialUnitType2AgainstZerg; // 디파일러
+			maxNumberOfSpecialUnitType3 = Config.maxNumberOfSpecialUnitType3AgainstZerg; // 스커지
+			maxNumberOfSpecialUnitType4 = Config.maxNumberOfSpecialUnitType4AgainstZerg; // 퀸
+		}else if(enemyRace == Race.Terran){
+			maxNumberOfCombatUnitType1 = Config.maxNumberOfCombatUnitType1AgainstTerran;  // 저글링 
+			maxNumberOfCombatUnitType2 = Config.maxNumberOfCombatUnitType2AgainstTerran;  // 히드라
+			maxNumberOfCombatUnitType3 = Config.maxNumberOfCombatUnitType3AgainstTerran;  // 럴커
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType4AgainstTerran;  // 뮤탈
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType5AgainstTerran;  // 울트라
+			
+			maxNumberOfSpecialUnitType1 = Config.maxNumberOfSpecialUnitType1AgainstTerran; // 오버로드  
+			maxNumberOfSpecialUnitType2 = Config.maxNumberOfSpecialUnitType2AgainstTerran; // 디파일러
+			maxNumberOfSpecialUnitType3 = Config.maxNumberOfSpecialUnitType3AgainstTerran; // 스커지
+			maxNumberOfSpecialUnitType4 = Config.maxNumberOfSpecialUnitType4AgainstTerran; // 퀸
+		}else{
+			maxNumberOfCombatUnitType1 = Config.maxNumberOfCombatUnitType1AgainstProtoss;  // 저글링 
+			maxNumberOfCombatUnitType2 = Config.maxNumberOfCombatUnitType2AgainstProtoss;  // 히드라
+			maxNumberOfCombatUnitType3 = Config.maxNumberOfCombatUnitType3AgainstProtoss;  // 럴커
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType4AgainstProtoss;  // 뮤탈
+			maxNumberOfCombatUnitType4 = Config.maxNumberOfCombatUnitType5AgainstProtoss;  // 울트라
+			
+			maxNumberOfSpecialUnitType1 = Config.maxNumberOfSpecialUnitType1AgainstProtoss; // 오버로드  
+			maxNumberOfSpecialUnitType2 = Config.maxNumberOfSpecialUnitType2AgainstProtoss; // 디파일러
+			maxNumberOfSpecialUnitType3 = Config.maxNumberOfSpecialUnitType3AgainstProtoss; // 스커지
+			maxNumberOfSpecialUnitType4 = Config.maxNumberOfSpecialUnitType4AgainstProtoss; // 퀸
+		}
+		
+		numCombatUnitType1 = 0;
+		numCombatUnitType2 = 0;
+		numCombatUnitType3 = 0;
+		numCombatUnitType4 = 0;
+		numCombatUnitType5 = 0;
+		
+		numSpecialUnitType1 = 0;
+		numSpecialUnitType2 = 0;
+		numSpecialUnitType3 = 0;
+		numSpecialUnitType4 = 0;
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+		// sc76.choi 모든 공격 대상 유닛을 ArrayList에 담는다. 
+		// sc76.choi for(Unit unit : myPlayer.getUnits()) {
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		int distClosesAttackUnitFromEnemyMainBase = 10000000;
+		
+		Iterator<Integer> it = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		while (it.hasNext()) {
+			UnitInfo ui = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().get(it.next());
+			
+			Unit unit;
+			
+			if(!commandUtil.IsValidSelfUnit(ui.getUnit())) {
+	        	continue;
+	        }else{
+	        	unit = ui.getUnit();
+	        }
 			
 			if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0) continue;
 			
-			if (unit.getType() == myCombatUnitType1) { 
-				myCombatUnitType1List.add(unit);
+			if (unit.getType() == myCombatUnitType1) {
+				numCombatUnitType1 ++;
+				if (myCombatUnitType1List.size() < maxNumberOfCombatUnitType1) {
+					myCombatUnitType1List.add(unit);
+				}
 				myAllCombatUnitList.add(unit);
 			}
 			else if (unit.getType() == myCombatUnitType2) { 
-				myCombatUnitType2List.add(unit); 
+				numCombatUnitType2 ++;
+				if (myCombatUnitType2List.size() < maxNumberOfCombatUnitType2) {
+					if(commandUtil.IsValidUnit(unit) && distClosesAttackUnitFromEnemyMainBase > ui.getDistanceFromEnemyMainBase()){
+						// sc76.choi 적진과 가장 가까운 히드라를 찾는다.
+						closesAttackUnitFromEnemyMainBase = unit;
+						distClosesAttackUnitFromEnemyMainBase = ui.getDistanceFromEnemyMainBase();
+					}
+					myCombatUnitType2List.add(unit); 
+				}			
 				myAllCombatUnitList.add(unit);
 			}
 			else if (unit.getType() == myCombatUnitType3) { 
-				myCombatUnitType3List.add(unit); 
+				numCombatUnitType3 ++;
+				if (myCombatUnitType3List.size() < maxNumberOfCombatUnitType3) {
+					myCombatUnitType3List.add(unit); 
+				}
 				myAllCombatUnitList.add(unit);
-			}else if (unit.getType() == myCombatUnitType4) { 
-				myCombatUnitType4List.add(unit); 
+			}
+			else if (unit.getType() == myCombatUnitType4) { 
+				numCombatUnitType4 ++;
+				if (myCombatUnitType4List.size() < maxNumberOfCombatUnitType4) {
+					myCombatUnitType4List.add(unit); 
+				}
 				myAllCombatUnitList.add(unit);
-			}else if (unit.getType() == myCombatUnitType5) { 
-				myCombatUnitType5List.add(unit); 
+			}
+			else if (unit.getType() == myCombatUnitType5) { 
+				numCombatUnitType5 ++;
+				if (myCombatUnitType5List.size() < maxNumberOfCombatUnitType5) {
+					myCombatUnitType5List.add(unit); 
+				}
 				myAllCombatUnitList.add(unit);
 			}
 			else if (unit.getType() == mySpecialUnitType1) {
+				numSpecialUnitType1 ++;
 				// maxNumberOfSpecialUnitType1 숫자까지만 특수유닛 부대에 포함시킨다 (저그 종족의 경우 오버로드가 전부 전투참여했다가 위험해질 수 있으므로)
 				// sc76.choi defence 모드 시에 좀 애매 하다. 본진 으로 귀한하지 않는 유닛이 생길 수 있다.
 				if (mySpecialUnitType1List.size() < maxNumberOfSpecialUnitType1) {
@@ -1763,32 +1806,35 @@ public class StrategyManager {
 					if(OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'I' 
 						|| OverloadManager.Instance().getOverloadData().getJobCode(unit) == 'A'){
 						mySpecialUnitType1List.add(unit); 
-						myAllCombatUnitList.add(unit);
 					}
+					myAllCombatUnitList.add(unit);
 				}
 			}
 			else if (unit.getType() == mySpecialUnitType2) { 
+				numSpecialUnitType2++;
 				// maxNumberOfSpecialUnitType2 숫자까지만 특수유닛 부대에 포함시킨다
 				if (mySpecialUnitType2List.size() < maxNumberOfSpecialUnitType2) {
 					mySpecialUnitType2List.add(unit); 
-					myAllCombatUnitList.add(unit);
 				}
+				myAllCombatUnitList.add(unit);
 			}
 			// 스커지
 			else if (unit.getType() == mySpecialUnitType3) { 
+				numSpecialUnitType3++;
 				// maxNumberOfSpecialUnitType2 숫자까지만 특수유닛 부대에 포함시킨다
 				if (mySpecialUnitType3List.size() < maxNumberOfSpecialUnitType3) {
 					mySpecialUnitType3List.add(unit); 
-					myAllCombatUnitList.add(unit);
 				}
+				myAllCombatUnitList.add(unit);
 			}
 			// 퀸
 			else if (unit.getType() == mySpecialUnitType4) { 
+				numSpecialUnitType4++;
 				// maxNumberOfSpecialUnitType2 숫자까지만 특수유닛 부대에 포함시킨다
 				if (mySpecialUnitType4List.size() < maxNumberOfSpecialUnitType4) {
 					mySpecialUnitType4List.add(unit); 
-					myAllCombatUnitList.add(unit);
 				}
+				myAllCombatUnitList.add(unit);
 			}
 			else if (unit.getType() == myDefenseBuildingType1) { 
 				myDefenseBuildingType1List.add(unit); 
@@ -1803,7 +1849,6 @@ public class StrategyManager {
 		
 		// sc76.choi 공격 포지션을 찾는다.
 		getTargetPositionForAttack();
-		
 	}
 	
 	/**
@@ -1846,9 +1891,9 @@ public class StrategyManager {
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 공격을 위한 아군 타겟 변수 할당
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if(enemyMainBaseLocation != null){
-			closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
-		}
+		//if(enemyMainBaseLocation != null){
+		//	closesAttackUnitFromEnemyMainBase = getClosestCanAttackUnitTypeToTarget(myPlayer, UnitType.Zerg_Hydralisk, enemyMainBaseLocation.getPosition());
+		//}
 	}
 
 	/// 아군 / 적군 공격 유닛 사망 유닛 숫자 누적값을 업데이트 합니다
@@ -2700,5 +2745,85 @@ public class StrategyManager {
 
 	public BuildOrderItem.SeedPositionStrategy getSeedPositionStrategyOfMyCombatUnitTrainingBuildingType() {
 		return seedPositionStrategyOfMyCombatUnitTrainingBuildingType;
+	}
+	
+	private void drawStrategyManagerStatus() {
+		
+		int y = 170;
+		int t = 240;
+		
+		// 아군 해처리 숫자
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My Hatchery");
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + getTotalHatcheryCount());
+
+		y += 10;
+		// 아군 공격유닛 숫자 및 적군 공격유닛 숫자
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType1.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + myCombatUnitType1List.size() + "[" + numCombatUnitType1 + "]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount1);
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType2.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + myCombatUnitType2List.size() + "[" + numCombatUnitType2 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount2);
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType3.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + myCombatUnitType3List.size() + "[" + numCombatUnitType3 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount3);
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType4.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + myCombatUnitType4List.size() + "[" + numCombatUnitType4 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount4);
+
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + myCombatUnitType5.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + myCombatUnitType5List.size() + "[" + numCombatUnitType5 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledCombatUnitCount5);		
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType1.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + mySpecialUnitType1List.size() + "[" + numSpecialUnitType1 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount1);
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType2.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + mySpecialUnitType2List.size() + "[" + numSpecialUnitType2 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount2);
+
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType3.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + mySpecialUnitType3List.size() + "[" + numSpecialUnitType3 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount3);
+		
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My " + mySpecialUnitType4.toString().replaceAll("Zerg_", ""));
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + mySpecialUnitType4List.size() + "[" + numSpecialUnitType4 +"]");
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + myKilledSpecialUnitCount4);
+
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "My Worker");
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + WorkerManager.Instance().getWorkerData().getWorkers().size());
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + selfKilledWorkerUnitCount);
+
+		y += 20;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "Enemy CombatUnit");
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + numberOfCompletedEnemyCombatUnit);
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + enemyKilledCombatUnitCount);
+		y += 10;
+		MyBotModule.Broodwar.drawTextScreen(200+t, y, "Enemy WorkerUnit");
+		MyBotModule.Broodwar.drawTextScreen(280+t, y, "alive " + numberOfCompletedEnemyWorkerUnit);
+		MyBotModule.Broodwar.drawTextScreen(350+t, y, "killed " + enemyKilledWorkerUnitCount);
+		y += 20;
+
+		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
+		MyBotModule.Broodwar.drawTextScreen(190, y-10, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
+		y += 10;
+		
+		// 전투 상황
+		MyBotModule.Broodwar.drawTextScreen(440, 20, red + "CombatState : " + combatState.toString());
+		MyBotModule.Broodwar.drawTextScreen(440, 30, red + "BuildState : " + "normal");
+		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "Attak Pos. : " + TARGET_POSITION);
+		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Defence Pos. : " + "normal");
 	}
 }
