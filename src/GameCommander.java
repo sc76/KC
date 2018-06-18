@@ -192,9 +192,19 @@ public class GameCommander {
 
 	/// 텍스트를 입력 후 엔터를 하여 다른 플레이어들에게 텍스트를 전달하려 할 때 발생하는 이벤트를 처리합니다
 	public void onSendText(String text){
-		int setSpeed = Integer.parseInt(text);
-		Config.setSetLocalSpeed(setSpeed); 
-		MyBotModule.Broodwar.setLocalSpeed(setSpeed);
+		int setSpeed = 0; 
+		boolean isNumber = false;
+		try {
+			setSpeed = Integer.parseInt(text);
+			isNumber = true;
+		} catch(NumberFormatException e) {
+			isNumber = false;
+		}
+		
+		if(isNumber){
+			Config.setSetLocalSpeed(setSpeed); 
+			MyBotModule.Broodwar.setLocalSpeed(setSpeed);
+		}
 	}
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다
