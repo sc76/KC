@@ -748,4 +748,22 @@ public class InformationManager {
 			return UnitType.None;
 		}
 	}
+	
+	public int getTotalHatcheryCount(){
+		return (selfPlayer.completedUnitCount(UnitType.Zerg_Hatchery) +
+				selfPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+				selfPlayer.incompleteUnitCount(UnitType.Zerg_Lair) +
+				selfPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				selfPlayer.incompleteUnitCount(UnitType.Zerg_Hive));
+	}
+	
+	public int getTotalLairCount(){
+		return (selfPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+				selfPlayer.incompleteUnitCount(UnitType.Zerg_Lair));
+	}
+	
+	public int getTotalHiveCount(){
+		return (selfPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				selfPlayer.incompleteUnitCount(UnitType.Zerg_Hive));
+	}		
 }
