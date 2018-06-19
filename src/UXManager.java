@@ -142,6 +142,7 @@ public class UXManager {
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/Config.TILE_SIZE) + ", " +  (int)(mouseY/Config.TILE_SIZE) + ")");
 			mouseY+=10;
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)mouseX + ", " +  (int)mouseY + ")");
+
 			//mouseY+=10;
 			//BaseLocation selfBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 			//double distanceFromSelfMainBase = (selfBaseLocation.getPosition()).getDistance(MyBotModule.Broodwar.getMousePosition());
@@ -207,6 +208,16 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(310, 330, "Closest Hydra : " + iClosestHydra);
 		
 		
+		
+		Unit closesAttackUnitFromEnemyMainBase = StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase();
+		if(closesAttackUnitFromEnemyMainBase != null){
+			MyBotModule.Broodwar.drawCircleMap(closesAttackUnitFromEnemyMainBase.getPosition(), 5, Color.Yellow, true);
+			MyBotModule.Broodwar.drawCircleMap(closesAttackUnitFromEnemyMainBase.getPosition(), 8, Color.Red, false);
+			MyBotModule.Broodwar.drawCircleMap(closesAttackUnitFromEnemyMainBase.getPosition(), 9, Color.Red, false);
+			MyBotModule.Broodwar.drawCircleMap(closesAttackUnitFromEnemyMainBase.getPosition(), 10, Color.Yellow, false);
+			MyBotModule.Broodwar.drawCircleMap(closesAttackUnitFromEnemyMainBase.getPosition(), 11, Color.Yellow, false);
+		}
+				
 		// 오버로드 
 		for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){
 			MyBotModule.Broodwar.drawCircleMap(overload.getPosition(), 10 * Config.TILE_SIZE, Color.Purple);
