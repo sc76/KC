@@ -142,7 +142,16 @@ public class UXManager {
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)(mouseX/Config.TILE_SIZE) + ", " +  (int)(mouseY/Config.TILE_SIZE) + ")");
 			mouseY+=10;
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)mouseX + ", " +  (int)mouseY + ")");
+			
+			boolean isValid = new Position(mouseX, mouseY).isValid();
+			mouseY+=10;
+			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "isValid : " + isValid);
 
+			boolean isValidTP = new Position(mouseX, mouseY).toTilePosition().isValid();
+			mouseY+=10;
+			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "isValidTP : " + isValidTP);
+			
+			
 			//mouseY+=10;
 			//BaseLocation selfBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 			//double distanceFromSelfMainBase = (selfBaseLocation.getPosition()).getDistance(MyBotModule.Broodwar.getMousePosition());
