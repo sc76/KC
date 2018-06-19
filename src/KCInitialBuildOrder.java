@@ -41,7 +41,7 @@ public class KCInitialBuildOrder {
 		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 		//		seedPositionStrategyOfMyDefenseBuildingType);	//16
 					
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//17
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//17
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
 		
 		
