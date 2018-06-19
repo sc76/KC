@@ -798,6 +798,15 @@ public class StrategyManager {
 			if (unit.getType() == mySpecialUnitType2) {					
 				hasCommanded = controlSpecialUnitType2(unit);
 			}
+			// 스커지
+			if (unit.getType() == mySpecialUnitType3) {					
+				hasCommanded = controlSpecialUnitType3(unit);
+			}
+			
+			// 퀸
+			if (unit.getType() == mySpecialUnitType2) {					
+				hasCommanded = controlSpecialUnitType4(unit);
+			}
 			
 			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다. 단, 오버로드는 제외
 			if (hasCommanded == false) {
@@ -1548,7 +1557,13 @@ public class StrategyManager {
 			}
 			else if (unit.getEnergy() >= TechType.Dark_Swarm.energyCost()) {
 				
-				Position targetPosition = TARGET_POSITION;
+				Position targetPosition;
+				
+				if(closesAttackUnitFromEnemyMainBase != null){
+					targetPosition = closesAttackUnitOfPositionFromEnemyMainBase;
+				}else{
+					targetPosition = TARGET_POSITION;
+				}
 
 				// targetPosition 을 적절히 정해보세요
 				
@@ -1568,19 +1583,23 @@ public class StrategyManager {
 		
 		if (unit.getType() == UnitType.Zerg_Scourge) {
 			Random random = new Random();
-			int mapHeight = Config.TILE_SIZE * 50;	// 128
-			int mapWidth = Config.TILE_SIZE * 50;		// 128
+			int mapHeight = Config.TILE_SIZE * 70;	// 128
+			int mapWidth = Config.TILE_SIZE * 70;	// 128
 			
 			// defenseMode 일 경우
 			if (combatState == CombatState.defenseMode) {
 				Position targetPosition = new Position(random.nextInt(mapWidth), random.nextInt(mapHeight));
-				//			if(myMainBaseLocation.getPosition().getX() mapWidth){
-				//				
-				//			} 
-				//			
-				//			if(myMainBaseLocation.getPosition().getY() mapWidth){
-				//				
-				//			}
+				
+//				// X값
+//				if(Math.abs(myMainBaseLocation.getPosition().getX() - mapWidth) > 0 ){
+//					return true;
+//				} 
+//				
+//				// Y값
+//				if(Math.abs(myMainBaseLocation.getPosition().getY() - mapWidth) > 0){
+//					return true;
+//				}
+				
 				// 본진으로 부터 1600 이하
 				if(myMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * 40){
 					return true;
@@ -1593,7 +1612,9 @@ public class StrategyManager {
 				if(unit.isIdle()){
 					commandUtil.attackMove(unit, targetPosition);
 				}	
-			}else{
+			}
+			// 공격 모드 일때
+			else{
 				Position targetPosition = new Position(random.nextInt(mapWidth), random.nextInt(mapHeight));
 	//			if(myMainBaseLocation.getPosition().getX() mapWidth){
 	//				
@@ -2280,11 +2301,16 @@ public class StrategyManager {
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 6개 까지만
 		if (isPossibleToConstructCombatUnitTrainingBuildingType == true
 			&& BuildManager.Instance().getAvailableMinerals() > 300 
-			&& numberOfMyCombatUnitTrainingBuilding < 6) {
+			&& numberOfMyCombatUnitTrainingBuilding < 7) {
 			// 게이트웨이 / 배럭 / 해처리 증설
 			if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 ) 
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(InformationManager.Instance().getBasicCombatBuildingType(), false);
+				if(numberOfMyCombatUnitTrainingBuilding < 4){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(InformationManager.Instance().getBasicCombatBuildingType(), false);
+				}else{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+							seedPositionStrategyOfMyDefenseBuildingType.SecondChokePoint,  false);
+				}
 			}
 		}
 	}
