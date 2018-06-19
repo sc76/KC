@@ -1576,7 +1576,7 @@ public class StrategyManager {
 				Position targetPosition = new Position(random.nextInt(mapWidth), random.nextInt(mapHeight));
 				//			if(myMainBaseLocation.getPosition().getX() mapWidth){
 				//				
-				//			}
+				//			} 
 				//			
 				//			if(myMainBaseLocation.getPosition().getY() mapWidth){
 				//				
