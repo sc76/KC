@@ -221,6 +221,24 @@ public class WorkerData {
 			}
 		}
 	}
+	
+	public void removeRefinery(Unit unit)
+	{	
+		if (unit == null) { return; }
+
+		refineryWorkerCount.remove(unit.getID());
+		
+
+		// re-balance workers in here
+		for (Unit worker : workers)
+		{
+			// if a worker was working at this depot
+			if (workerRefineryMap.get(worker.getID()) == unit)
+			{
+				setWorkerJob(worker, WorkerJob.Idle, (Unit)null);
+			}
+		}
+	}
 
 	public List<Unit> getDepots()
 	{

@@ -108,35 +108,44 @@ public class WorkerManager {
 		
 		// for each unit we have
 		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+			
 			// refinery 가 건설 completed 되었으면,
 			if (unit.getType().isRefinery() && unit.isCompleted() )	{
 				
 				// 미네랄3이 가스보다 많고 현재 미네랄이 200 이상이 있으면 가스를 계속 캔다. 
-				if(selfMinerals*3 >= selfGas || selfMinerals >= 200){ 
+				if(selfMinerals*3 >= selfGas || selfMinerals > 200){
+					Config.WorkersPerRefinery = 3; // sc76.choi 필요가스 일꾼 조정 3
 					// get the number of workers currently assigned to it 
-					int numAssigned = workerData.getNumAssignedWorkers(unit);;
+					int numAssigned = workerData.getNumAssignedWorkers(unit);
 	
 					// if it's less than we want it to be, fill 'er up
 					// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
+					//System.out.println("                      trans gas1 " + Config.WorkersPerRefinery);
 					for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i){
 						Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
+						//System.out.println("                      trans gas2 " + Config.WorkersPerRefinery);
 						if (commandUtil.IsValidSelfUnit(gasWorker)){
-							if(gasWorker.isCarryingMinerals()) continue;
+							//System.out.println("                      trans gas3 " + Config.WorkersPerRefinery);
 							workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
 						}
 					}
 				}
-				// sc76.choi 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 500 이하이면 skip
-				// sc76.choi 하지만, Lair 이후 테크이면, 가스가 많이 필요하다
+				// sc76.choi 레어가 없을 때, 가스가 많으면 미네랄 일꾼으로 전환 한다.
+				// sc76.choi 가스 일꾼을 Idle 상태로 만들어 준다., 단 가스가 300 이하이면 skip
+				// sc76.choi TODO 하지만, Lair 이후 테크이면, 가스가 많이 필요하다
 				else{
-					if(selfMinerals <= 100 && selfGas <= 500) return;
-					
-					for (Unit changeMineralWorker : MyBotModule.Broodwar.self().getUnits()){
-						if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
-							if (commandUtil.IsValidSelfUnit(changeMineralWorker)){
-								if(changeMineralWorker.isCarryingGas()) continue;
-								//setIdleWorker(changeMineralWorker);
-								setMineralWorker(changeMineralWorker);
+					if(InformationManager.Instance().getTotalLairCount() <= 0 
+							&& selfMinerals < 100 && selfGas > 300){
+						//System.out.println("                      trans mineral 1 " + Config.WorkersPerRefinery);
+						Config.WorkersPerRefinery = -1; // sc76.choi 필요가스 일꾼 조정 0, 가스 일꾼은 1마리만..
+						
+						for (Unit changeMineralWorker : workerData.getWorkers()){
+							if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
+								//System.out.println("                      trans mineral2 " + Config.WorkersPerRefinery);
+								if (commandUtil.IsValidSelfUnit(changeMineralWorker)){
+									//System.out.println("                      trans mineral3 " + Config.WorkersPerRefinery);
+									setMineralWorker(changeMineralWorker);
+								}
 							}
 						}
 					}
