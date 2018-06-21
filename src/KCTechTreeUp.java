@@ -17,8 +17,8 @@ public class KCTechTreeUp {
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
-			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 || myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
-		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 && myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
+		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 10
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0) 
@@ -39,10 +39,7 @@ public class KCTechTreeUp {
 		
 		// sc76.choi 기본 spire 테크 작성예정
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-				&& (myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) + 
-					myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
-					myPlayer.completedUnitCount(UnitType.Zerg_Hive)
-				   ) >= 3
+				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
