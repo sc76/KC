@@ -158,7 +158,7 @@ public class Config {
 	public static int BuildingSupplyDepotSpacing = 0;
 	
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 0; // sc76.choi 0 -> 3 조정
+	public static int BuildingDefenseTowerSpacing = 1; // sc76.choi 0 -> 3 조정
 	
 	/// 화면 표시 여부 - 게임 정보
 	public static boolean DrawGameInfo = true;
