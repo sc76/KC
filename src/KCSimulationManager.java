@@ -201,7 +201,7 @@ public class KCSimulationManager {
 			if(unit.getRemainingBuildTime() > 0){
 				return 0;
 			}
-			return 4;
+			return 2;
 		} else if (enemyRace == Race.Terran) {
 			if(unit.getRemainingBuildTime() > 0){
 				return 0;
