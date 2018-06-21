@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import bwta.Region;
 /// 여러 Manager 들로부터 정보를 조회하여 Screen 혹은 Map 에 정보를 표시합니다
 public class UXManager {
 
+	
 	private final Character brown = '';
 	private final char red = '';
 	private final char teal = '';
@@ -50,6 +52,14 @@ public class UXManager {
 	
 	private static UXManager instance = new UXManager();
 	
+	BaseLocation selfMainBaseLocation = null;
+	BaseLocation selfFirstExpansionLocation = null;
+	Chokepoint selfFirstChokePoint = null;
+	Chokepoint selfSecondChokePoint = null;	
+	BaseLocation enemyMainBaseLocation = null;
+	Chokepoint enemyFirstChokePoint = null;
+	Chokepoint enemySecondChokePoint = null;
+	
 	/// static singleton 객체를 리턴합니다
 	public static UXManager Instance() {
 		return instance;
@@ -62,7 +72,14 @@ public class UXManager {
 	/// 경기 진행 중 매 프레임마다 추가 정보를 출력하고 사용자 입력을 처리합니다
 	public void update() {
 		
-		MyBotModule.Broodwar.drawCircleMap(new Position(2000, 2000), Config.TILE_SIZE * 35, Color.White);
+		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		selfFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+		selfFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		selfSecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+		
 		
 		drawGameInformationOnScreen(5, 15);
 
@@ -209,6 +226,9 @@ public class UXManager {
 	// sc76.choi 오버로드의 시야를 원을 Map 에 표시합니다
 	public void drawSightToSpecialUnits() {
 		
+		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 20, Color.White);
+		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 35, Color.White);
+		
 		// 가장 앞선 히드라
 		int iClosestHydra = 0;
 		if(StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase() != null){
@@ -248,12 +268,17 @@ public class UXManager {
 			
 			if(unit.getType() == UnitType.Zerg_Defiler){
 				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6 * Config.TILE_SIZE, Color.Red);
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6, Color.Blue, true);
 			}
 			
 			if(unit.getType() == UnitType.Zerg_Mutalisk){
 				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 3 * Config.TILE_SIZE, Color.Red);
 			}
 		}
+		
+		// build order array
+		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
+		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder));
 	}
 
 	/// Players 정보를 Screen 에 표시합니다
