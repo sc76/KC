@@ -1,0 +1,219 @@
+import java.util.ArrayList;
+import java.util.List;
+
+import bwapi.Player;
+import bwapi.Position;
+import bwapi.Race;
+import bwapi.TilePosition;
+import bwapi.Unit;
+import bwapi.UnitType;
+import bwta.BWTA;
+import bwta.BaseLocation;
+import bwta.Chokepoint;
+
+public class KCSimulationManager {
+
+	public Player selfPlayer;		///< 아군 Player		
+	public Player enemyPlayer;		///< 아군 Player의 종족		
+	public Race selfRace;			///< 적군 Player		
+	public Race enemyRace;			///< 적군 Player의 종족  
+	
+	private BaseLocation selfMainBaseLocation = null;
+	private BaseLocation selfFirstExpansionLocation = null;
+	private Chokepoint selfFirstChokePoint = null;
+	private Chokepoint selfSecondChokePoint = null;	
+	private BaseLocation enemyMainBaseLocation = null;
+	private Chokepoint enemyFirstChokePoint = null;
+	private Chokepoint enemySecondChokePoint = null;
+	
+	private UnitType enemyBasicCombatUnitType = null;
+	private UnitType enemyAdvancedCombatUnitType = null;
+	private UnitType enemyBasicDefenceUnitType = null;
+	private UnitType enemyAdvencedDefenceUnitType = null;
+	
+	
+	// static singleton 객체를 리턴합니다
+	private static KCSimulationManager instance = new KCSimulationManager();
+	public static KCSimulationManager Instance() {
+		return instance;
+	}
+	
+	public KCSimulationManager() {
+		
+	}
+	
+	/**
+	 * 
+	[enemyBasicCombatUnitType]
+	UnitType.Protoss_Zealot;
+	UnitType.Terran_Marine;
+	UnitType.Zerg_Zergling;
+		
+	[enemyAdvancedCombatUnitType]
+	UnitType.Protoss_Dragoon;
+	UnitType.Terran_Medic;
+	UnitType.Zerg_Hydralisk;
+	
+	[enemyBasicDefenceUnitType]
+	UnitType.Protoss_Pylon;
+	UnitType.Terran_Bunker;
+	UnitType.Zerg_Creep_Colony;
+	
+	[enemyAdvencedDefenceUnitType]
+	UnitType.Protoss_Photon_Cannon;
+	UnitType.Terran_Missile_Turret;
+	UnitType.Zerg_Sunken_Colony;
+			
+	 */
+	
+	public boolean canAttackNow(List<Unit> Units){
+		
+		selfPlayer = MyBotModule.Broodwar.self();
+		enemyPlayer = MyBotModule.Broodwar.enemy();
+		selfRace = selfPlayer.getRace();
+		enemyRace = enemyPlayer.getRace();
+		
+		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		selfFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+		selfFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		selfSecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+		
+		enemyBasicCombatUnitType = InformationManager.Instance().getBasicCombatUnitType(enemyRace);
+		enemyAdvancedCombatUnitType = InformationManager.Instance().getAdvancedCombatUnitType(enemyRace);
+		enemyBasicDefenceUnitType = InformationManager.Instance().getBasicDefenseBuildingType(enemyRace);
+		enemyAdvencedDefenceUnitType = InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace);
+		
+		int myPoint = 0;
+		int enemyPoint = 0;
+		
+		int myBasicCombatUnitTypePoint = 1;
+		int myAdvencedCombatUnitTypePoint = 4;
+		int myBasicDefenceUnitTypePoint = 0;
+		int myDefenceCombatUnitTypePoint = 5;
+
+		for(Unit unit : Units){
+			if(unit.getPlayer() == selfPlayer){
+				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType()){
+					myPoint += myBasicCombatUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType()){
+					myPoint += myAdvencedCombatUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getBasicDefenseBuildingType()){
+					myPoint += myBasicDefenceUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType()){
+					myPoint += myDefenceCombatUnitTypePoint;
+				}
+			}else{
+				//System.out.println("unit.getPlayer          : " + unit.getPlayer().toString());
+				//System.out.println("unit.enemyRace          : " + enemyRace);
+				//System.out.println("unit.getType            : " + unit.getType());
+				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType(enemyRace)){
+					enemyPoint += getBasicCombatUnitTypePoint(unit);
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType(enemyRace)){
+					enemyPoint += getAdvencedCombatUnitTypePoint(unit);
+				}else if(unit.getType() == InformationManager.Instance().getBasicDefenseBuildingType(enemyRace)){
+					enemyPoint += getBasicDefenceBuildingTypePoint(unit);
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace)){
+					enemyPoint += getAdvencedDefenceBuildingTypePoint(unit);
+				}
+				//System.out.println("      enemyPoint By 1   : " + enemyPoint);
+			}
+		}
+		
+		System.out.println("canAttackNow myPoint    : " + myPoint);
+		System.out.println("canAttackNow enemyPoint : " + enemyPoint);
+		System.out.println();
+		System.out.println();
+		
+		// TODO sc76.choi 각 false 값을 누적해서 계속 false가 나오면 CombatState를 defence모드로 변경한다.
+		// TODO sc76.choi 개별 전투에서 모두 패배를 기록하고 있다고 판단한다.
+		if(myPoint >= enemyPoint){
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	UnitType.Protoss_Zealot;
+	UnitType.Terran_Marine;
+	UnitType.Zerg_Zergling;
+	 */
+	public int getBasicCombatUnitTypePoint(Unit unit){
+		
+		if (enemyRace == Race.Protoss) {
+			return 3;
+		} else if (enemyRace == Race.Terran) {
+			return 1;
+		} else if (enemyRace == Race.Zerg) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	
+	/*
+	UnitType.Protoss_Dragoon;
+	UnitType.Terran_Medic;
+	UnitType.Zerg_Hydralisk;
+	 */
+	public int getAdvencedCombatUnitTypePoint(Unit unit){
+		if (enemyRace == Race.Protoss) {
+			return 3;
+		} else if (enemyRace == Race.Terran) {
+			return 2;
+		} else if (enemyRace == Race.Zerg) {
+			return 3;
+		} else {
+			return 0;
+		}
+	}
+	
+	/*
+	UnitType.Protoss_Pylon;
+	UnitType.Terran_Bunker;
+	UnitType.Zerg_Creep_Colony;
+	 */
+	public int getBasicDefenceBuildingTypePoint(Unit unit){
+		if (enemyRace == Race.Protoss) {
+			return 0;
+		} else if (enemyRace == Race.Terran) {
+			if(unit.getRemainingBuildTime() > 0){
+				return 0;
+			}
+			return 5;
+		} else if (enemyRace == Race.Zerg) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}	
+	
+	/*
+	UnitType.Protoss_Photon_Cannon;
+	UnitType.Terran_Missile_Turret;
+	UnitType.Zerg_Sunken_Colony;
+	 */
+	public int getAdvencedDefenceBuildingTypePoint(Unit unit){
+		if (enemyRace == Race.Protoss) {
+			// sc76.choi 아직 지어지고 있으면 0로 리턴
+			if(unit.getRemainingBuildTime() > 0){
+				return 0;
+			}
+			return 4;
+		} else if (enemyRace == Race.Terran) {
+			if(unit.getRemainingBuildTime() > 0){
+				return 0;
+			}
+			return 1;
+		} else if (enemyRace == Race.Zerg) {
+			if(unit.getRemainingBuildTime() > 0){
+				return 0;
+			}
+			return 4;
+		} else {
+			return 0;
+		}
+	}	
+}
