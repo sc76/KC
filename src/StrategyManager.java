@@ -77,6 +77,9 @@ public class StrategyManager {
 	int myKilledCombatUnitCount4;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 뮤탈
 	int myKilledCombatUnitCount5;				/// 세번째 유닛 타입의 사망자 숫자 누적값 // 울트라
 
+	// 아군의 일반유닛 숫자
+	int maxNumberOfCombatUnitType3;
+	
 	// 아군의 특수유닛 숫자
 	int maxNumberOfSpecialUnitType1;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 오버로드
 	int maxNumberOfSpecialUnitType2;			/// 최대 몇개까지 생산 / 전투참가 시킬것인가 디파일러
@@ -244,7 +247,7 @@ public class StrategyManager {
 		myCombatUnitType5 = UnitType.Zerg_Ultralisk;
 
 		// 공격 유닛 생산 순서 설정
-		buildOrderArrayOfMyCombatUnitType = new int[]{1,1,2,2,2,3}; 	// 저글링 저글링 히드라 히드라 히드라 러커 ...
+		buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커 ...
 		nextTargetIndexOfBuildOrderArray = 0; 			    	// 다음 생산 순서 index
 
 		// 특수 유닛 종류 설정 
@@ -253,10 +256,13 @@ public class StrategyManager {
 		mySpecialUnitType3 = UnitType.Zerg_Scourge;
 		mySpecialUnitType4 = UnitType.Zerg_Queen;
 
+		// 일반 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
+		maxNumberOfCombatUnitType3 = 4; // 럴커
+		
 		// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
 		maxNumberOfSpecialUnitType1 = 3; // 오버로드  
 		maxNumberOfSpecialUnitType2 = 2; // 디파일러
-		maxNumberOfSpecialUnitType3 = 12; // 스커지
+		maxNumberOfSpecialUnitType3 = 8; // 스커지
 		maxNumberOfSpecialUnitType4 = 2; // 퀸
 
 		// 방어 건물 종류 및 건설 갯수 설정
@@ -339,7 +345,8 @@ public class StrategyManager {
 		}
 		
 		
-		
+		// sc76.choi TODO 해당지역에 건물이 없으면 그냥 본진을 타켓을 잡아야 한다. (Basic Bot 버그)
+		// sc76.choi TODO 적 본진이 정확히 보이지 않았다면(오버로드가 정찰을 깊숙히 못했을 경우) 본진으로 타켓이 이동하지 않는다.
 		if(targetBaseLocation != null){
 			TARGET_POSITION = targetBaseLocation.getPosition();
 		}else{
@@ -598,7 +605,9 @@ public class StrategyManager {
 			// 1. 저글링이 12마리이상, 럴커가 2마리 이상
 			// 2. 히드라가 8마리이상, 럴커가 1마리 이상
 			//////////////////////////////////////////////////////////////////////////////
-			if ((myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2) ||    // 히드라
+			if ((myCombatUnitType1List.size() >= 20) ||    // 저글링
+					
+				(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2) ||    // 히드라
 					
 				(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1        // 저글링
 				&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) ||  // 럴커 
@@ -682,12 +691,12 @@ public class StrategyManager {
 		
 		// sc76.choi 일꾼만 20마리 죽여도 elimination한다.
 		// sc76.choi 그리고, frame count가 28800 = 24 * 60 * 20 (즉 20분이 지났으면)이면 eliminate를 시작한다.
-		if (enemyKilledWorkerUnitCount >= 20 && MyBotModule.Broodwar.getFrameCount() >= 20000) {
+		if (enemyKilledWorkerUnitCount >= 15 && MyBotModule.Broodwar.getFrameCount() >= 20000) {
 			return true;
 		}
 		
 		// sc76.choi 일꾼만 25마리 죽여도 elimination한다.
-		if (enemyKilledWorkerUnitCount >= 25){
+		if (enemyKilledWorkerUnitCount >= 20){
 			return true;
 		}
 		
@@ -759,7 +768,7 @@ public class StrategyManager {
 				
 				// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
 				// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
-				Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, new Position(2000, 2000));
+				Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
 				if(myDefenseBuildingUnit != null){
 					double d1 = myFirstExpansionLocation.getDistance(mySecondChokePoint); // 확장과 center와의 거리
 					double d2 = myDefenseBuildingUnit.getDistance(mySecondChokePoint); // 방어 타워와 center화의 거리
@@ -1100,8 +1109,8 @@ public class StrategyManager {
 				if(canAttackNow){
 					commandUtil.attackMove(unit, targetPosition);
 				}else{
-					// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving
-					if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
+					// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
+					if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*10){
 						commandUtil.move(unit, DEFENCE_POSITION);
 					}
 					// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
@@ -1281,9 +1290,10 @@ public class StrategyManager {
 			}else{
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
 				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*6));
-				System.out.println("hydra canAttackNow ["+unit.getID()+"] : " + canAttackNow);
-				System.out.println("-------------------------------------------------------------");
-				if(canAttackNow && unit.getGroundWeaponCooldown() == 0 
+				//System.out.println("hydra canAttackNow ["+unit.getID()+"] : " + canAttackNow);
+				//System.out.println("-------------------------------------------------------------");
+				if(canAttackNow 
+					&& unit.getGroundWeaponCooldown() == 0 
 					&& unit.getHitPoints() > 10
 				){
 					// targetPosition = enemyMainBaseLocation.getPosition();
@@ -1587,12 +1597,12 @@ public class StrategyManager {
 				
 				// 본진으로 부터 1600 이하
 				if(myMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * maxDistForScourgePatrol){
-					System.out.println(" -------------------------------------- too long " + targetPosition );
+					//System.out.println(" -------------------------------------- too long " + targetPosition );
 					return true;
 				}
 				
 				if(myMainBaseLocation.getDistance(targetPosition) < Config.TILE_SIZE * minDistForScourgePatrol){
-					System.out.println(" -------------------------------------- too short " + targetPosition );
+					//System.out.println(" -------------------------------------- too short " + targetPosition );
 					return true;
 				}
 				
@@ -1614,12 +1624,12 @@ public class StrategyManager {
 				
 				// 본진으로 부터 1600 이하
 				if(myMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * maxDistForScourgePatrol){
-					System.out.println(" -------------------------------------- too long " + targetPosition );
+					//System.out.println(" -------------------------------------- too long " + targetPosition );
 					return true;
 				}
 				
 				if(myMainBaseLocation.getDistance(targetPosition) < Config.TILE_SIZE * minDistForScourgePatrol){
-					System.out.println(" -------------------------------------- too short " + targetPosition );
+					//System.out.println(" -------------------------------------- too short " + targetPosition );
 					return true;
 				}
 				
@@ -1951,6 +1961,7 @@ public class StrategyManager {
 	
 	/**
 	 * 전투 상황에 맞게 뽑을 유닛을 컨트롤 한다.(CombatNeedUnitState)
+	 * buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3};
 	 * 
 	 * @ sc76.choi
 	 */
@@ -1966,19 +1977,23 @@ public class StrategyManager {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
-			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 3, 2, 4, 4}; 	// 저글링 저글링 저글링 히드라 뮤탈 뮤탈
+			if(selfGas < 200){
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 3, 4, 4, 1, 2, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}
 			
 		}else if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
 			if(selfGas < 200){
-				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 3, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 3, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
 			}else{
-				buildOrderArrayOfMyCombatUnitType = new int[]{5, 5, 1, 1, 3, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
+				buildOrderArrayOfMyCombatUnitType = new int[]{5, 5, 1, 1, 3, 2, 5, 5, 1, 1, 3, 2}; 	// 저글링 저글링 울트라 울트라 히드라 히드라
 			}
 			
 		}else{
 			// 기본
-			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
 			
 		}
 		
@@ -2263,7 +2278,13 @@ public class StrategyManager {
 			if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) {
 				isPossibleToConstructDefenseBuildingType2 = true;	
 			}
-			isPossibleToConstructCombatUnitTrainingBuildingType = true;
+			
+			// sc76.choi TODO 히드라의 갯수로 해처리를 더 지을지 말지 결정한다.
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2){
+				isPossibleToConstructCombatUnitTrainingBuildingType = true;
+			}else{
+				isPossibleToConstructCombatUnitTrainingBuildingType = false;
+			}
 		}
 
 		if (isPossibleToConstructDefenseBuildingType1 == true 
@@ -2501,19 +2522,7 @@ public class StrategyManager {
 				
 				boolean isPossibleToTrain = false;
 
-				if (mySpecialUnitType2 == UnitType.Protoss_High_Templar) {
-					if (myPlayer.completedUnitCount(UnitType.Protoss_Gateway) > 0 
-							&& myPlayer.completedUnitCount(UnitType.Protoss_Templar_Archives) > 0 ) {
-						isPossibleToTrain = true;
-					}							
-				}
-				else if (mySpecialUnitType2 == UnitType.Terran_Battlecruiser) {
-					if (myPlayer.completedUnitCount(UnitType.Terran_Starport) > 0 
-							&& myPlayer.completedUnitCount(UnitType.Terran_Physics_Lab) > 0) {
-						isPossibleToTrain = true;
-					}							
-				}
-				else if (mySpecialUnitType2 == UnitType.Zerg_Defiler) {
+				if (mySpecialUnitType2 == UnitType.Zerg_Defiler) {
 					if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0) {
 						isPossibleToTrain = true;
 					}							
