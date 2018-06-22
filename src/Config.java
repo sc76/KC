@@ -7,7 +7,9 @@ import bwapi.UnitType;
 public class Config {
 	
 	/// KC custom start
-	public static final boolean DEBUG = true; // debug show 여부를 판단할 boolean
+	public static boolean DEBUG = true; // debug show 여부를 판단할 boolean
+	
+	public static boolean IS_DRAW = true; // draw를 그릴지 말지 여부 
 	
 	// sc76.choi 추가 정보를 화면에 그린다.
 	public static boolean DrawSightInfo = true; 
