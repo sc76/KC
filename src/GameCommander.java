@@ -205,6 +205,12 @@ public class GameCommander {
 			Config.setSetLocalSpeed(setSpeed); 
 			MyBotModule.Broodwar.setLocalSpeed(setSpeed);
 		}
+		
+		if("on".equals(text)){
+			Config.IS_DRAW = true;
+		}else if("off".equals(text)){
+			Config.IS_DRAW = false;
+		}
 	}
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다
