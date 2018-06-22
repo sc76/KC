@@ -32,7 +32,7 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
+	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 6; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
 	
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
