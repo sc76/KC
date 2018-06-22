@@ -7,6 +7,7 @@ import bwapi.Race;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import bwapi.UpgradeType;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -162,6 +163,9 @@ public class KCSimulationManager {
 	public int getBasicCombatUnitTypePoint(Unit unit){
 		
 		if (enemyRace == Race.Protoss) {
+			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
+				return 1;
+			}
 			return 3;
 		} else if (enemyRace == Race.Terran) {
 			return 1;
@@ -179,11 +183,14 @@ public class KCSimulationManager {
 	 */
 	public int getAdvencedCombatUnitTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
+			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
+				return 2;
+			}
 			return 3;
 		} else if (enemyRace == Race.Terran) {
 			return 2;
 		} else if (enemyRace == Race.Zerg) {
-			return 3;
+			return 2;
 		} else {
 			return 0;
 		}
@@ -198,8 +205,8 @@ public class KCSimulationManager {
 		if (enemyRace == Race.Protoss) {
 			return 0;
 		} else if (enemyRace == Race.Terran) {
-			if(unit.getRemainingBuildTime() > 0){
-				return 0;
+			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
+				return 2;
 			}
 			return 5;
 		} else if (enemyRace == Race.Zerg) {
@@ -225,12 +232,15 @@ public class KCSimulationManager {
 //			if(unit.getRemainingBuildTime() > 0){
 //				return 0;
 //			}
-			return 1;
+			return 0;
 		} else if (enemyRace == Race.Zerg) {
 //			if(unit.getRemainingBuildTime() > 0){
 //				return 0;
 //			}
-			return 4;
+			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
+				return 2;
+			}			
+			return 3;
 		} else {
 			return 0;
 		}
