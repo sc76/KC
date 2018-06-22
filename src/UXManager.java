@@ -80,6 +80,11 @@ public class UXManager {
 		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 유닛의 사정거리 만큼 원을 그린다.
+		if (Config.DrawSightInfo) {
+			drawSightToSpecialUnits();
+		}
 		
 		drawGameInformationOnScreen(5, 15);
 
@@ -176,10 +181,7 @@ public class UXManager {
 			//MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)distanceFromSelfMainBase + ")");
 		}
 
-		// sc76.choi 유닛의 사정거리 만큼 원을 그린다.
-		if (Config.DrawSightInfo) {
-			drawSightToSpecialUnits();
-		}
+
 	}
 
 	// 게임 개요 정보를 Screen 에 표시합니다
@@ -267,8 +269,8 @@ public class UXManager {
 			}
 			
 			if(unit.getType() == UnitType.Zerg_Defiler){
-				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6 * Config.TILE_SIZE, Color.Red);
-				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 6, Color.Blue, true);
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 15 , Color.Blue);
+				MyBotModule.Broodwar.drawCircleMap(unit.getPosition(), 5, Color.Yellow, true);
 			}
 			
 			if(unit.getType() == UnitType.Zerg_Mutalisk){
