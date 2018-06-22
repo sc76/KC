@@ -27,8 +27,8 @@ import bwta.Chokepoint;
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
 public class StrategyManager {
 
-	private int countAttack;
-	private int countDefence;
+	private int countAttackMode;
+	private int countDefenceMode;
 	
 	// 아군
 	Player myPlayer;
@@ -543,7 +543,7 @@ public class StrategyManager {
 			// sc76.choi defenseMode 모드에서 크립 콜로니가 하나 완성이 되었으면, 
 			// sc76.choi 건물간격을 변경 해 준다.
 			// sc76.choi TODO 어떤 수치가 가장 효율적인지는 판단해야 한다.
-			if(Config.BuildingDefenseTowerSpacing == 0 
+			if(Config.BuildingDefenseTowerSpacing == 1 
 				 && (myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony) > 0 || 
 					 myPlayer.allUnitCount(UnitType.Zerg_Sunken_Colony) > 0)){
 				System.out.println("adjust BuildingDefenseTowerSpacing 0 - > 1");
@@ -626,7 +626,7 @@ public class StrategyManager {
 //				if (isSpecialUnitHasEnoughEnergy) {
 //					return true;
 //				}
-				countAttack++;
+				countAttackMode++;
 				return true;
 			}
 		}
@@ -647,7 +647,7 @@ public class StrategyManager {
 			  && myCombatUnitType5List.size() < necessaryNumberOfCombatUnitType5   // 울트라
 		)
 		{
-			countDefence++;
+			countDefenceMode++;
 			return true;
 		}
 		
@@ -1090,8 +1090,9 @@ public class StrategyManager {
 				
 				
 				targetPosition = TARGET_POSITION;
-				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*5));
-				System.out.println(" canAttackNow ["+unit.getID()+"] : " + canAttackNow);
+				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*7));
+				System.out.println("zergling canAttackNow ["+unit.getID()+"] : " + canAttackNow);
+				System.out.println("-------------------------------------------------------------");
 				System.out.println();
 				System.out.println();
 				
@@ -1280,7 +1281,8 @@ public class StrategyManager {
 			}else{
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
 				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*6));
-				System.out.println(" canAttackNow ["+unit.getID()+"] : " + canAttackNow);
+				System.out.println("hydra canAttackNow ["+unit.getID()+"] : " + canAttackNow);
+				System.out.println("-------------------------------------------------------------");
 				if(canAttackNow && unit.getGroundWeaponCooldown() == 0 
 					&& unit.getHitPoints() > 10
 				){
@@ -1298,7 +1300,7 @@ public class StrategyManager {
 	
 					commandUtil.attackMove(unit, targetPosition);
 				}
-				// cooldown이 빠졌을때는 뒤로 도망, 갈때는
+				// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
 				else{
 					
 					// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 
@@ -1307,7 +1309,8 @@ public class StrategyManager {
 					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
 						if(who.getPlayer() == enemyPlayer){
 							//System.out.println("who ID ["+who.getID()+"] : " + who.getPlayer() + ", " + who.getType().canAttack());
-							if(who.getType().canAttack()){
+							// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
+							if(who.getType().canAttack() && !who.getType().isBuilding()){
 								checkAroundCanAttakUnit++;
 							}
 						}
@@ -2823,19 +2826,19 @@ public class StrategyManager {
 
 	// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 	public int getCountAttack() {
-		return countAttack;
+		return countAttackMode;
 	}
 
 	public void setCountAttack(int countAttack) {
-		this.countAttack = countAttack;
+		this.countAttackMode = countAttack;
 	}
 
 	public int getCountDefence() {
-		return countDefence;
+		return countDefenceMode;
 	}
 
 	public void setCountDefence(int countDefence) {
-		this.countDefence = countDefence;
+		this.countDefenceMode = countDefence;
 	}
 	
 	public ArrayList<Unit> getMyAllCombatUnitList() {
