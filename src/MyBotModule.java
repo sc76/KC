@@ -231,7 +231,9 @@ public class MyBotModule extends DefaultBWListener {
 		
 		// 화면 출력 및 사용자 입력 처리
 		// 빌드서버에서는 Dependency가 없는 빌드서버 전용 UXManager 를 실행시킵니다
-		UXManager.Instance().update();
+		if(Config.IS_DRAW){
+			UXManager.Instance().update();
+		}
 
 		checkLostConditions();
 
