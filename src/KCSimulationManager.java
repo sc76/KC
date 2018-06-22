@@ -31,6 +31,18 @@ public class KCSimulationManager {
 	private UnitType enemyBasicDefenceUnitType = null;
 	private UnitType enemyAdvencedDefenceUnitType = null;
 	
+	private int myPoint = 0;
+	private int enemyPoint = 0;
+	
+	private int countBasicCombatUnit = 0;
+	private int countAdvencedCombatUnit = 0;
+	private int countBasicDefenceUnit = 0;
+	private int countAdvencedDefenceUnit = 0;
+	
+	int myBasicCombatUnitTypePoint = 1;
+	int myAdvencedCombatUnitTypePoint = 4;
+	int myBasicDefenceUnitTypePoint = 0;
+	int myDefenceCombatUnitTypePoint = 5;
 	
 	// static singleton 객체를 리턴합니다
 	private static KCSimulationManager instance = new KCSimulationManager();
@@ -86,14 +98,14 @@ public class KCSimulationManager {
 		enemyBasicDefenceUnitType = InformationManager.Instance().getBasicDefenseBuildingType(enemyRace);
 		enemyAdvencedDefenceUnitType = InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace);
 		
-		int myPoint = 0;
-		int enemyPoint = 0;
+		myPoint = 0;
+		enemyPoint = 0;
 		
-		int myBasicCombatUnitTypePoint = 1;
-		int myAdvencedCombatUnitTypePoint = 4;
-		int myBasicDefenceUnitTypePoint = 0;
-		int myDefenceCombatUnitTypePoint = 5;
-
+		countBasicCombatUnit = 0;
+		countAdvencedCombatUnit = 0;
+		countBasicDefenceUnit = 0;
+		countAdvencedDefenceUnit = 0;
+		
 		for(Unit unit : Units){
 			if(unit.getPlayer() == selfPlayer){
 				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType()){
@@ -110,22 +122,29 @@ public class KCSimulationManager {
 				//System.out.println("unit.enemyRace          : " + enemyRace);
 				//System.out.println("unit.getType            : " + unit.getType());
 				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType(enemyRace)){
+					countBasicCombatUnit++;
 					enemyPoint += getBasicCombatUnitTypePoint(unit);
 				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType(enemyRace)){
+					countAdvencedCombatUnit++;
 					enemyPoint += getAdvencedCombatUnitTypePoint(unit);
 				}else if(unit.getType() == InformationManager.Instance().getBasicDefenseBuildingType(enemyRace)){
+					countBasicDefenceUnit++;
 					enemyPoint += getBasicDefenceBuildingTypePoint(unit);
 				}else if(unit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace)){
+					countAdvencedDefenceUnit++;
 					enemyPoint += getAdvencedDefenceBuildingTypePoint(unit);
 				}
 				//System.out.println("      enemyPoint By 1   : " + enemyPoint);
 			}
 		}
-		
-		System.out.println("canAttackNow myPoint    : " + myPoint);
-		System.out.println("canAttackNow enemyPoint : " + enemyPoint);
+		System.out.println("-------------------------------------------------------------");
+		System.out.println("countBasicCombatUnit     : " + countBasicCombatUnit);
+		System.out.println("countAdvencedCombatUnit  : " + countBasicCombatUnit);
+		System.out.println("countBasicDefenceUnit    : " + countBasicCombatUnit);
+		System.out.println("countAdvencedDefenceUnit : " + countBasicCombatUnit);
 		System.out.println();
-		System.out.println();
+		System.out.println("canAttackNow myPoint     : " + myPoint);
+		System.out.println("canAttackNow enemyPoint  : " + enemyPoint);
 		
 		// TODO sc76.choi 각 false 값을 누적해서 계속 false가 나오면 CombatState를 defence모드로 변경한다.
 		// TODO sc76.choi 개별 전투에서 모두 패배를 기록하고 있다고 판단한다.
@@ -198,19 +217,19 @@ public class KCSimulationManager {
 	public int getAdvencedDefenceBuildingTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
 			// sc76.choi 아직 지어지고 있으면 0로 리턴
-			if(unit.getRemainingBuildTime() > 0){
-				return 0;
-			}
+//			if(unit.getRemainingBuildTime() > 0){
+//				return 0;
+//			}
 			return 2;
 		} else if (enemyRace == Race.Terran) {
-			if(unit.getRemainingBuildTime() > 0){
-				return 0;
-			}
+//			if(unit.getRemainingBuildTime() > 0){
+//				return 0;
+//			}
 			return 1;
 		} else if (enemyRace == Race.Zerg) {
-			if(unit.getRemainingBuildTime() > 0){
-				return 0;
-			}
+//			if(unit.getRemainingBuildTime() > 0){
+//				return 0;
+//			}
 			return 4;
 		} else {
 			return 0;
