@@ -421,12 +421,14 @@ public class OverloadManager {
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		} 
 		// 나의 두번째 choke position
+		/*
 		else if(mySecondChokeOverload == null){
 			mySecondChokeOverload = unit;
 			overloadData.setOverloadJob(mySecondChokeOverload, OverloadData.OverloadJob.MySecondChoke, (Unit)null);
 			commandUtil.move(mySecondChokeOverload, selfSecondChokePosition);
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		}
+		*/
 		// 적의 두번째 choke position
 		/*
 		else if(enemySecondChokeOverload == null && enemyMainBaseLocation != null){
