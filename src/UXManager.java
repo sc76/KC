@@ -280,7 +280,7 @@ public class UXManager {
 		
 		// build order array
 		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
-		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder));
+		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
 	}
 
 	/// Players 정보를 Screen 에 표시합니다
@@ -1026,7 +1026,12 @@ public class UXManager {
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "CoolDown : " + white + unit.getGroundWeaponCooldown());
 				if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null)
 					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
+			}else if(unit.getType() == UnitType.Zerg_Mutalisk){
+				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "CoolDown : " + white + unit.getGroundWeaponCooldown());
+				if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null)
+					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
 			}
+				
 		}
 		for (Unit unit : MyBotModule.Broodwar.enemy().getUnits())
 		{
