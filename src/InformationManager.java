@@ -593,6 +593,12 @@ public class InformationManager {
 	}
 
 	// 해당 종족의 UnitType 중 Advanced Combat Unit 에 해당하는 UnitType을 리턴합니다
+	public UnitType getAdvancedCombatUnitType2() {
+		return getAdvancedCombatUnitType2(MyBotModule.Broodwar.self().getRace());
+	}
+
+	
+	// 해당 종족의 UnitType 중 Advanced Combat Unit 에 해당하는 UnitType을 리턴합니다
 	public UnitType getAdvancedCombatUnitType(Race race) {
 		if (race == Race.Protoss) {
 			return UnitType.Protoss_Dragoon;
@@ -605,6 +611,18 @@ public class InformationManager {
 		}
 	}
 
+	public UnitType getAdvancedCombatUnitType2(Race race) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Archon;
+		} else if (race == Race.Terran) {
+			return UnitType.Terran_Firebat;
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Ultralisk;
+		} else {
+			return UnitType.None;
+		}
+	}
+	
 	// 해당 종족의 UnitType 중 Basic Combat Unit 을 생산하기 위해 건설해야하는 UnitType을 리턴합니다
 	public UnitType getBasicCombatBuildingType() {
 		return getBasicCombatBuildingType(MyBotModule.Broodwar.self().getRace());
