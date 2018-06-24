@@ -208,7 +208,7 @@ public class GameCommander {
 		
 		if("on".equals(text)){
 			Config.IS_DRAW = true;
-		}else if("off".equals(text)){
+		}else if("off".equals(text) || "of".equals(text)){
 			Config.IS_DRAW = false;
 		}
 	}
