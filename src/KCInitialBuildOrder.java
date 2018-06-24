@@ -306,6 +306,9 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
 		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+				StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
+		
 		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);	
 	}
 	
@@ -406,6 +409,8 @@ public class KCInitialBuildOrder {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
+		
+
 		
 		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);	
 	}
