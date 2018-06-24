@@ -60,8 +60,8 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 8; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 14;  // 히드라
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 12; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 12;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 1;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
@@ -138,6 +138,15 @@ public class Config {
 	public static int maxNumberOfTrainSpecialUnitType3AgainstTerran = 6;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstTerran = 4;  // 퀸
 	
+	// 방어 건물 종류 및 건설 갯수 설정
+	public static int necessaryNumberOfDefenseBuilding1AgainstProtoss = 2;
+	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 2; 			
+	
+	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
+	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
+	
+	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
+	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 2;	
 	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경

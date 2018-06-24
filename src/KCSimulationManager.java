@@ -232,12 +232,12 @@ public class KCSimulationManager {
 	 */
 	public int getBasicDefenceBuildingTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
-			return 0;
+			return 4;
 		} else if (enemyRace == Race.Terran) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 1;
+				return 2;
 			}
-			return 1;
+			return 4;
 		} else if (enemyRace == Race.Zerg) {
 			return 1;
 		} else {
