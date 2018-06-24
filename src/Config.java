@@ -22,19 +22,27 @@ public class Config {
 	// sc76.choi 일꾼 공격 합세숫자
 	public static int COUNT_WORKERS_CANATTACK = 2; 
 	
+	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 0; // 럴커
+	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
+	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
+	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
+	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 6; // 히드라
+	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
+	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
+	public static int necessaryNumberOfDefenceUnitType5AgainstTerran = 0; // 울트라
 	
+	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
@@ -50,26 +58,27 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
-	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 1; // 디파일러
+	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
 	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 8; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 12;  // 히드라
+	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 14;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 1;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
-	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 1; // 디파일러	
+	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 3; // 디파일러	
 
+	//////////////////////////////////////////////////////////////////////////////////////////
 	// 아군의 일반 유닛 최대 전투참가 제한 수
 	public static int maxNumberOfCombatUnitType1AgainstProtoss = 12;  // 저글링
-	public static int maxNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
+	public static int maxNumberOfCombatUnitType2AgainstProtoss = 16; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstProtoss = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstProtoss = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
 	
-	public static int maxNumberOfSpecialUnitType1AgainstProtoss = 3;  // 오버로드
-	public static int maxNumberOfSpecialUnitType2AgainstProtoss = 12; // 디파일러
-	public static int maxNumberOfSpecialUnitType3AgainstProtoss = 4;  // 스커지
+	public static int maxNumberOfSpecialUnitType1AgainstProtoss = 1;  // 오버로드
+	public static int maxNumberOfSpecialUnitType2AgainstProtoss = 2; // 디파일러
+	public static int maxNumberOfSpecialUnitType3AgainstProtoss = 0;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstProtoss = 0;  // 퀸
 	
 	public static int maxNumberOfCombatUnitType1AgainstZerg = 12;  // 저글링
@@ -78,8 +87,8 @@ public class Config {
 	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
 	
-	public static int maxNumberOfSpecialUnitType1AgainstZerg = 3;  // 오버로드
-	public static int maxNumberOfSpecialUnitType2AgainstZerg = 12; // 디파일러
+	public static int maxNumberOfSpecialUnitType1AgainstZerg = 1;  // 오버로드
+	public static int maxNumberOfSpecialUnitType2AgainstZerg = 3; // 디파일러
 	public static int maxNumberOfSpecialUnitType3AgainstZerg = 4;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
@@ -89,10 +98,46 @@ public class Config {
 	public static int maxNumberOfCombatUnitType4AgainstTerran = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstTerran = 3;  // 울트라
 	
-	public static int maxNumberOfSpecialUnitType1AgainstTerran = 3;  // 오버로드
-	public static int maxNumberOfSpecialUnitType2AgainstTerran = 12; // 디파일러
+	public static int maxNumberOfSpecialUnitType1AgainstTerran = 2;  // 오버로드
+	public static int maxNumberOfSpecialUnitType2AgainstTerran = 3; // 디파일러
 	public static int maxNumberOfSpecialUnitType3AgainstTerran = 4;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstTerran = 2;  // 퀸	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	// sc76.choi 아군 최대 생산 제한 유닛수
+	public static int maxNumberOfTrainUnitType1AgainstProtoss = 20; // 저글링
+	public static int maxNumberOfTrainUnitType2AgainstProtoss = 16; // 히드라
+	public static int maxNumberOfTrainUnitType3AgainstProtoss = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType4AgainstProtoss = 8;  // 뮤탈
+	public static int maxNumberOfTrainUnitType5AgainstProtoss = 3;  // 울트라
+	
+	public static int maxNumberOfTrainSpecialUnitType1AgainstProtoss = 1;  // 오버로드
+	public static int maxNumberOfTrainSpecialUnitType2AgainstProtoss = 2;  // 디파일러
+	public static int maxNumberOfTrainSpecialUnitType3AgainstProtoss = 6;  // 스커지
+	public static int maxNumberOfTrainSpecialUnitType4AgainstProtoss = 1;  // 퀸
+	
+	public static int maxNumberOfTrainUnitType1AgainstZerg = 20; // 저글링
+	public static int maxNumberOfTrainUnitType2AgainstZerg = 16; // 히드라
+	public static int maxNumberOfTrainUnitType3AgainstZerg = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType4AgainstZerg = 8;  // 뮤탈
+	public static int maxNumberOfTrainUnitType5AgainstZerg = 3;  // 울트라
+	
+	public static int maxNumberOfTrainSpecialUnitType1AgainstZerg = 1;  // 오버로드
+	public static int maxNumberOfTrainSpecialUnitType2AgainstZerg = 3;  // 디파일러
+	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 6;  // 스커지
+	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 1;  // 퀸
+	
+	public static int maxNumberOfTrainUnitType1AgainstTerran = 20; // 저글링
+	public static int maxNumberOfTrainUnitType2AgainstTerran = 16; // 히드라
+	public static int maxNumberOfTrainUnitType3AgainstTerran = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
+	public static int maxNumberOfTrainUnitType5AgainstTerran = 3;  // 울트라
+	
+	public static int maxNumberOfTrainSpecialUnitType1AgainstTerran = 2;  // 오버로드
+	public static int maxNumberOfTrainSpecialUnitType2AgainstTerran = 3;  // 디파일러
+	public static int maxNumberOfTrainSpecialUnitType3AgainstTerran = 6;  // 스커지
+	public static int maxNumberOfTrainSpecialUnitType4AgainstTerran = 4;  // 퀸
+	
 	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
