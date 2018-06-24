@@ -36,15 +36,15 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 8; // 저글링
+	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 6; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstTerran = 0; // 울트라
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
+	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 16;  // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
@@ -92,7 +92,7 @@ public class Config {
 	public static int maxNumberOfSpecialUnitType3AgainstZerg = 4;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
-	public static int maxNumberOfCombatUnitType1AgainstTerran = 12;  // 저글링
+	public static int maxNumberOfCombatUnitType1AgainstTerran = 16;  // 저글링
 	public static int maxNumberOfCombatUnitType2AgainstTerran = 12; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstTerran = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstTerran = 8;  // 뮤탈
