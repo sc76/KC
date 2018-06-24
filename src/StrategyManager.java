@@ -365,16 +365,6 @@ public class StrategyManager {
 	
 	// 현재 나의 거주 지역 중 가장 방어해야할 곳을 찾아 DEFENCE_POSITION으로 지정한다.
 	public void getTargetPositionForDefence(){
-//		switch (seedPositionStrategyOfMyDefenseBuildingType) {
-//		case MainBaseLocation: 
-//
-//			DEFENCE_POSITION = myMainBaseLocation.getPosition();
-//			break;
-//		case FirstChokePoint: 
-//
-//			DEFENCE_POSITION = myFirstChokePoint.getCenter();
-//			break;
-//		case FirstExpansionLocation: 
 			Position myDefenseBuildingPosition = myFirstExpansionLocation.getPosition();
 			
 			// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
@@ -390,14 +380,6 @@ public class StrategyManager {
 			}
 			
 			DEFENCE_POSITION = myDefenseBuildingPosition;
-//			break;
-//		case SecondChokePoint: 
-//			DEFENCE_POSITION = mySecondChokePoint.getCenter();
-//			break;
-//		default: 
-//			DEFENCE_POSITION = myMainBaseLocation.getPosition();
-//			break;
-//	}
 	}
 		
 	/// 게임 초기에 사용할 빌드오더를 세팅합니다
@@ -633,14 +615,24 @@ public class StrategyManager {
 		}
 	}
 	
+	/**
+	 * 방어 판단을 위한 방어 수
+	 * @author csc
+	 * @return
+	 */	
 	boolean isNecessaryNumberOfDefencedUnitType(){
 		return (myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1 
 				|| myCombatUnitType2List.size() >= necessaryNumberOfDefenceUnitType2
 				|| myCombatUnitType3List.size() >= necessaryNumberOfDefenceUnitType3);
 	}
 	
+	/**
+	 * 공격 판단을 위한 공격 수
+	 * @author csc
+	 * @return
+	 */
 	boolean isNecessaryNumberOfCombatUnitType(){
-		return (myCombatUnitType1List.size() >= 20) ||
+		return (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1) ||
 				
 			(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2) ||  
 				
@@ -2072,6 +2064,10 @@ public class StrategyManager {
 			maxNumberOfTrainSpecialUnitType3 = Config.maxNumberOfTrainSpecialUnitType3AgainstProtoss;
 			maxNumberOfTrainSpecialUnitType4 = Config.maxNumberOfTrainSpecialUnitType4AgainstProtoss; 
 			
+			// 방어 건물 종류 및 건설 갯수 설정
+			necessaryNumberOfDefenseBuilding1 = Config.necessaryNumberOfDefenseBuilding1AgainstProtoss;
+			necessaryNumberOfDefenseBuilding2 = Config.necessaryNumberOfDefenseBuilding2AgainstProtoss;
+			 
 		}else if(enemyRace != Race.None && enemyRace == Race.Zerg){
 			// sc76.choi 각 종족별 방어, 공격에 필요한 유닛 수 설정
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstZerg;
@@ -2105,6 +2101,9 @@ public class StrategyManager {
 			maxNumberOfTrainSpecialUnitType3 = Config.maxNumberOfTrainSpecialUnitType3AgainstZerg;
 			maxNumberOfTrainSpecialUnitType4 = Config.maxNumberOfTrainSpecialUnitType4AgainstZerg; 
 			
+			// 방어 건물 종류 및 건설 갯수 설정
+			necessaryNumberOfDefenseBuilding1 = Config.necessaryNumberOfDefenseBuilding1AgainstZerg;
+			necessaryNumberOfDefenseBuilding2 = Config.necessaryNumberOfDefenseBuilding2AgainstZerg;			
 		}else if(enemyRace != Race.None && enemyRace == Race.Terran){
 			
 			// sc76.choi 각 종족별 방어, 공격에 필요한 유닛 수 설정
@@ -2139,6 +2138,9 @@ public class StrategyManager {
 			maxNumberOfTrainSpecialUnitType3 = Config.maxNumberOfTrainSpecialUnitType3AgainstTerran;
 			maxNumberOfTrainSpecialUnitType4 = Config.maxNumberOfTrainSpecialUnitType4AgainstTerran; 
 			
+			// 방어 건물 종류 및 건설 갯수 설정
+			necessaryNumberOfDefenseBuilding1 = Config.necessaryNumberOfDefenseBuilding1AgainstTerran;
+			necessaryNumberOfDefenseBuilding2 = Config.necessaryNumberOfDefenseBuilding2AgainstTerran;
 		}else{
 			
 			// sc76.choi 각 종족별 방어, 공격에 필요한 유닛 수 설정
@@ -2173,6 +2175,9 @@ public class StrategyManager {
 			maxNumberOfTrainSpecialUnitType3 = Config.maxNumberOfTrainSpecialUnitType3AgainstProtoss;
 			maxNumberOfTrainSpecialUnitType4 = Config.maxNumberOfTrainSpecialUnitType4AgainstProtoss; 			
 			
+			// 방어 건물 종류 및 건설 갯수 설정
+			necessaryNumberOfDefenseBuilding1 = Config.necessaryNumberOfDefenseBuilding1AgainstProtoss;
+			necessaryNumberOfDefenseBuilding2 = Config.necessaryNumberOfDefenseBuilding2AgainstProtoss;
 		}
 		
 		// 아군 방어 건물 목록, 공격 유닛 목록
