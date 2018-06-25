@@ -846,6 +846,8 @@ public class StrategyManager {
 			if (unit.getType() == myCombatUnitType3) {
 				hasCommanded = controlCombatUnitType3(unit);
 			}
+			
+			// 오버로드
 			if (unit.getType() == mySpecialUnitType1) {					
 				hasCommanded = controlSpecialUnitType1(unit);
 			}
@@ -1641,8 +1643,8 @@ public class StrategyManager {
 				// TODO idle인것 중 멀리 있는것만 리턴 시켜야 한다.
 				for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){
 					if(OverloadManager.Instance().getOverloadData().getJobCode(overload) == 'A'){
-						OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Idle, (Unit)null);				
-						commandUtil.move(unit, myFirstExpansionLocation.getPosition());
+						OverloadManager.Instance().getOverloadData().setOverloadJob(overload, OverloadData.OverloadJob.Idle, (Unit)null);				
+						commandUtil.move(overload, myFirstExpansionLocation.getPosition());
 					}
 				}
 				
@@ -2480,7 +2482,7 @@ public class StrategyManager {
 			// 최적의 일꾼 수 = 미네랄 * (1~1.5) + 가스 * 3
 			int optimalWorkerCount = 0;
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
-				optimalWorkerCount += baseLocation.getMinerals().size() * 1.5;
+				optimalWorkerCount += baseLocation.getMinerals().size() * 2;
 				optimalWorkerCount += baseLocation.getGeysers().size() * 3;
 			}
 						
@@ -2597,6 +2599,7 @@ public class StrategyManager {
 
 	/// 방어건물 및 공격유닛 생산 건물을 건설합니다
 	void executeBuildingConstruction() {
+		
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		if (isInitialBuildOrderFinished == false) {
 			return;

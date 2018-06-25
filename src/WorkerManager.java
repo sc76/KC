@@ -136,7 +136,7 @@ public class WorkerManager {
 				// sc76.choi TODO 하지만, Lair 이후 테크이면, 가스가 많이 필요하다
 				else{
 					if(InformationManager.Instance().getTotalLairCount() <= 0 
-							&& selfMinerals < 100 && selfGas > 300){
+							&& selfMinerals < 100 && selfGas > 200){
 						//System.out.println("                      trans mineral 1 " + Config.WorkersPerRefinery);
 						Config.WorkersPerRefinery = -1; // sc76.choi 필요가스 일꾼 조정 0, 가스 일꾼은 1마리만..
 						
