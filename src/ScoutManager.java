@@ -171,9 +171,11 @@ public class ScoutManager {
 					//currentScoutTargetPosition = getScoutFleePositionFromEnemyRegionVertices();
 					//commandUtil.move(currentScoutUnit, currentScoutTargetPosition);					
 					
-					WorkerManager.Instance().setIdleWorker(currentScoutUnit);
-					currentScoutStatus = ScoutStatus.NoScout.ordinal();
-					currentScoutTargetPosition = myBaseLocation.getPosition();
+					if(WorkerManager.Instance().getWorkerData().getWorkerJob(currentScoutUnit) != WorkerData.WorkerJob.Minerals){
+						WorkerManager.Instance().setIdleWorker(currentScoutUnit);
+						currentScoutStatus = ScoutStatus.NoScout.ordinal();
+						currentScoutTargetPosition = myBaseLocation.getPosition();
+					}
 				}
 			}
 		}
