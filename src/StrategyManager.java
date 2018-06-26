@@ -14,6 +14,7 @@ import bwapi.Player;
 import bwapi.Position;
 import bwapi.Race;
 import bwapi.TechType;
+import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
@@ -191,9 +192,11 @@ public class StrategyManager {
 
 	// 공격 포지션
 	Position TARGET_POSITION = null;
+	TilePosition TARGET_TILEPOSITION = null;
 	
 	// 방어 포지션
 	Position DEFENCE_POSITION = null;
+	TilePosition DEFENCE_TILEPOSITION = null;
 	
 	// target으로 부터 가장 가까운 공격 유닛을 찾기 위한 변수
 	ArrayList<UnitInfo> unitListByType = new ArrayList<UnitInfo>();
@@ -354,8 +357,10 @@ public class StrategyManager {
 		// sc76.choi TODO 적 본진이 정확히 보이지 않았다면(오버로드가 정찰을 깊숙히 못했을 경우) 본진으로 타켓이 이동하지 않는다.
 		if(targetBaseLocation != null){
 			TARGET_POSITION = targetBaseLocation.getPosition();
+			TARGET_TILEPOSITION = targetBaseLocation.getTilePosition();
 		}else{
 			TARGET_POSITION = enemyMainBaseLocation.getPosition();
+			TARGET_TILEPOSITION = enemyMainBaseLocation.getTilePosition();
 		}
 		
 		//System.out.println("TARGET_POSITION : " + TARGET_POSITION);
@@ -366,6 +371,7 @@ public class StrategyManager {
 	// 현재 나의 거주 지역 중 가장 방어해야할 곳을 찾아 DEFENCE_POSITION으로 지정한다.
 	public void getTargetPositionForDefence(){
 			Position myDefenseBuildingPosition = myFirstExpansionLocation.getPosition();
+			TilePosition myDefenseBuildingTilePosition = myFirstExpansionLocation.getTilePosition();
 			
 			// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
 			// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
@@ -376,10 +382,12 @@ public class StrategyManager {
 				// sc76.choi 방어 타워가 앞마당 헤처리보다 센터로 부터 더 멀리 있으면, 그냥 앞마당으로 모인다. 
 				if(d1 > d2){
 					myDefenseBuildingPosition = myDefenseBuildingUnit.getPosition();
+					myDefenseBuildingTilePosition = myDefenseBuildingUnit.getTilePosition();
 				}
 			}
 			
 			DEFENCE_POSITION = myDefenseBuildingPosition;
+			DEFENCE_TILEPOSITION = myDefenseBuildingTilePosition;
 	}
 		
 	/// 게임 초기에 사용할 빌드오더를 세팅합니다
@@ -611,7 +619,12 @@ public class StrategyManager {
 		// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
 		//////////////////////////////////////////////////////////////////////////
 		else if (combatState == CombatState.eliminateEnemy) {
-			commandMyCombatUnitToEliminate();	
+			commandMyCombatUnitToEliminate();
+
+			// sc76.choi eliminate하다 역공을 당하면 다시 방어 모드로 전환해야 한다. 이후 재정비 후 공격			
+			if (isTimeToStartDefense()) {
+				combatState = CombatState.defenseMode;
+			}	
 		}
 	}
 	
@@ -1013,13 +1026,14 @@ public class StrategyManager {
 		for(Unit unit : myAllCombatUnitList) {
 			
 			boolean hasCommanded = false;
+			boolean hasCommandedSpecialType2 = false;
 			
 			if (unit.getType() == myCombatUnitType3) { // 럴커
 				hasCommanded = controlCombatUnitType3(unit);					
 			}
 			
 			if (unit.getType() == mySpecialUnitType1) {	// 오버로드				
-				hasCommanded = controlSpecialUnitType1(unit);
+				hasCommandedSpecialType2 = controlSpecialUnitType1(unit);
 			}
 			
 			if (unit.getType() == mySpecialUnitType2) {	// 디파일러	
@@ -1027,7 +1041,7 @@ public class StrategyManager {
 			}
 			
 			// 따로 명령 내린 적이 없으면, 적군의 남은 건물 혹은 랜덤 위치로 이동시킨다
-			if (hasCommanded == false) {
+			if (hasCommandedSpecialType2 == false) {
 
 				if (unit.isIdle()) {
 
@@ -1635,6 +1649,7 @@ public class StrategyManager {
 				
 				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);	
 				commandUtil.move(unit, targetPosition);
+				hasCommanded = true;
 				
 				
 			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
@@ -1645,6 +1660,7 @@ public class StrategyManager {
 					if(OverloadManager.Instance().getOverloadData().getJobCode(overload) == 'A'){
 						OverloadManager.Instance().getOverloadData().setOverloadJob(overload, OverloadData.OverloadJob.Idle, (Unit)null);				
 						commandUtil.move(overload, myFirstExpansionLocation.getPosition());
+						hasCommanded = true;
 					}
 				}
 				
@@ -1652,7 +1668,6 @@ public class StrategyManager {
 				
 			}
 			
-			hasCommanded = true;
 		}
 		
 		//System.out.println("controlSpecialUnitType1(Unit) hasCommanded : " + hasCommanded);
@@ -1944,8 +1959,8 @@ public class StrategyManager {
 		// 전투 상황
 		MyBotModule.Broodwar.drawTextScreen(440, 20, red + "CombatState : " + combatState.toString());
 		MyBotModule.Broodwar.drawTextScreen(440, 30, red + "BuildState : " + "normal");
-		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "Attak Pos. : " + TARGET_POSITION);
-		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Defence Pos. : " + DEFENCE_POSITION);
+		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "Attak Pos. : " + TARGET_TILEPOSITION + TARGET_POSITION);
+		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Defence Pos. : " + DEFENCE_TILEPOSITION + DEFENCE_POSITION);
 		
 		MyBotModule.Broodwar.drawTextScreen(440, 60, "is Defence Num. : " + isNecessaryNumberOfDefencedUnitType());
 		MyBotModule.Broodwar.drawTextScreen(440, 70, "is Combat Num. : " + isNecessaryNumberOfCombatUnitType() + "(" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +")");
@@ -2893,6 +2908,7 @@ public class StrategyManager {
 //			}
 
 			// 특수 유닛 생산 - 2 디파일러
+			// TODO 자원이 없을 때는 True로 생산하면 lock이 걸린다.
 			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType2) == 0) {	
 				
 				boolean isPossibleToTrain = false;
@@ -2934,8 +2950,12 @@ public class StrategyManager {
 					for(Unit unit : myPlayer.getUnits()) {
 						if (unit.getType() == producerType) {
 							if (unit.isTraining() == false && unit.isMorphing() == false) {
-		
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType2, true);
+								
+								if(selfGas < 200){
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType2, false);
+								}else{
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType2, true);
+								}
 								break;
 							}
 							
@@ -2945,6 +2965,7 @@ public class StrategyManager {
 			}
 			
 			// 특수 유닛 생산 - 3 스커지
+			// TODO 자원이 없을 때는 True로 생산하면 lock이 걸린다.			
 			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType3) == 0) {	
 				
 				boolean isPossibleToTrain = false;
@@ -2996,6 +3017,7 @@ public class StrategyManager {
 			}
 			
 //			// 특수 유닛 생산 - 4 퀸
+//			// TODO 자원이 없을 때는 True로 생산하면 lock이 걸린다.			
 //			if (BuildManager.Instance().buildQueue.getItemCount(mySpecialUnitType4) == 0) {	
 //				
 //				boolean isPossibleToTrain = false;
