@@ -348,7 +348,7 @@ public class InformationManager {
 			// for (const auto & kv : unitData.get(enemy).getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
-				if (ui.getType().isBuilding() && commandUtil.IsValidUnit(ui.getUnit())) {
+				if (ui.getType().isBuilding()) {
 					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()),
 							MyBotModule.Broodwar.enemy());
 				}
@@ -362,7 +362,7 @@ public class InformationManager {
 			// for (const auto & kv : _unitData[_self].getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(selfPlayer).getUnitAndUnitInfoMap().get(it.next());
-				if (ui.getType().isBuilding() && commandUtil.IsValidUnit(ui.getUnit())) {
+				if (ui.getType().isBuilding()) {
 					updateOccupiedRegions(BWTA.getRegion(ui.getLastPosition().toTilePosition()),
 							MyBotModule.Broodwar.self());
 				}
@@ -466,7 +466,7 @@ public class InformationManager {
 		}
 
 		// 반지름 10 (TilePosition 단위) 이면 거의 화면 가득이다
-		int maxRadius = 6;
+		int maxRadius = 8;
 
 		if (unitData.get(player) != null) {
 			Iterator<Integer> it = unitData.get(player).getUnitAndUnitInfoMap().keySet().iterator();
@@ -474,16 +474,25 @@ public class InformationManager {
 			// for (const auto & kv : _unitData[player].getUnits())
 			while (it.hasNext()) {
 				final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
-				if (ui.getType().isBuilding() && commandUtil.IsValidUnit(ui.getUnit())) {
-					if(player == enemyPlayer){
-						System.out.println("enemyPlayer hasBuildingAroundBaseLocation : " + ui.getUnitID() + " " + ui.getType());
-					}
+				if (ui.getType().isBuilding()) {
+					
+					if(!commandUtil.IsValidUnit(ui.getUnit())) continue;
+					
 					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
+					
+//					if(player == enemyPlayer){
+//						System.out.println("enemyPlayer hasBuildingAroundBaseLocation 1 : " + baseLocation.getTilePosition() + " " + buildingPosition +" " + ui.getUnitID() + " " + ui.getType());
+//					}
 
 					if (buildingPosition.getX() >= baseLocation.getTilePosition().getX() - maxRadius
 							&& buildingPosition.getX() <= baseLocation.getTilePosition().getX() + maxRadius
 							&& buildingPosition.getY() >= baseLocation.getTilePosition().getY() - maxRadius
 							&& buildingPosition.getY() <= baseLocation.getTilePosition().getY() + maxRadius) {
+						
+//						if(player == enemyPlayer){
+//							System.out.println("enemyPlayer hasBuildingAroundBaseLocation 2 : " + baseLocation.getTilePosition() + " " + ui.getUnitID() + " " + ui.getType());
+//						}
+						
 						return true;
 					}
 				}
@@ -511,11 +520,11 @@ public class InformationManager {
 		// for (const auto & kv : unitData.get(self).getUnits())
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
-			if (ui.getType().isBuilding() && commandUtil.IsValidUnit(ui.getUnit())) {
+			if (ui.getType().isBuilding()) {
 				
-				if(player == enemyPlayer){
-					System.out.println("enemyPlayer existsPlayerBuildingInRegion : " + ui.getUnitID() + " " + ui.getType());
-				}
+//				if(player == enemyPlayer){
+//					System.out.println("enemyPlayer existsPlayerBuildingInRegion : " + ui.getUnitID() + " " + ui.getType());
+//				}
 				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
 				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
 
