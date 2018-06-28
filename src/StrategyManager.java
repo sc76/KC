@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -1169,11 +1170,8 @@ public class StrategyManager {
 				
 				
 				targetPosition = TARGET_POSITION;
-				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*7));
-//				System.out.println("zergling canAttackNow ["+unit.getID()+"] : " + canAttackNow);
-//				System.out.println("-------------------------------------------------------------");
-//				System.out.println();
-//				System.out.println();
+				List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*7);
+				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
 				
 				// sc76.choi 공격이 가능하면
 				if(canAttackNow){
@@ -1250,22 +1248,37 @@ public class StrategyManager {
 				
 			}else if(combatState == CombatState.defenseMode){
 				
-				// 태어 나서는 앞마당으로 집결
-				if(unit.getDistance(myFirstExpansionLocation.getPosition()) > Config.TILE_SIZE*9){
-					//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
-					commandUtil.attackMove(unit, DEFENCE_POSITION);
-				}
+//				if(unit.isUnderAttack()){
+//					System.out.println("isUnderAttacking : " + unit.getID());
+//				}
+
 				
-				if(unit.getDistance(myFirstExpansionLocation.getPosition()) < Config.TILE_SIZE*3){
-					//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
-					commandUtil.attackMove(unit, myFirstChokePoint.getCenter());
-				}
+				Unit enemyUnitForMainDefence = findAttackTargetForMainDefence();
+				Unit enemyUnitForExpansionDefence = findAttackTargetForExpansionDefence();
 				
-				if(unit.getDistance(myFirstChokePoint.getCenter()) < Config.TILE_SIZE*1){
-					//System.out.println("CombatState.defenseMode 2 : " + unit.getID());
-					commandUtil.attackMove(unit, DEFENCE_POSITION);
+				if(enemyUnitForMainDefence == null && enemyUnitForExpansionDefence == null){
+					// 태어 나서는 앞마당으로 집결
+					if(unit.getDistance(myFirstExpansionLocation.getPosition()) > Config.TILE_SIZE*9){
+						//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
+						commandUtil.attackMove(unit, DEFENCE_POSITION);
+					}
+					
+					if(unit.getDistance(myFirstExpansionLocation.getPosition()) < Config.TILE_SIZE*3){
+						//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
+						commandUtil.attackMove(unit, myFirstChokePoint.getCenter());
+					}
+					
+					if(unit.getDistance(myFirstChokePoint.getCenter()) < Config.TILE_SIZE*1){
+						//System.out.println("CombatState.defenseMode 2 : " + unit.getID());
+						commandUtil.attackMove(unit, DEFENCE_POSITION);
+					}
+					
+				}else if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
+					commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
+
+				}else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence)){
+					commandUtil.attackUnit(unit, enemyUnitForMainDefence);
 				}
-				
 				hasCommanded = true;
 			}
 		}
@@ -1280,20 +1293,30 @@ public class StrategyManager {
 			
 			if (combatState == CombatState.defenseMode) {
 				
-				// 태어 나서는 앞마당으로 집결
-				if(unit.getDistance(myFirstExpansionLocation.getPosition()) > Config.TILE_SIZE*9){
-					//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
-					commandUtil.attackMove(unit, DEFENCE_POSITION);
-				}
+				Unit enemyUnitForMainDefence = findAttackTargetForMainDefence();
+				Unit enemyUnitForExpansionDefence = findAttackTargetForExpansionDefence();
 				
-				if(unit.getDistance(myFirstExpansionLocation.getPosition()) < Config.TILE_SIZE*3){
-					//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
-					commandUtil.attackMove(unit, myFirstChokePoint.getCenter());
-				}
-				
-				if(unit.getDistance(myFirstChokePoint.getCenter()) < Config.TILE_SIZE*1){
-					//System.out.println("CombatState.defenseMode 2 : " + unit.getID());
-					commandUtil.attackMove(unit, DEFENCE_POSITION);
+				if(enemyUnitForMainDefence == null && enemyUnitForExpansionDefence == null){
+					// 태어 나서는 앞마당으로 집결
+					if(unit.getDistance(myFirstExpansionLocation.getPosition()) > Config.TILE_SIZE*9){
+						//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
+						commandUtil.attackMove(unit, DEFENCE_POSITION);
+					}
+					
+					if(unit.getDistance(myFirstExpansionLocation.getPosition()) < Config.TILE_SIZE*3){
+						//System.out.println("CombatState.defenseMode 1 : " + unit.getID());
+						commandUtil.attackMove(unit, myFirstChokePoint.getCenter());
+					}
+					
+					if(unit.getDistance(myFirstChokePoint.getCenter()) < Config.TILE_SIZE*1){
+						//System.out.println("CombatState.defenseMode 2 : " + unit.getID());
+						commandUtil.attackMove(unit, DEFENCE_POSITION);
+					}
+				}else if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
+					commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
+
+				}else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence) ){
+					commandUtil.attackUnit(unit, enemyUnitForMainDefence);
 				}
 				
 				hasCommanded = true;
@@ -1491,9 +1514,17 @@ public class StrategyManager {
 			
 			if (combatState == CombatState.defenseMode) {
 				
-				hasCommanded = false;
+				Unit enemyUnitForMutalisk = findAttackTargetForMutalisk();
+				
+				if(enemyUnitForMutalisk != null && commandUtil.IsValidUnit(enemyUnitForMutalisk)){
+					commandUtil.attackUnit(unit, enemyUnitForMutalisk);
+				}
+				hasCommanded = true;
 			}else{
 				
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) < 4){
+					return true;
+				}
 				
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
 				//boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*6));
@@ -1502,12 +1533,16 @@ public class StrategyManager {
 				if(unit.getGroundWeaponCooldown() == 0 
 					&& unit.getHitPoints() > 10
 				){
-//					System.out.println("Mutallisk Attack 1 -------------------------------------------------------------");
-//					System.out.println("Mutallisk Attack 1 -------------------------------------------------------------");
-//					System.out.println("Mutallisk Attack 1 -------------------------------------------------------------");
-//					System.out.println("Mutallisk Attack 1 -------------------------------------------------------------");
 					// targetPosition = enemyMainBaseLocation.getPosition();
-					targetPosition = TARGET_POSITION;
+					// targetPosition = TARGET_POSITION;
+					
+					Unit enemyUnitForMutalisk = findAttackTargetForMutalisk();
+					
+					if(enemyUnitForMutalisk != null && commandUtil.IsValidUnit(enemyUnitForMutalisk)){
+						targetPosition = findAttackTargetForMutalisk().getPosition();
+					}else{
+						targetPosition = TARGET_POSITION;
+					}
 	
 					// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 도망갈때의 포지션 만큼 이동을 계속 한다.
 					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*4)){
@@ -1877,6 +1912,50 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
+	// sc76.choi Defence 모드 일때, 실행한다. 
+	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
+    private Unit findAttackTargetForExpansionDefence() {
+        Unit target = null;
+        for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+        	//if(unit.getDistance(myFirstExpansionLocation.getPoint()) <= Config.TILE_SIZE*4){
+        	if(unit.getDistance(DEFENCE_POSITION) <= Config.TILE_SIZE*2){
+            //if (unit.canAttack()) {
+                target = unit;
+                break;
+            //}
+        	}
+        }
+        return target;
+    }
+    
+	// sc76.choi Defence 모드 일때, 실행한다. 
+	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
+    private Unit findAttackTargetForMainDefence() {
+        Unit target = null;
+        for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+        	if(unit.getDistance(myMainBaseLocation.getPoint()) <= Config.TILE_SIZE*15){
+            //if (unit.canAttack()) {
+                target = unit;
+                break;
+            //}
+        	}
+        }
+        return target;
+    }    
+	
+	// sc76.choi Defence 모드 일때, 실행한다. 
+	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
+    private Unit findAttackTargetForMutalisk() {
+        Unit target = null;
+        for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+        	if (unit.canAttack()) {
+                target = unit;
+                break;
+        	}
+        }
+        return target;
+    }   
+    
 	/// StrategyManager 의 수행상황을 표시합니다
 	private final Character brown = '';
 	private final char red = '';
@@ -2692,7 +2771,7 @@ public class StrategyManager {
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 6개 까지만
 		if (isPossibleToConstructCombatUnitTrainingBuildingType == true
 			&& BuildManager.Instance().getAvailableMinerals() > 300 
-			&& numberOfMyCombatUnitTrainingBuilding <= 6) {
+			&& numberOfMyCombatUnitTrainingBuilding <= Config.numberOfMyCombatUnitTrainingBuilding) { // 3
 			// 게이트웨이 / 배럭 / 해처리 증설
 			if (BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 ) 
 			{

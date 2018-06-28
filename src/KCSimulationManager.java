@@ -232,12 +232,12 @@ public class KCSimulationManager {
 	 */
 	public int getBasicDefenceBuildingTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
-			return 4;
+			return 2;
 		} else if (enemyRace == Race.Terran) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 2;
+				return 1;
 			}
-			return 4;
+			return 2;
 		} else if (enemyRace == Race.Zerg) {
 			return 1;
 		} else {
@@ -254,16 +254,16 @@ public class KCSimulationManager {
 		if (enemyRace == Race.Protoss) {
 			// sc76.choi 아직 지어지고 있으면 0로 리턴
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 1;
+				return 0;
 			}		
-			return 2;
+			return 1;
 		} else if (enemyRace == Race.Terran) {
 			return 0;
 		} else if (enemyRace == Race.Zerg) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 1;
+				return 0;
 			}			
-			return 2;
+			return 1;
 		} else {
 			return 0;
 		}

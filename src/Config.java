@@ -148,6 +148,8 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 2;	
 	
+	public static int numberOfMyCombatUnitTrainingBuilding = 3;
+	
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
 	/// 봇 이름
