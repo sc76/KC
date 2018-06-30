@@ -543,7 +543,9 @@ public class BuildManager {
 				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
 				break;
 			case SecondChokePoint:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SecondChokePoint;
 			case SeedPositionSpecified:
+				seedPositionStrategy = BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified;
 			default:
 				findAnotherPlace = false;
 				break;
@@ -758,6 +760,7 @@ public class BuildManager {
 				seedPosition = tempChokePoint.getCenter();
 			}
 			break;
+			
 		}
 
 		return seedPosition;

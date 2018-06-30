@@ -490,7 +490,9 @@ public class InformationManager {
 							&& buildingPosition.getY() <= baseLocation.getTilePosition().getY() + maxRadius) {
 						
 //						if(player == enemyPlayer){
+//							System.out.println();
 //							System.out.println("enemyPlayer hasBuildingAroundBaseLocation 2 : " + baseLocation.getTilePosition() + " " + ui.getUnitID() + " " + ui.getType());
+//							System.out.println();
 //						}
 						
 						return true;

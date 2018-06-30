@@ -49,9 +49,10 @@ public class ScoutManager {
 		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 		
-		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함. 
-		assignScoutIfNeeded();
-		moveScoutUnit();
+		// scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
+		// sc76.choi TODO 일꾼 정찰 주석 처리함
+		//assignScoutIfNeeded();
+		//moveScoutUnit();
 
 		// 참고로, scoutUnit 의 이동에 의해 발견된 정보를 처리하는 것은 InformationManager.update() 에서 수행함
 	}
