@@ -466,7 +466,7 @@ public class StrategyManager {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi start
 		/// StrategyManager 의 수행상황을 표시합니다
-		drawStrategyManagerStatus();
+		if(Config.IS_DRAW) drawStrategyManagerStatus();
 		// sc76.choi end
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -895,7 +895,7 @@ public class StrategyManager {
 			}
 			
 			// 퀸
-			if (unit.getType() == mySpecialUnitType2) {					
+			if (unit.getType() == mySpecialUnitType4) {					
 				hasCommanded = controlSpecialUnitType4(unit);
 			}
 			
@@ -986,6 +986,7 @@ public class StrategyManager {
 				
 				// 퀸
 				//if (unit.getType() == mySpecialUnitType4) {
+				//System.out.println("attack mySpecialUnitType4List size : " + mySpecialUnitType4List.size());
 				for(Unit unit : mySpecialUnitType4List){					
 					hasCommanded = controlSpecialUnitType4(unit);
 				}
@@ -1128,10 +1129,10 @@ public class StrategyManager {
 					
 					// 부실한 공격 유닛은 해제
 					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
-						remainHitPoint = (double)(worker.getHitPoints()*1.0/worker.getInitialHitPoints()*1.0);
+						remainHitPoint = (worker.getHitPoints()*1.0)/40.0;
 						//System.out.println("combat Unit remainHitPoint : " + worker.getHitPoints() + "[" +worker.getID()+ "]");
 						if(remainHitPoint <= .7){
-							System.out.println("remove Unit remainHitPoint : " + worker.getHitPoints()+ "/" + worker.getInitialHitPoints() + " " +remainHitPoint + "[" +worker.getID()+ "]");
+							System.out.println("remove Unit remainHitPoint : " + " " +remainHitPoint + "[" +worker.getID()+ "]");
 							WorkerManager.Instance().setIdleWorker(worker);
 						}
 					}
@@ -1149,7 +1150,7 @@ public class StrategyManager {
 						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
 							if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 							
-							remainHitPoint = (double)(worker.getHitPoints()*1.0/worker.getInitialHitPoints()*1.0);
+							remainHitPoint = (worker.getHitPoints()*1.0)/40.0;
 							if(worker.isCarryingMinerals() || worker.isAttacking()) continue; // 미네랄 운반 일꾼은 제외
 							if(remainHitPoint >= .8){
 								WorkerManager.Instance().setCombatWorker(worker);
@@ -1839,16 +1840,6 @@ public class StrategyManager {
 			// defenseMode 일 경우
 			if (combatState == CombatState.defenseMode) {
 				
-//				// X값
-//				if(Math.abs(myMainBaseLocation.getPosition().getX() - mapWidth) > 0 ){
-//					return true;
-//				} 
-//				
-//				// Y값
-//				if(Math.abs(myMainBaseLocation.getPosition().getY() - mapWidth) > 0){
-//					return true;
-//				}
-				
 				// 본진으로 부터 1600 이하
 				if(myMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * maxDistForScourgePatrol){
 					//System.out.println(" -------------------------------------- too long " + targetPosition );
@@ -1875,15 +1866,12 @@ public class StrategyManager {
 			}
 			// 공격 모드 일때
 			else{
-//				// X값
-//				if(Math.abs(myMainBaseLocation.getPosition().getX() - mapWidth) > 0 ){
-//					return true;
-//				} 
-//				
-//				// Y값
-//				if(Math.abs(myMainBaseLocation.getPosition().getY() - mapWidth) > 0){
+				// 본진으로 부터 1600 이하
+//				if(enemyMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * minDistForScourgePatrol){
+//					//System.out.println(" -------------------------------------- too long " + targetPosition );
 //					return true;
 //				}
+				
 				
 				Unit enemyFlyerUnit = findAttackTargetForScourge();
 				if(!unit.isMoving() || unit.isIdle()){
@@ -1906,8 +1894,78 @@ public class StrategyManager {
 	boolean controlSpecialUnitType4(Unit unit) {
 		boolean hasCommanded = false;
 		
+		if (unit.getType() == UnitType.Zerg_Queen) {
+			Random random = new Random();
+			
+			int mapHeight = Config.TILE_SIZE * 128;	// sc76.choi 좌표이기 때문에 전체 맵에서 추출되어야 한다.
+			int mapWidth = Config.TILE_SIZE * 128;	// sc76.choi 좌표이기 때문에 전체 맵에서 추출되어야 한다.
+			
+			int rMapWidth = random.nextInt(mapWidth);
+			int rMapHeight = random.nextInt(mapHeight);
+			
+			Position targetPosition = new Position(rMapWidth, rMapHeight);
+			//System.out.println();
+			int maxDistForScourgePatrol = 35;
+			int minDistForScourgePatrol = 20;
+			// defenseMode 일 경우
+			if (combatState == CombatState.defenseMode) {
+				
+				if (unit.getEnergy() > 150 && myPlayer.hasResearched(TechType.Spawn_Broodlings)) {
+					// 본진으로 부터 1600 이하
+					if(myMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * maxDistForScourgePatrol){
+						//System.out.println(" -------------------------------------- too long " + targetPosition );
+						return true;
+					}
+					
+					if(myMainBaseLocation.getDistance(targetPosition) < Config.TILE_SIZE * minDistForScourgePatrol){
+						//System.out.println(" -------------------------------------- too short " + targetPosition );
+						return true;
+					}
+					Unit enemyUnit = findAttackTargetForQueen();
+					if(!unit.isMoving() || unit.isIdle()){
+						if(enemyUnit == null){
+							commandUtil.move(unit, targetPosition);
+						}else{
+							// sc76.choi 가까이 있으면 
+							if(myMainBaseLocation.getDistance(enemyUnit) < Config.TILE_SIZE * maxDistForScourgePatrol){
+								System.out.println("defence Use Spawn_Broodlings enemyUnitCount total : " + unit.getID() + " " + enemyUnit.getID());
+								unit.useTech(TechType.Spawn_Broodlings, enemyUnit);
+							}
+						}
+					}	
+				}else{
+					commandUtil.move(unit, DEFENCE_POSITION);
+				}
+			}
+			// 공격 모드 일때
+			else{
+//				// 본진으로 부터 1600 이하
+//				if(enemyMainBaseLocation.getDistance(targetPosition) >= Config.TILE_SIZE * minDistForScourgePatrol){
+//					//System.out.println(" -------------------------------------- too long " + targetPosition );
+//					return true;
+//				}
+				
+				if (unit.getEnergy() > 150 && myPlayer.hasResearched(TechType.Spawn_Broodlings)) {
+					Unit enemyUnit = findAttackTargetForQueen();
+					if(!unit.isMoving() || unit.isIdle()){
+						if(enemyUnit == null){
+							commandUtil.move(unit, targetPosition);
+						}else{
+							// sc76.choi 가까이 있으면 
+							if(myMainBaseLocation.getDistance(enemyUnit) < Config.TILE_SIZE * maxDistForScourgePatrol){
+								System.out.println("attak Use Spawn_Broodlings enemyUnitCount total : " + unit.getID() + " " + enemyUnit.getID());
+								unit.useTech(TechType.Spawn_Broodlings, enemyUnit);
+							}
+						}
+					}	
+				}else{
+					commandUtil.move(unit, DEFENCE_POSITION);
+				}
+			}
+			
+			hasCommanded = true;
+		}
 		
-		hasCommanded = true; // sc76.choi 일반 공격 못하게 처리
 		return hasCommanded;
 	}
 	
@@ -1966,7 +2024,25 @@ public class StrategyManager {
         	}
         }
         return target;
-    }       
+    }
+    
+	// sc76.choi Defence 모드 일때, 실행한다. 
+	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
+    private Unit findAttackTargetForQueen() {
+        Unit target = null;
+        for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+        	if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode 
+        		  || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
+//        		  || unit.getType() == UnitType.Terran_Vulture
+//        		  || unit.getType() == UnitType.Terran_Goliath
+        	){
+                target = unit;
+                break;
+        	}
+        }
+        
+        return target;
+    } 
     
 	/// StrategyManager 의 수행상황을 표시합니다
 	private final Character brown = '';
@@ -2447,13 +2523,20 @@ public class StrategyManager {
 		// 3 : 러커
 		// 4 : 뮤탈
 		// 5 : 울트라
+		
+		// sc76.choi 스파이어만 올라가 있을 때,
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
 			if(selfGas < 200){
-				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 3, 1, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}else{
-				buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 3, 4, 4, 1, 2, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				// 테란일때, 럴커를 위주로
+				if(enemyRace == Race.Terran){
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 3, 4, 1, 1, 2, 3, 3, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 3, 4, 1, 1, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
 			}
 			
 		}
@@ -2463,13 +2546,13 @@ public class StrategyManager {
 				if(selfGas < 200){
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 4, 3, 4, 5, 1, 2, 4, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 3, 2, 5, 1, 2, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
 				
 		}
 		else{
 			// 기본
-			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
 			
 		}
 		
@@ -2597,7 +2680,7 @@ public class StrategyManager {
 			// 최적의 일꾼 수 = 미네랄 * (1~1.5) + 가스 * 3
 			int optimalWorkerCount = 0;
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
-				optimalWorkerCount += baseLocation.getMinerals().size() * 2;
+				optimalWorkerCount += baseLocation.getMinerals().size() * 1.8;
 				optimalWorkerCount += baseLocation.getGeysers().size() * 3;
 			}
 						
@@ -2611,12 +2694,11 @@ public class StrategyManager {
 								// std.cout + "worker enqueue" + std.endl;
 								
 								// sc76.choi 30마리 이상이면, 확장에서 일꾼을 생산한다.
-								if(WorkerManager.Instance().getWorkerData().getNumWorkers() > 30){
+								if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 30){
 									BuildManager.Instance().buildQueue.queueAsLowestPriority(
 											new MetaType(InformationManager.Instance().getWorkerType()), false);
 								}else{
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(
-											new MetaType(InformationManager.Instance().getWorkerType()), 
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(), 
 											BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified);
 								}
 							}
@@ -2807,8 +2889,7 @@ public class StrategyManager {
 				
 				// 3개 까지는 main location 주변에 나머지는 확장한다.
 				if (numberOfMyCombatUnitTrainingBuilding < 3
-					 && BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 
-					 && ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0) 
+					 && BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 ) 
 				{
 					// sc76.choi 해처리 갯수가 3개 이상이면 밖에 짓는다.
 					// sc76.choi 뛰울 최소한 공간 조정
@@ -2829,8 +2910,8 @@ public class StrategyManager {
 				// 확장지역에 건설한다.
 				else{
 					if(combatState == CombatState.attackStarted || combatState == CombatState.eliminateEnemy){
-						if(BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 
-						 && ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0){
+						if(BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0){
 							
 							System.out.println("**********************************************************");
 							System.out.println("                  add hatchery 2");
@@ -3197,7 +3278,11 @@ public class StrategyManager {
 						if (unit.getType() == producerType) {
 							if (unit.isTraining() == false && unit.isMorphing() == false) {
 		
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType3, true);
+								if(selfGas < 200){
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType3, false);
+								}else{
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType3, true);
+								}
 								break;
 							}
 							
@@ -3245,8 +3330,11 @@ public class StrategyManager {
 					for(Unit unit : myPlayer.getUnits()) {
 						if (unit.getType() == producerType) {
 							if (unit.isTraining() == false && unit.isMorphing() == false) {
-		
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType4, true);
+								if(selfGas < 200){
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType4, false);
+								}else{
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(mySpecialUnitType4, true);
+								}
 								break;
 							}
 							

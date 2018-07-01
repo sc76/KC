@@ -19,6 +19,7 @@ public class KCUpgradeAndTech {
 	TechType necessaryTechType1 = TechType.Lurker_Aspect; // 럴커
 	TechType necessaryTechType2 = TechType.Consume; // 컨슘
 	TechType necessaryTechType3 = TechType.Plague; // 플레이그
+	TechType necessaryTechType4 = TechType.Spawn_Broodlings; // 브루들링
 	
 	
 	boolean			isTimeToStartUpgradeType1 = false;	/// 업그레이드할 타이밍인가, 히드라 사정 업
@@ -27,25 +28,24 @@ public class KCUpgradeAndTech {
 	boolean			isTimeToStartUpgradeType4 = false;	/// 업그레이드할 타이밍인가, 저글링 아드레날린
 	
 	boolean			isTimeToStartResearchTech1 = false;	/// 리서치할 타이밍인가, 럴커
-	boolean			isTimeToStartResearchTech2 = false;	/// 리서치할 타이밍인가
-	boolean			isTimeToStartResearchTech3 = false;	/// 리서치할 타이밍인가
+	boolean			isTimeToStartResearchTech2 = false;	/// 리서치할 타이밍인가, 디파일러 컴슘
+	boolean			isTimeToStartResearchTech3 = false;	/// 리서치할 타이밍인가, 플레이그
+	boolean			isTimeToStartResearchTech4 = false;	/// 리서치할 타이밍인가, 브루들링
 	
 	public void upGradeAndTechAgainstProtoss(){
 
-
-
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 4기 생산 후 업그레이드한다
 		// 히드라 사정 업그레이드
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
 			isTimeToStartUpgradeType1 = true;
 		}
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 사정거리 업그레이드 후 업그레이드한다
+		
 		// 히드라 발업
 		if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType2 = true;
-		}			
+		}
+		
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
 		// sc76.choi 오버로드 속도업
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
@@ -68,22 +68,24 @@ public class KCUpgradeAndTech {
 		
 		// 러커는 최우선으로 리서치한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+			  && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 
 			  && (myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
+		
 		// 컨슘은 최우선으로 리서치한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0) {
 			isTimeToStartResearchTech2 = true;
-		}			
+		}
+		
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 컨슘 리서치 후 리서치한다
 		// 컨슘
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0
 				&& myPlayer.hasResearched(necessaryTechType2) == true) {
 			isTimeToStartResearchTech3 = true;
 		}			
-		
 		
 		// 테크 리서치는 높은 우선순위로 우선적으로 실행
 		// 럴커
@@ -118,6 +120,7 @@ public class KCUpgradeAndTech {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType3, false);
 			}
 		}		
+
 		
 		// 업그레이드는 낮은 우선순위로 실행
 		// sc76.choi 히드라 사정 업그레이드
@@ -158,7 +161,6 @@ public class KCUpgradeAndTech {
 		}
 		
 		// 저글링 아드레날린
-		// sc76.choi necessaryUpgradeType3 : Pneumatized_Carapace
 		if (isTimeToStartUpgradeType4) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) == 0 
@@ -309,17 +311,17 @@ public class KCUpgradeAndTech {
 
 	public void upGradeAndTechAgainstZerg(){
 
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 4기 생산 후 업그레이드한다
 		// 히드라 사정 업그레이드
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
 			isTimeToStartUpgradeType1 = true;
 		}
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 사정거리 업그레이드 후 업그레이드한다
+		
 		// 히드라 발업
 		if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
 			isTimeToStartUpgradeType2 = true;
-		}			
+		}
+		
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
 		// sc76.choi 오버로드 속도업
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
@@ -332,8 +334,15 @@ public class KCUpgradeAndTech {
 			isTimeToStartUpgradeType3 = true;
 		}		
 		
+		
 		// 저글링 아드레날린
-		// sc76.choi necessaryUpgradeType3 : Pneumatized_Carapace
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
+			) {
+				isTimeToStartUpgradeType4 = true;
+		}
+		
+		// 저글링 아드레날린
 		if (isTimeToStartUpgradeType4) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType4) == 0 
@@ -345,28 +354,25 @@ public class KCUpgradeAndTech {
 		}	
 		
 		// 러커는 최우선으로 리서치한다
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			  && myPlayer.getUpgradeLevel(necessaryUpgradeType2) > 0 // 히드라 속도 업 후에
 			  && (myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
 				  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
+		
 		// 컨슘은 최우선으로 리서치한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0) {
 			isTimeToStartResearchTech2 = true;
-		}			
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 컨슘 리서치 후 리서치한다
-		// 컨슘
+		}
+		
+		// 플레이그
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0
 				&& myPlayer.hasResearched(necessaryTechType2) == true) {
 			isTimeToStartResearchTech3 = true;
 		}			
-		
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
-				  && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-			) {
-				isTimeToStartUpgradeType4 = true;
-		}
+
 		
 		// 테크 리서치는 높은 우선순위로 우선적으로 실행
 		// 럴커
@@ -410,7 +416,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType1) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
 			}
 		}
 		
@@ -422,7 +428,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, false);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
 			}
 		}
 
@@ -569,33 +575,33 @@ public class KCUpgradeAndTech {
 	
 	public void upGradeAndTechAgainstTerran(){
 
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 4기 생산 후 업그레이드한다
-		// 히드라 사정 업그레이드
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+		// sc76.choi 히드라 사정 업그레이드, 테란은 럴커를 먼저 업그레이드 한다.
+		if (isTimeToStartResearchTech1
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
 			isTimeToStartUpgradeType1 = true;
 		}
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라 사정거리 업그레이드 후 업그레이드한다
-		// 히드라 발업
-		if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
+		
+		// sc76.choi 히드라 발업, 테란은 럴커를 먼저 업그레이드 한다.
+		if (isTimeToStartResearchTech1
+			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
 			isTimeToStartUpgradeType2 = true;
-		}			
+		}
+		
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
 		// sc76.choi 오버로드 속도업
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
-		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
-				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
-				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
-				&& myPlayer.isResearching(necessaryTechType1) == true) {
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+			   && myPlayer.isResearching(necessaryTechType1) == true) {
 			isTimeToStartUpgradeType3 = true;
 		}		
 		
+		// 저글링 아드레 날린
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
-				  && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-			) {
-				isTimeToStartUpgradeType4 = true;
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
+			isTimeToStartUpgradeType4 = true;
 		}
 		
 		// 러커는 최우선으로 리서치한다
@@ -605,18 +611,59 @@ public class KCUpgradeAndTech {
 				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
 			isTimeToStartResearchTech1 = true;
 		}
+		
 		// 컨슘은 최우선으로 리서치한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0) {
 			isTimeToStartResearchTech2 = true;
 		}			
-		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 컨슘 리서치 후 리서치한다
-		// 컨슘
+
+		// 플레이그
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0
 				&& myPlayer.hasResearched(necessaryTechType2) == true) {
 			isTimeToStartResearchTech3 = true;
 		}			
 		
+		// 브루들링은 최우선으로 리서치한다
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0) {
+			isTimeToStartResearchTech4 = true;
+		}	
+		
 
+		
+		// sc76.choi 히드라 사정 업그레이드
+		if (isTimeToStartUpgradeType1) 
+		{
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 0 
+				&& myPlayer.isUpgrading(necessaryUpgradeType1) == false
+				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
+			}
+		}
+		
+		
+		// sc76.choi 히드라 발업
+		if (isTimeToStartUpgradeType2) 
+		{
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 0 
+				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
+				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+			}
+		}
+
+		// 오버로드 속도업
+		if (isTimeToStartUpgradeType3) 
+		{
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) == 0 
+				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
+				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+			}
+		}
+		
 		// 저글링 아드레날린
 		// sc76.choi necessaryUpgradeType3 : Pneumatized_Carapace
 		if (isTimeToStartUpgradeType4) 
@@ -629,13 +676,7 @@ public class KCUpgradeAndTech {
 			}
 		}	
 		
-		
-		// 테크 리서치는 높은 우선순위로 우선적으로 실행
 		// 럴커
-		//System.out.println(" isTimeToStartResearchTech1 :  " + isTimeToStartResearchTech1);
-		//System.out.println(" myPlayer.isResearching(necessaryTechType1) :  " + myPlayer.isResearching(necessaryTechType1));
-		//System.out.println(" myPlayer.hasResearched(necessaryTechType1) :  " + myPlayer.hasResearched(necessaryTechType1));
-		//System.out.println(" BuildManager.Instance().buildQueue.getItemCount(necessaryTechType1) :  " + BuildManager.Instance().buildQueue.getItemCount(necessaryTechType1));
 		if (isTimeToStartResearchTech1) 
 		{
 			if (myPlayer.isResearching(necessaryTechType1) == false
@@ -668,54 +709,16 @@ public class KCUpgradeAndTech {
 			}
 		}		
 		
-		// 업그레이드는 낮은 우선순위로 실행
-		// sc76.choi 히드라 사정 업그레이드
-		if (isTimeToStartUpgradeType1) 
+		// 퀸 브루들링
+		if (isTimeToStartResearchTech4) 
 		{
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 0 
-				&& myPlayer.isUpgrading(necessaryUpgradeType1) == false
-				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
+			if (myPlayer.isResearching(necessaryTechType4) == false
+				&& myPlayer.hasResearched(necessaryTechType4) == false
+				&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType4) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, false);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType4, true);
 			}
 		}
-		
-		
-		// 히드라 발업
-		if (isTimeToStartUpgradeType2) 
-		{
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 0 
-				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
-				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
-			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, false);
-			}
-		}
-
-		// 오버로드 속도업
-		if (isTimeToStartUpgradeType3) 
-		{
-			if (myPlayer.getUpgradeLevel(necessaryUpgradeType3) == 0 
-				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
-				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
-			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
-			}
-		}
-
-		// BWAPI 4.1.2 의 버그때문에, 오버로드 업그레이드를 위해서는 반드시 Zerg_Lair 가 있어야함	
-		// sc76.choi 오버로드 이동속도
-		//if (myRace == Race.Zerg) {
-		//	if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
-		//		if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0 
-		//			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
-		//			&& (myPlayer.allUnitCount(UnitType.Zerg_Hive) < 1
-		//			|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) < 1)) 
-		//		{
-		//			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);					
-		//		}
-		//	}
-		//}
 	}
 	
 	public void chamberUpgradeAgainstTerran(){
