@@ -584,7 +584,8 @@ public class KCUpgradeAndTech {
 		
 		// sc76.choi 히드라 발업, 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
-			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0) {
+			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
 			isTimeToStartUpgradeType2 = true;
 		}
 		

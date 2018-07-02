@@ -42,11 +42,6 @@ public class KCSimulationManager {
 	private int countBasicDefenceUnit = 0;
 	private int countAdvencedDefenceUnit = 0;
 	
-	int myBasicCombatUnitTypePoint = 1;
-	int myAdvencedCombatUnitTypePoint = 4;
-	int myAdvencedCombatUnitType2Point = 4;
-	int myBasicDefenceUnitTypePoint = 0;
-	int myDefenceCombatUnitTypePoint = 5;
 	
 	// static singleton 객체를 리턴합니다
 	private static KCSimulationManager instance = new KCSimulationManager();
@@ -111,6 +106,12 @@ public class KCSimulationManager {
 		countAdvencedCombatUnit2 = 0;
 		countBasicDefenceUnit = 0;
 		countAdvencedDefenceUnit = 0;
+		
+		int myBasicCombatUnitTypePoint = 1;
+		int myAdvencedCombatUnitTypePoint = 4;
+		int myAdvencedCombatUnitType2Point = 4; // 울트라리스크
+		int myBasicDefenceUnitTypePoint = 0;
+		int myDefenceCombatUnitTypePoint = 5;
 		
 		for(Unit unit : Units){
 			if(unit.getPlayer() == selfPlayer){

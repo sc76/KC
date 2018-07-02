@@ -206,9 +206,9 @@ public class GameCommander {
 			MyBotModule.Broodwar.setLocalSpeed(setSpeed);
 		}
 		
-		if("on".equals(text)){
+		if("on".equals(text) || "n".equals(text)){
 			Config.IS_DRAW = true;
-		}else if("off".equals(text) || "of".equals(text)){
+		}else if("off".equals(text) || "of".equals(text) || "f".equals(text)){
 			Config.IS_DRAW = false;
 		}
 	}
