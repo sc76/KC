@@ -1315,23 +1315,23 @@ public class StrategyManager {
 				// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.				
 				if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
 					
-					// sc76.choi 본진과 멀리 있으면, 와리가리 아니면 그냥 싸운다.
+					// sc76.choi 유닛이 디펜스 지점보다 멀리 있으면, 와리가리 아니면 그냥 싸운다.
 					if(DEFENCE_POSITION != null && unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*15){
+						commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
+					}else{
 						// sc76.choi 나의 유닛의 주변, 적군의 공격 포인트 판단.
 						List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*4);
 						boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
 						
-	//					System.out.println("canAttackNow : " + canAttackNow);
-	//					System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
-	//					System.out.println("my Unit                      : " + unit.getID());
+						//					System.out.println("canAttackNow : " + canAttackNow);
+						//					System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
+						//					System.out.println("my Unit                      : " + unit.getID());
 						
 						if(canAttackNow){
 							commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
 						}else{
 							commandUtil.move(unit, myMainBaseLocation.getPoint());
 						}
-					}else{
-						commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
 					}
 					
 				}
