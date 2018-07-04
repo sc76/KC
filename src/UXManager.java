@@ -80,14 +80,29 @@ public class UXManager {
 		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
+//		int yy = 15;
+//		yy += 12;
+//		yy += 12;
+		drawAPM(5, 5);
+		drawLocalSpeep(5 + 100, 5);
+		
+		drawGameInformationOnScreen(5, 15);
+		
+		// build order array
+		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
+		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		
+		if(!Config.IS_DRAW){
+			return;
+		}
+		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 유닛의 사정거리 만큼 원을 그린다.
 		if (Config.DrawSightInfo) {
 			drawSightToSpecialUnits();
 		}
 		
-		drawGameInformationOnScreen(5, 15);
-
+		
 		if (Config.DrawEnemyUnitInfo) {
 			drawUnitStatisticsOnScreen(400, 20);
 		}
@@ -202,10 +217,6 @@ public class UXManager {
 		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "A/D : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + StrategyManager.Instance().getCountAttack() + "/" + StrategyManager.Instance().getCountDefence());
-		y += 12;
-		drawAPM(x, 5);
-		drawLocalSpeep(x + 100, 5);
-		
 		
 	}
 
@@ -278,9 +289,7 @@ public class UXManager {
 			}
 		}
 		
-		// build order array
-		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
-		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		
 	}
 
 	/// Players 정보를 Screen 에 표시합니다

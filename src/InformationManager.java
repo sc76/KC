@@ -537,6 +537,34 @@ public class InformationManager {
 		}
 		return false;
 	}
+	
+	// sc76.choi 해당 Region 에 해당 Player의 UnitType 건물이 존재하는지 리턴합니다
+	public boolean existsPlayerBuildingInRegion(Region region, Player player, UnitType type) {
+		// invalid regions aren't considered the same, but they will both be null
+		if (region == null || player == null) {
+			return false;
+		}
+
+		Iterator<Integer> it = unitData.get(player).getUnitAndUnitInfoMap().keySet().iterator();
+
+		// for (const auto & kv : unitData.get(self).getUnits())
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
+			if (ui.getType().isBuilding() && ui.getType() == type) {
+				
+//				if(player == enemyPlayer){
+//					System.out.println("enemyPlayer existsPlayerBuildingInRegion : " + ui.getUnitID() + " " + ui.getType());
+//				}
+				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
+				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
+
+				if (BWTA.getRegion(ui.getLastPosition()) == region) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/// 해당 Player (아군 or 적군) 의 모든 유닛 목록 (가장 최근값) UnitAndUnitInfoMap 을 리턴합니다<br>	 
 	/// 파악된 정보만을 리턴하기 때문에 적군의 정보는 틀린 값일 수 있습니다

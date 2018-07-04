@@ -50,7 +50,6 @@ public class KCSimulationManager {
 	}
 	
 	public KCSimulationManager() {
-		
 	}
 	
 	/**
@@ -107,11 +106,11 @@ public class KCSimulationManager {
 		countBasicDefenceUnit = 0;
 		countAdvencedDefenceUnit = 0;
 		
-		int myBasicCombatUnitTypePoint = 1;
-		int myAdvencedCombatUnitTypePoint = 4;
-		int myAdvencedCombatUnitType2Point = 4; // 울트라리스크
+		int myBasicCombatUnitTypePoint = 10;
+		int myAdvencedCombatUnitTypePoint = 40;
+		int myAdvencedCombatUnitType2Point = 40; // 울트라리스크
 		int myBasicDefenceUnitTypePoint = 0;
-		int myDefenceCombatUnitTypePoint = 5;
+		int myDefenceCombatUnitTypePoint = 50;
 		
 		for(Unit unit : Units){
 			if(unit.getPlayer() == selfPlayer){
@@ -175,13 +174,13 @@ public class KCSimulationManager {
 		
 		if (enemyRace == Race.Protoss) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 1;
+				return 10;
 			}
-			return 3;
+			return 30;
 		} else if (enemyRace == Race.Terran) {
-			return 1;
+			return 10;
 		} else if (enemyRace == Race.Zerg) {
-			return 1;
+			return 10;
 		} else {
 			return 0;
 		}
@@ -195,13 +194,13 @@ public class KCSimulationManager {
 	public int getAdvencedCombatUnitTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 2;
+				return 20;
 			}
-			return 3;
+			return 30;
 		} else if (enemyRace == Race.Terran) {
 			return 0;
 		} else if (enemyRace == Race.Zerg) {
-			return 1;
+			return 10;
 		} else {
 			return 0;
 		}
@@ -216,11 +215,11 @@ public class KCSimulationManager {
 	public int getAdvencedCombatUnitType2Point(Unit unit){
 		
 		if (enemyRace == Race.Protoss) {
-			return 3;
+			return 30;
 		} else if (enemyRace == Race.Terran) {
-			return 2;
+			return 20;
 		} else if (enemyRace == Race.Zerg) {
-			return 5;
+			return 50;
 		} else {
 			return 0;
 		}
@@ -233,14 +232,14 @@ public class KCSimulationManager {
 	 */
 	public int getBasicDefenceBuildingTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
-			return 2;
+			return 20;
 		} else if (enemyRace == Race.Terran) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 1;
+				return 10;
 			}
-			return 2;
+			return 20;
 		} else if (enemyRace == Race.Zerg) {
-			return 1;
+			return 10;
 		} else {
 			return 0;
 		}
@@ -257,14 +256,14 @@ public class KCSimulationManager {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 0;
 			}		
-			return 1;
+			return 10;
 		} else if (enemyRace == Race.Terran) {
 			return 0;
 		} else if (enemyRace == Race.Zerg) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 0;
 			}			
-			return 1;
+			return 10;
 		} else {
 			return 0;
 		}

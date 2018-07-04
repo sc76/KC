@@ -7,9 +7,9 @@ import bwapi.UnitType;
 public class Config {
 	
 	/// KC custom start
-	public static boolean DEBUG = true; // debug show 여부를 판단할 boolean
+	public static boolean DEBUG = false; // debug show 여부를 판단할 boolean
 	
-	public static boolean IS_DRAW = true; // draw를 그릴지 말지 여부 
+	public static boolean IS_DRAW = false; // draw를 그릴지 말지 여부 
 	
 	// sc76.choi 추가 정보를 화면에 그린다.
 	public static boolean DrawSightInfo = true; 
@@ -30,8 +30,8 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 5; // 히드라
+	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 5; // 저글링
+	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 6; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
@@ -112,9 +112,9 @@ public class Config {
 	public static int maxNumberOfTrainUnitType5AgainstProtoss = 3;  // 울트라
 	
 	public static int maxNumberOfTrainSpecialUnitType1AgainstProtoss = 1;  // 오버로드
-	public static int maxNumberOfTrainSpecialUnitType2AgainstProtoss = 2;  // 디파일러
+	public static int maxNumberOfTrainSpecialUnitType2AgainstProtoss = 1;  // 디파일러
 	public static int maxNumberOfTrainSpecialUnitType3AgainstProtoss = 6;  // 스커지
-	public static int maxNumberOfTrainSpecialUnitType4AgainstProtoss = 1;  // 퀸
+	public static int maxNumberOfTrainSpecialUnitType4AgainstProtoss = 0;  // 퀸
 	
 	public static int maxNumberOfTrainUnitType1AgainstZerg = 20; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstZerg = 16; // 히드라
@@ -123,9 +123,9 @@ public class Config {
 	public static int maxNumberOfTrainUnitType5AgainstZerg = 3;  // 울트라
 	
 	public static int maxNumberOfTrainSpecialUnitType1AgainstZerg = 1;  // 오버로드
-	public static int maxNumberOfTrainSpecialUnitType2AgainstZerg = 3;  // 디파일러
+	public static int maxNumberOfTrainSpecialUnitType2AgainstZerg = 1;  // 디파일러
 	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 6;  // 스커지
-	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 1;  // 퀸
+	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
 	public static int maxNumberOfTrainUnitType1AgainstTerran = 20; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 16; // 히드라
@@ -171,7 +171,7 @@ public class Config {
 	/// Fastest: 42 ms/frame.  1초에 24 frame. 일반적으로 1초에 24frame을 기준 게임속도로 합니다<br>
 	/// Normal: 67 ms/frame. 1초에 15 frame<br>
 	/// As fast as possible : 0 ms/frame. CPU가 할수있는 가장 빠른 속도.
-	public static int SetLocalSpeed = 0;
+	public static int SetLocalSpeed = 67;
 	
 	public static void setSetLocalSpeed(int setLocalSpeed) {
 		SetLocalSpeed = setLocalSpeed;

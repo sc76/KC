@@ -58,6 +58,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null) == 0) 
@@ -156,6 +157,7 @@ public class KCTechTreeUp {
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1			
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null) == 0) 

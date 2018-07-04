@@ -717,7 +717,9 @@ public class KCUpgradeAndTech {
 				&& myPlayer.hasResearched(necessaryTechType4) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType4) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType4, true);
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 4){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType4, true);
+				}
 			}
 		}
 	}
