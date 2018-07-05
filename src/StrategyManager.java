@@ -343,38 +343,50 @@ public class StrategyManager {
 		
 		if(enemyMainBaseLocation == null) return;
 		
-		BaseLocation targetBaseLocation = enemyMainBaseLocation;
-		double closestDistance = 100000000;
-		
-		// 나의 MainBaseLocation 와 적진의 BaseLocation중, 가장 가까운 곳을 선정한다.
-		for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(enemyPlayer)) {
-			
-			//System.out.println("enemy baseLocation : " + baseLocation.getTilePosition());
-			// start와 end의 거리
-			//double distance = BWTA.getGroundDistance(myMainBaseLocation.getTilePosition(), baseLocation.getTilePosition());
-			double distance = (myMainBaseLocation.getPosition()).getDistance(baseLocation.getPosition());
-			if (distance < closestDistance) {
-				
-				// sc76.choi 주변에 건물이 있는지 판단해서 skip 한다.
-				//int enemyBuildingCount = getCombatUnitCountInPosition(baseLocation.getPosition(), enemyPlayer, Config.TILE_SIZE*10);
-				//System.out.println("enemyBuildingCount : " + enemyBuildingCount);
-				
-				//if(enemyBuildingCount > 0){
-					closestDistance = distance;
-					targetBaseLocation = baseLocation;
-				//}
-			}
-		}
-		
-		
 		// sc76.choi TODO 해당지역에 건물이 없으면 그냥 본진을 타켓을 잡아야 한다. (Basic Bot 버그)
 		// sc76.choi TODO 적 본진이 정확히 보이지 않았다면(오버로드가 정찰을 깊숙히 못했을 경우) 본진으로 타켓이 이동하지 않는다.
-		if(targetBaseLocation != null){
-			TARGET_POSITION = targetBaseLocation.getPosition();
-			TARGET_TILEPOSITION = targetBaseLocation.getTilePosition();
+		// sc76.choi 본진 근처에 적이 있으면 그 pos로 타겟을 잡는다.
+		
+		// sc76.choi 적진에 가까운 적 유닛이 있는지
+		Unit urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*35);
+		
+//		if(commandUtil.IsValidUnit(urgentUnit)){
+//			System.out.println("urgentUnit : " + urgentUnit.getID() + " " + urgentUnit.getType() + urgentUnit.getTilePosition());
+//			System.out.println("urgentUnit : " + urgentUnit.getID() + " " + urgentUnit.getType() + urgentUnit.getTilePosition());
+//			System.out.println();
+//		}
+		
+		// sc76.choi 공격모드라도, 본진 가까이에 적이 있으면 그 곳으로 타겟을 잡는다.
+		if(commandUtil.IsValidUnit(urgentUnit)){
+			TARGET_POSITION = urgentUnit.getPosition();
+			TARGET_TILEPOSITION = urgentUnit.getTilePosition();
 		}else{
-			TARGET_POSITION = enemyMainBaseLocation.getPosition();
-			TARGET_TILEPOSITION = enemyMainBaseLocation.getTilePosition();
+			BaseLocation targetBaseLocation = enemyMainBaseLocation;
+			double closestDistance = 100000000;
+			
+			closestDistance = 100000000;
+			
+			// 나의 MainBaseLocation 와 적진의 BaseLocation중, 가장 가까운 곳을 선정한다.
+			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(enemyPlayer)) {
+				
+				//System.out.println("enemy baseLocation : " + baseLocation.getTilePosition());
+				// start와 end의 거리
+				//double distance = BWTA.getGroundDistance(myMainBaseLocation.getTilePosition(), baseLocation.getTilePosition());
+				double distance = (myMainBaseLocation.getPosition()).getDistance(baseLocation.getPosition());
+				
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					targetBaseLocation = baseLocation;
+				}
+			}
+			
+			if(targetBaseLocation != null){
+				TARGET_POSITION = targetBaseLocation.getPosition();
+				TARGET_TILEPOSITION = targetBaseLocation.getTilePosition();
+			}else{
+				TARGET_POSITION = enemyMainBaseLocation.getPosition();
+				TARGET_TILEPOSITION = enemyMainBaseLocation.getTilePosition();
+			}
 		}
 		
 		//System.out.println("TARGET_POSITION : " + TARGET_POSITION);
@@ -519,6 +531,67 @@ public class StrategyManager {
 		
 		//printUintData();
 	}
+
+	/**
+	 * getUnitAndUnitInfoMap 중에 target으로 부터 가장 가까운 공격 유닛을 찾는다.
+	 * 단, 주어진 거리 (closeDistance) 보다 가까이 있는 유닛을 찾을 때 사용한다.
+	 * TODO 유닛을 제한을 해야한다. 단순히 옵저버 같은 것 때문에 체크가 될 수 있기 때문에 공격에
+	 * TODO 전체 유닛을 다 볼 필요는 없다. 한마리라도 있으면 return가능, 속도가 문제된다면 return 권고
+	 * 
+	 * @author sc76.choi
+	 * @param type
+	 * @param target
+	 * @return
+	 */
+	public Unit getClosestCanAttackUnitTypeToTarget(Player player, UnitType type, Position target, int closeDistance){
+		
+		Unit closestUnit = null;
+		double closestDist = 1000000000;
+		
+		Iterator<Integer> it = InformationManager.Instance().getUnitData(player).getUnitAndUnitInfoMap().keySet().iterator();
+		while (it.hasNext()) {
+		//for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+			UnitInfo ui = InformationManager.Instance().getUnitData(player).getUnitAndUnitInfoMap().get(it.next());
+			
+			Unit enemyUnit = ui.getUnit();
+			//Unit enemyUnit = unit;
+			
+			if(!commandUtil.IsValidUnit(enemyUnit)) continue;
+				
+			
+			if(type != null && enemyUnit.getType() == type){
+				double dist = enemyUnit.getDistance(target);
+				
+				if(dist > closeDistance) continue; // 설정한 거리보다 멀리 있으면 return
+					
+				if (closestUnit == null || dist < closestDist){
+					closestUnit = enemyUnit;
+					closestDist = dist;
+				}
+				return closestUnit;
+			}
+			
+			// sc76.choi 한마리라도 찾았으면 바로 return하는 로직임.
+			if(type == null){
+				//System.out.println("target1 enemyUnit : " + enemyUnit.getID() + " " + enemyUnit.getType());
+				double dist = enemyUnit.getDistance(target);
+				
+				if(dist > closeDistance) continue; // 설정한 거리보다 멀리 있으면 return
+				
+				//System.out.println("checked enemyUnit : " + enemyUnit.getID() + " " + enemyUnit.getType());
+				
+				if (closestUnit == null || dist < closestDist){
+					closestUnit = enemyUnit;
+					closestDist = dist;
+					
+					return closestUnit;
+				}
+				return closestUnit;
+			}
+		}
+		
+   		return closestUnit;       	
+	}
 	
 	/**
 	 * myAllCombatUnitList 중에 target으로 부터 가장 가까운 공격 유닛을 찾는다.
@@ -543,7 +616,6 @@ public class StrategyManager {
 			}
 		}
 		
-		//System.out.println("unitListByType.size() : " + unitListByType.size());
 		if(unitListByType.isEmpty()){
 			return closestUnitForAttack;
 		}
@@ -551,17 +623,10 @@ public class StrategyManager {
 		// 적진에 가까운 순으로 오름차순
         Collections.sort(unitListByType,new CompareSeqAsc());
 
-        //for (UnitInfo rtnUnitInfo : unitListByType){
-       	//	closestUnitForAttack = rtnUnitInfo.getUnit();
-       	//	//System.out.println(" getClosestCanAttackUnitTypeToTarget : " + j++ + " " + closestUnitForAttack.getID());
-       	//	break;
-        //}
-        
         if(!commandUtil.IsValidSelfUnit(unitListByType.get(0).getUnit())) {
         	return closestUnitForAttack;
         }
         closestUnitForAttack = unitListByType.get(0).getUnit();
-        //System.out.println("getClosestCanAttackUnitTypeToTarget : " + closestUnitForAttack.getID());
    		return closestUnitForAttack;       	
 	}
 	
@@ -744,23 +809,6 @@ public class StrategyManager {
 			// sc76.choi 공격 유닛수가 충족하면
 			if (isNecessaryNumberOfCombatUnitType()) {
 				
-				// 에너지 100 이상 갖고있는 특수 유닛이 존재하면 
-//				boolean isSpecialUnitHasEnoughEnergy = false;
-//				for(Unit unit : mySpecialUnitType1List) {
-//					if (unit.getEnergy() > 100) {
-//						isSpecialUnitHasEnoughEnergy = true;
-//						break;
-//					}
-//				}				
-//				for(Unit unit : mySpecialUnitType2List) {
-//					if (unit.getEnergy() > 100) {
-//						isSpecialUnitHasEnoughEnergy = true;
-//						break;
-//					}
-//				}				
-//				if (isSpecialUnitHasEnoughEnergy) {
-//					return true;
-//				}
 				countAttackMode++;
 				return true;
 			}
@@ -771,36 +819,35 @@ public class StrategyManager {
 	
 	/// 방어 모드로 전환할 때인지 여부를 리턴합니다
 	boolean isTimeToStartDefense() {
+		
+		boolean returnDefenceMode = false;
+		
 		// sc76.choi myCombatUnitType1 : 저글링 
 		// sc76.choi myCombatUnitType2 : 히드라 
 		// sc76.choi myCombatUnitType3 : 럴커
 		// sc76.choi myCombatUnitType4 : 뮤탈 
-		// sc76.choi myCombatUnitType5 : 울트라 		
+		// sc76.choi myCombatUnitType5 : 울트라 
 		// sc76.choi AND 조건으로 체크 한다.
-		if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
-			 && myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
-		)
-		{
-			
-			// sc76.choi TARGET_POSITION을 다시 두번째 choke point로 잡는다.
-			if(enemyMainBaseLocation != null){
-				TARGET_POSITION = enemySecondChokePoint.getCenter();
-				TARGET_TILEPOSITION = enemySecondChokePoint.getCenter().toTilePosition();
-				
-				isPassOKSecondChokePoint = false;
+		
+		if(Race.Terran == enemyRace){
+			if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
+				 && myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
+				 && myCombatUnitType3List.size() < 1   // 럴커
+			){
+				countDefenceMode++;
+				returnDefenceMode = true;
 			}
-			
-			//System.out.println("call isTimeToStartDefense!!");
-			countDefenceMode++;
-			
-			// sc76.choi TODO 반드시 제거
-			if(myCombatUnitType2List.size() >= 10) return false;
-			
-			
-			return true;
+		}else{
+			if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
+					 && myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
+				)
+			{
+				countDefenceMode++;
+				returnDefenceMode = true;
+			}
 		}
 		
-		return false;
+		return returnDefenceMode;
 	}
 
 	/// 적군을 Eliminate 시키는 모드로 전환할지 여부를 리턴합니다
@@ -1375,9 +1422,13 @@ public class StrategyManager {
 							if(unit.getDistance(myMainBaseLocation.getPoint()) < Config.TILE_SIZE*5){
 								commandUtil.attackMove(unit, myMainBaseLocation.getPoint());
 							}
+							// sc76.choi 확장 가까이 있으면 그냥 싸운다.
+							else if(unit.getDistance(myFirstExpansionLocation.getPoint()) < Config.TILE_SIZE*5){
+								commandUtil.attackMove(unit, myFirstExpansionLocation.getPoint());
+							}
 							// sc76.choi 본진 좀 거리가 있으면 move로 움직인다.
 							else{
-								commandUtil.move(unit, myMainBaseLocation.getPoint());
+								commandUtil.move(unit, DEFENCE_POSITION);
 							}
 						}
 					}
@@ -1537,22 +1588,15 @@ public class StrategyManager {
 		if (combatState == CombatState.defenseMode) {
 			
 			// 아군 방어 건물이 세워져있는 위치 주위에 버로우시켜놓는다
-//			Position myDefenseBuildingPosition = null;
-//			switch (seedPositionStrategyOfMyDefenseBuildingType) {
-//				case MainBaseLocation: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-//				case FirstChokePoint: myDefenseBuildingPosition = myFirstChokePoint.getCenter(); break;
-//				case FirstExpansionLocation: myDefenseBuildingPosition = myFirstExpansionLocation.getPosition(); break;
-//				case SecondChokePoint: myDefenseBuildingPosition = mySecondChokePoint.getCenter(); break;
-//				default: myDefenseBuildingPosition = myMainBaseLocation.getPosition(); break;
-//			}
-
-			// sc76.choi, defenseMode이지만, 적진에 깊이 박혀 있으면, 그대로 둔다.
+			// sc76.choi defenseMode이지만, 적진에 깊이 박혀 있으면, 그대로 둔다.
+			// sc76.choi 디데일 점검 필요
 			if (DEFENCE_POSITION != null) {
 				
-				// sc76.choi 버로우 되어 있지 않고, 나의 지역과 가까이 있으면, 버로우 한다.
+				// sc76.choi 버로우 되어 있지 않고, 나의 지역과 가까이 있으면 (35), 버로우 한다.
 				if (unit.isBurrowed() == false) {			
-					if (unit.getDistance(DEFENCE_POSITION) < 15 * Config.TILE_SIZE
-						  || unit.getDistance(myMainBaseLocation.getPoint()) < 15 * Config.TILE_SIZE) {
+					if (unit.getDistance(DEFENCE_POSITION) < 35 * Config.TILE_SIZE
+						  || unit.getDistance(myMainBaseLocation.getPoint()) < 15 * Config.TILE_SIZE
+					){
 						unit.burrow();
 						hasCommanded = true;
 					}
@@ -1561,12 +1605,17 @@ public class StrategyManager {
 						commandUtil.move(unit, DEFENCE_POSITION);
 					}
 				}
-				// sc76.choi 현재 버로우 되어 있고
-				// sc76.choi 공격 받고 있으면 본진으로 귀환
+				// sc76.choi 현재 버로우 되어 있고, 공격 받고 있으면 바로 본진으로 귀환
+				// sc76.choi TODO 본진 근처면 그냥 계속 버로우 한다.
 				else{
 					if(unit.isUnderAttack()){
 						unit.unburrow();
 					}
+				}
+			}else{
+				if (unit.isBurrowed() == false) {
+					unit.burrow();
+					hasCommanded = true;
 				}
 			}
 		}
@@ -3457,7 +3506,7 @@ public class StrategyManager {
 				
 				if (allCountOfSpecialUnitType3 < maxNumberOfTrainSpecialUnitType3) {
 					// sc76.choi 뮤탈이 4마리 이상 있으면 생산시작한다.
-					if(myCombatUnitType4List.size() >= 4){
+					if(myCombatUnitType4List.size() >= 2){
 						isNecessaryToTrainMore = true;
 					}
 				}							
@@ -3517,7 +3566,7 @@ public class StrategyManager {
 				}
 				if (allCountOfSpecialUnitType4 < maxNumberOfTrainSpecialUnitType4) {
 					// sc76.choi 뮤탈이 4마리 이상 있으면 생산시작한다.
-					if(myCombatUnitType4List.size() >= 4){
+					if(myCombatUnitType4List.size() >= 2){
 						isNecessaryToTrainMore = true;
 					}
 				}							

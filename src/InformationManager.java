@@ -466,7 +466,7 @@ public class InformationManager {
 		}
 
 		// 반지름 10 (TilePosition 단위) 이면 거의 화면 가득이다
-		int maxRadius = 8;
+		int maxRadius = 7;
 
 		if (unitData.get(player) != null) {
 			Iterator<Integer> it = unitData.get(player).getUnitAndUnitInfoMap().keySet().iterator();
@@ -811,6 +811,19 @@ public class InformationManager {
 			return UnitType.Terran_Missile_Turret;
 		} else if (race == Race.Zerg) {
 			return UnitType.Zerg_Sunken_Colony;
+		} else {
+			return UnitType.None;
+		}
+	}
+	
+	// 해당 종족의 UnitType 중 load 기능을 하는 UnitType을 리턴합니다
+	public UnitType getAdvancedDropUnitType(Race race) {
+		if (race == Race.Protoss) {
+			return UnitType.Protoss_Shuttle;
+		} else if (race == Race.Terran) {
+			return UnitType.Terran_Dropship;
+		} else if (race == Race.Zerg) {
+			return UnitType.Zerg_Overlord;
 		} else {
 			return UnitType.None;
 		}

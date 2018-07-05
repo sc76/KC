@@ -176,11 +176,11 @@ public class KCSimulationManager {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 10;
 			}
-			return 30;
+			return 25;
 		} else if (enemyRace == Race.Terran) {
-			return 10;
+			return 9;
 		} else if (enemyRace == Race.Zerg) {
-			return 10;
+			return 9;
 		} else {
 			return 0;
 		}
@@ -194,13 +194,13 @@ public class KCSimulationManager {
 	public int getAdvencedCombatUnitTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 20;
+				return 18;
 			}
-			return 30;
+			return 25;
 		} else if (enemyRace == Race.Terran) {
 			return 0;
 		} else if (enemyRace == Race.Zerg) {
-			return 10;
+			return 9;
 		} else {
 			return 0;
 		}
@@ -215,11 +215,11 @@ public class KCSimulationManager {
 	public int getAdvencedCombatUnitType2Point(Unit unit){
 		
 		if (enemyRace == Race.Protoss) {
-			return 30;
+			return 25;
 		} else if (enemyRace == Race.Terran) {
-			return 20;
+			return 18;
 		} else if (enemyRace == Race.Zerg) {
-			return 50;
+			return 40;
 		} else {
 			return 0;
 		}
@@ -232,14 +232,14 @@ public class KCSimulationManager {
 	 */
 	public int getBasicDefenceBuildingTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
-			return 20;
+			return 8;
 		} else if (enemyRace == Race.Terran) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 10;
+				return 9;
 			}
-			return 20;
+			return 18;
 		} else if (enemyRace == Race.Zerg) {
-			return 10;
+			return 8;
 		} else {
 			return 0;
 		}
@@ -254,16 +254,16 @@ public class KCSimulationManager {
 		if (enemyRace == Race.Protoss) {
 			// sc76.choi 아직 지어지고 있으면 0로 리턴
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 0;
+				return 20;
 			}		
-			return 10;
+			return 30;
 		} else if (enemyRace == Race.Terran) {
 			return 0;
 		} else if (enemyRace == Race.Zerg) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 0;
 			}			
-			return 10;
+			return 30;
 		} else {
 			return 0;
 		}

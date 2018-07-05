@@ -145,8 +145,8 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
 	
-	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 5;
-	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 5;	
+	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 3;
+	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 3;	
 	
 	public static int numberOfMyCombatUnitTrainingBuilding = 8;
 	

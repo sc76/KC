@@ -170,6 +170,7 @@ public class MyBotModule extends DefaultBWListener {
 		gameCommander.onEnd(isWinner);
 		
         System.out.println("Match ended");
+        System.out.println("Max APM : " + UXManager.Instance().maxAPM);
         System.exit(0);		
 	}
 
