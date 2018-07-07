@@ -30,13 +30,13 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 5; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 6; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 6; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 6; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
@@ -44,25 +44,25 @@ public class Config {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 16;  // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
+	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 8; // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstProtoss = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstProtoss = 1; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 12; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 12;  // 히드라
+	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 8; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 8;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 12; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 12;  // 히드라
-	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 1;  // 럴커
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 8; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 8;  // 히드라
+	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
@@ -145,11 +145,16 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
 	
-	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 3;
-	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 3;	
+	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
+	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	
 	
-	public static int numberOfMyCombatUnitTrainingBuilding = 8;
+	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
+		
+
+	public static int numberOfMyCombatUnitTrainingBuilding = 10;
 	
+	public static double optimalWorkerCount = 1.8;
+			
 	// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 	// 봇 이름 및 파일 경로 기본값 변경
 	/// 봇 이름

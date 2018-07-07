@@ -200,6 +200,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Carapace 지상 갑피 업그레이드 1 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 2 || myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2)
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -464,6 +465,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Carapace 지상 갑피 업그레이드 1 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 2 || myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2)
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -661,7 +663,11 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+				// sc76.choi 테란일 경우 럴커 테크 연구를 먼저 진행한다.
+//				System.out.println("myPlayer.hasResearched(TechType.Lurker_Aspect) : " + myPlayer.hasResearched(TechType.Lurker_Aspect));
+				if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+				}
 			}
 		}
 		
@@ -730,6 +736,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Carapace 지상 갑피 업그레이드 1 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 2 || myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2)				
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)

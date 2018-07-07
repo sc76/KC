@@ -348,7 +348,7 @@ public class StrategyManager {
 		// sc76.choi 본진 근처에 적이 있으면 그 pos로 타겟을 잡는다.
 		
 		// sc76.choi 적진에 가까운 적 유닛이 있는지
-		Unit urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*35);
+		Unit urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*40);
 		
 //		if(commandUtil.IsValidUnit(urgentUnit)){
 //			System.out.println("urgentUnit : " + urgentUnit.getID() + " " + urgentUnit.getType() + urgentUnit.getTilePosition());
@@ -514,6 +514,9 @@ public class StrategyManager {
 		/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 		executeCombat();
 
+		// sc76.choi 각종 보수 작업을 한다.
+		executeMaintenance();
+		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi start
 		/// StrategyManager 의 수행상황을 표시합니다
@@ -766,6 +769,73 @@ public class StrategyManager {
 		}
 	}
 	
+	public void executeMaintenance(){
+		
+		// 1초에 4번만 실행합니다
+		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
+				
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 일꾼양이 7마리 이하이면, 가스 채취를 중단하고, 미네랄을 캔다.
+		if(isInitialBuildOrderFinished == true){
+			if(WorkerManager.Instance().getWorkerData().getNumWorkers() <= 7){
+				for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
+					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Gas){
+						WorkerManager.Instance().setMineralWorker(worker);
+					}
+				}
+			}
+		}
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 해처리가 많고 확장이 되면, 미네럴당 일꾼 수 조절을 한다.
+		if(InformationManager.Instance().getTotalHatcheryCount() >= 4){
+			Config.optimalWorkerCount = 1.5;
+		}
+		
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 스포닝 풀이 파괴되었을 때, 재건한다.
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) <= 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+				&& myPlayer.allUnitCount(UnitType.Zerg_Spawning_Pool) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spawning_Pool) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spawning_Pool, null) == 0) 
+		{
+				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool, true);
+		}
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 히드라덴이 파괴되었을 때, 재건한다.
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+				&& myPlayer.allUnitCount(UnitType.Zerg_Hydralisk_Den) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hydralisk_Den) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hydralisk_Den, null) == 0) 
+		{
+				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hydralisk_Den, true);
+		}		
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 쳄버가 파괴되었을 때, 재건한다.
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) <= 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+				&& myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Evolution_Chamber) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber, null) == 0) 
+		{
+				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber, true);
+		}
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi TODO 앞마당 해처리가가 파괴되었을 때, 재건한다.
+	}
+	
 	/**
 	 * 방어 판단을 위한 방어 수
 	 * @author csc
@@ -783,21 +853,66 @@ public class StrategyManager {
 	 * @return
 	 */
 	boolean isNecessaryNumberOfCombatUnitType(){
-		return (
-				 (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1)
+		
+		boolean isNecessaryNumberOfCombatUnitType = false;
+		
+		// sc76.choi 테란일때...
+		if(Race.Terran == enemyRace){
+			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
+			if(isInitialBuildOrderFinished == false){
 				
-			     || (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2)  
+				// sc76.choi defence저글링수만 초반 러쉬를 한번 간다.
+				isNecessaryNumberOfCombatUnitType = myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1;
+						
+			}else{
+				isNecessaryNumberOfCombatUnitType = 
+					(
+						// 히드라
+						(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2)  
+						
+						// 저글링, 럴커
+					    || (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1      
+					           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) 
+					
+					    // 히드라, 럴커
+					    || (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2      
+					           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
+					
+					    // 뮤탈
+					    || (myCombatUnitType4List.size() >= necessaryNumberOfCombatUnitType4)
+					     
+					    // 울트라
+					    || (myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)
+					); 
+			}
+		}
+		// sc76.choi 테란이 아닐 때...
+		else{
+			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
+			if(isInitialBuildOrderFinished == false){
 				
-			     || (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1      
-			           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) 
-			
-			     || (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2      
-			           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
-			
-			     || (myCombatUnitType4List.size() >= necessaryNumberOfCombatUnitType4)
-			     
-			     || (myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)
-			); 
+				// sc76.choi defence저글링수만 초반 러쉬를 한번 간다.
+				isNecessaryNumberOfCombatUnitType = myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1;
+						
+			}else{
+				isNecessaryNumberOfCombatUnitType = 
+					(
+						 (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
+						  && myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2)  
+						
+					     || (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1      
+					           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) 
+					
+					     || (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2      
+					           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
+					
+					     || (myCombatUnitType4List.size() >= necessaryNumberOfCombatUnitType4)
+					     
+					     || (myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)
+					); 
+			} 
+		}
+		return isNecessaryNumberOfCombatUnitType;
 	}
 	
 	/// 공격 모드로 전환할 때인지 여부를 리턴합니다
@@ -830,20 +945,36 @@ public class StrategyManager {
 		// sc76.choi AND 조건으로 체크 한다.
 		
 		if(Race.Terran == enemyRace){
-			if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
-				 && myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
-				 && myCombatUnitType3List.size() < 1   // 럴커
-			){
-				countDefenceMode++;
-				returnDefenceMode = true;
+			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
+			if(isInitialBuildOrderFinished == false){
+				if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1){ // 저글링
+					countDefenceMode++;
+					returnDefenceMode = true;
+				}
+			}else{
+				if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
+						&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
+						&& myCombatUnitType3List.size() < 1   // 럴커
+						){
+					countDefenceMode++;
+					returnDefenceMode = true;
+				}
 			}
 		}else{
-			if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
-					 && myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
-				)
-			{
-				countDefenceMode++;
-				returnDefenceMode = true;
+			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해			
+			if(isInitialBuildOrderFinished == false){
+				if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1){ // 저글링
+					countDefenceMode++;
+					returnDefenceMode = true;
+				}
+			}else{
+				if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
+						&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
+						&& myCombatUnitType3List.size() < 1   // 럴커
+						){
+					countDefenceMode++;
+					returnDefenceMode = true;
+				}
 			}
 		}
 		
@@ -860,7 +991,7 @@ public class StrategyManager {
 			// 적군 본진에 아군 유닛이 10 이상 도착했으면 거의 게임 끝난 것
 			int myUnitCountAroundEnemyMainBaseLocation = 0;
 			int enemyUnitCountAroundEnemyMainBaseLocation = 0;
-			for(Unit unit : MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), 8 * Config.TILE_SIZE)) {
+			for(Unit unit : MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), Config.TILE_SIZE*10)) {
 				if (unit.getPlayer() == myPlayer) {
 					myUnitCountAroundEnemyMainBaseLocation ++;
 				}
@@ -1251,7 +1382,7 @@ public class StrategyManager {
 						remainHitPoint = (worker.getHitPoints()*1.0)/40.0;
 						//System.out.println("combat Unit remainHitPoint : " + worker.getHitPoints() + "[" +worker.getID()+ "]");
 						if(remainHitPoint <= .7){
-							System.out.println("remove Unit remainHitPoint : " + " " +remainHitPoint + "[" +worker.getID()+ "]");
+							//System.out.println("remove Unit remainHitPoint : " + " " +remainHitPoint + "[" +worker.getID()+ "]");
 							WorkerManager.Instance().setIdleWorker(worker);
 						}
 					}
@@ -1273,7 +1404,7 @@ public class StrategyManager {
 							if(worker.isCarryingMinerals() || worker.isAttacking()) continue; // 미네랄 운반 일꾼은 제외
 							if(remainHitPoint >= .8){
 								WorkerManager.Instance().setCombatWorker(worker);
-								System.out.println("add Unit remainHitPoint : " + remainHitPoint + "[" +worker.getID()+ "]");
+								//System.out.println("add Unit remainHitPoint : " + remainHitPoint + "[" +worker.getID()+ "]");
 								// 일꾼 공격 합세는 2마리만 한다.
 								if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) { 
 									break;
@@ -1309,81 +1440,30 @@ public class StrategyManager {
 			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
 				
-				
 				targetPosition = TARGET_POSITION;
-				List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*7);
-				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
 				
-				// sc76.choi 공격이 가능하면
-				if(canAttackNow){
-					commandUtil.attackMove(unit, targetPosition);
+				// sc76.choi 공격 모드 이나, 아직 적진을 발견 못했을 때는 앞다당(DEFENCE_POSITION) 으로 이동해 놓는다.
+				if(targetPosition == null){
+					//System.out.println("Attack Move 1");
+					commandUtil.attackMove(unit, mySecondChokePoint.getCenter());
 				}else{
-					// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
-					if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
-						commandUtil.move(unit, DEFENCE_POSITION);
-					}
-					// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
-					else{
-						commandUtil.attackMove(unit, DEFENCE_POSITION);
+					List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*7);
+					boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
+					
+					// sc76.choi 공격이 가능하면
+					if(canAttackNow){
+						commandUtil.attackMove(unit, targetPosition);
+					}else{
+						// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
+						if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
+							commandUtil.move(unit, DEFENCE_POSITION);
+						}
+						// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
+						else{
+							commandUtil.attackMove(unit, DEFENCE_POSITION);
+						}
 					}
 				}
-				
-				// sc76.choi 가장 가까운 공격 유닛(히드라)의 위치를 찾아 오버로드가 따라가게 한다. 
-				// sc76.choi 36이면 서킷에서 다리를 양쪽으로 건널 수 있다.
-//				
-//				if(targetPosition == null){
-//					targetPosition = TARGET_POSITION;
-//				}
-//				
-//				// 적진과 가까이에 있으면 그냥 자유롭게 싸운다.
-//				// TODO 단, 공격 타겟이 항상 enemyMainBaseLocation는 아니다, 수정 해야 한다. 메인 타켓 Position은 별도는 global하게 관리 되어야 한다.
-//				//if(unit.getDistance(enemyMainBaseLocation.getPosition()) <= Config.TILE_SIZE*30){
-//				//	targetPosition = enemyMainBaseLocation.getPosition();
-//				//}
-//				
-//				int capFromHydra = 4;
-//				// 12시
-//				if(unit.getID() % 4 == 0){
-//					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*capFromHydra);
-//					
-//					// 12시가 invalid이면 Config.TILE_SIZE*capFromHydra시
-//					if(!targetPosition.isValid()){
-//						targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*capFromHydra);
-//					}
-//				}
-//				// 3시
-//				else if(unit.getID() % 4 == 1){
-//					targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*capFromHydra, targetPosition.getY());
-//					
-//					// 3시가 invalid이면 9시
-//					if(!targetPosition.isValid()){
-//						targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*capFromHydra, targetPosition.getY());
-//					}					
-//				}
-//				// 6시
-//				else if(unit.getID() % 4 == 2){
-//					targetPosition = new Position(targetPosition.getX(), targetPosition.getY() + Config.TILE_SIZE*capFromHydra);
-//					
-//					// 6시가 invalid이면 12시
-//					if(!targetPosition.isValid()){
-//						targetPosition = new Position(targetPosition.getX(), targetPosition.getY() - Config.TILE_SIZE*capFromHydra);
-//					}
-//				}
-//				// 9시
-//				else{
-//					targetPosition = new Position(targetPosition.getX() - Config.TILE_SIZE*capFromHydra, targetPosition.getY());
-//					// 9시가 invalid이면 3시
-//					if(!targetPosition.isValid()){
-//						targetPosition = new Position(targetPosition.getX() + Config.TILE_SIZE*capFromHydra, targetPosition.getY());
-//					}										
-//				}
-//				
-//				// 4방향의 포지션 중, valid지역이 아니면 그냥 적진을 targetPosition으로 지정한다.
-//				if(!targetPosition.isValid()){
-//					targetPosition = enemyMainBaseLocation.getPosition();
-//				}
-//				
-//				commandUtil.attackMove(unit, targetPosition);
 				
 				hasCommanded = true;
 				
@@ -1398,7 +1478,7 @@ public class StrategyManager {
 				
 				// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.				
 				if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
-					
+					//System.out.println("Defence Move 1");
 					// sc76.choi 유닛이 디펜스 지점보다 멀리 있으면, 와리가리 아니면 그냥 싸운다.
 //					System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
 //					System.out.println();
@@ -1436,10 +1516,12 @@ public class StrategyManager {
 				}
 				// sc76.choi 본진에 적이 있으면, DEFENCE_POSITION 까지 후퇴한다.				
 				else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence)){
+					//System.out.println("Defence Move 2");
 					commandUtil.attackUnit(unit, enemyUnitForMainDefence);
 				}
 				// sc76.choi 적이 없으면,
 				else{
+					//System.out.println("Defence Move 3");
 					commandUtil.move(unit, DEFENCE_POSITION);
 				}
 				hasCommanded = true;
@@ -1485,7 +1567,7 @@ public class StrategyManager {
 				){
 					// targetPosition = enemyMainBaseLocation.getPosition();
 					targetPosition = TARGET_POSITION;
-	
+
 					// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 도망갈때의 포지션 만큼 이동을 계속 한다.
 					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*4)){
 						if(who.getPlayer() == enemyPlayer
@@ -1569,6 +1651,7 @@ public class StrategyManager {
 								targetPosition = calPosition;;
 							}
 							
+							// sc76.choi TODO 계속 무브를 하면 벽에서 멍청하게 서 있는다, 이 때는 공격을 할 수 있게 해야 한다.
 							commandUtil.move(unit, targetPosition);
 						}
 					}
@@ -1590,34 +1673,45 @@ public class StrategyManager {
 			// 아군 방어 건물이 세워져있는 위치 주위에 버로우시켜놓는다
 			// sc76.choi defenseMode이지만, 적진에 깊이 박혀 있으면, 그대로 둔다.
 			// sc76.choi 디데일 점검 필요
-			if (DEFENCE_POSITION != null) {
 				
-				// sc76.choi 버로우 되어 있지 않고, 나의 지역과 가까이 있으면 (35), 버로우 한다.
-				if (unit.isBurrowed() == false) {			
-					if (unit.getDistance(DEFENCE_POSITION) < 35 * Config.TILE_SIZE
-						  || unit.getDistance(myMainBaseLocation.getPoint()) < 15 * Config.TILE_SIZE
-					){
-						unit.burrow();
-						hasCommanded = true;
-					}
-					// sc76.choi 나의 본거지와 멀리 있으면 귀환
-					else{
-						commandUtil.move(unit, DEFENCE_POSITION);
-					}
-				}
-				// sc76.choi 현재 버로우 되어 있고, 공격 받고 있으면 바로 본진으로 귀환
-				// sc76.choi TODO 본진 근처면 그냥 계속 버로우 한다.
-				else{
-					if(unit.isUnderAttack()){
-						unit.unburrow();
-					}
-				}
-			}else{
-				if (unit.isBurrowed() == false) {
+			// sc76.choi 버로우 되어 있지 않고, 나의 지역과 가까이 있으면 (35), 버로우 한다.
+			if (unit.isBurrowed() == false) {			
+				if (unit.getDistance(DEFENCE_POSITION) < 25 * Config.TILE_SIZE
+					  || unit.getDistance(myMainBaseLocation.getPoint()) < 15 * Config.TILE_SIZE
+				){
 					unit.burrow();
-					hasCommanded = true;
+				}
+				// sc76.choi 나의 본거지와 멀리 있으면 귀환
+				else{
+					commandUtil.move(unit, DEFENCE_POSITION);
 				}
 			}
+			// sc76.choi 방어 모드 시에, 현재 버로우 되어 있고, 공격 받고 있으면 바로 본진으로 귀환
+			// sc76.choi TODO 본진 근처면 그냥 계속 버로우 한다.
+			else{
+				if(unit.isUnderAttack() 
+					&& unit.getDistance(DEFENCE_POSITION) >= 25 * Config.TILE_SIZE){
+					
+					// 근처에 적 유닛이 있으면 버로우 시키고, 없으면 언버로우 시킨다
+					Position nearEnemyUnitPosition = null;
+					double tempDistance = 0;
+					for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
+						
+						if (enemyUnit.isFlying()) continue;
+
+						tempDistance = unit.getDistance(enemyUnit.getPosition());
+						if (tempDistance < 6 * Config.TILE_SIZE) {
+							nearEnemyUnitPosition = enemyUnit.getPosition();
+						}
+					}
+					if (nearEnemyUnitPosition == null) {
+						unit.unburrow();
+					}else{
+						unit.burrow();
+					}
+				}
+			}
+			hasCommanded = true;
 		}
 		// sc76.choi 공격일때.
 		else {
@@ -1645,12 +1739,12 @@ public class StrategyManager {
 					commandUtil.move(unit, TARGET_POSITION);
 				}
 			}
-			// 버로우 되지 않았으면
+			// sc76.choi 공격중이나, 버로우 되지 않았으면
 			else {
 				if (nearEnemyUnitPosition == null) {
 					// sc76.choi Config.TILE_SIZE*5 거리 만큼 적이 있으면 unburrow를 하면 안된다.
 					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
-						if(who.getPlayer() == enemyPlayer && who.canAttack()){
+						if(who.getPlayer() == enemyPlayer && !who.getType().isFlyer()){
 							unit.burrow();
 							hasCommanded = true;
 						}else{
@@ -1702,13 +1796,16 @@ public class StrategyManager {
 						lastMutalisk = unit;
 						break;
 					}
+					
+					if(!commandUtil.IsValidUnit(lastMutalisk)) return true;
+					
 					closestOverloadWithIDLE = getClosestOverloadWithIDLE(lastMutalisk.getPosition());
 					
 					if(commandUtil.IsValidUnit(closestOverloadWithIDLE)){
-						System.out.println("*************************************************");
-						System.out.println("combatState : " + combatState);
-						System.out.println("Mutalisk    : " + lastMutalisk.getID());
-						System.out.println("Overload    : " + closestOverloadWithIDLE.getID());
+//						System.out.println("*************************************************");
+//						System.out.println("combatState : " + combatState);
+//						System.out.println("Mutalisk    : " + lastMutalisk.getID());
+//						System.out.println("Overload    : " + closestOverloadWithIDLE.getID());
 
 						myCombatUnitType4List.add(closestOverloadWithIDLE);
 					}else{
@@ -1720,11 +1817,11 @@ public class StrategyManager {
 				Unit enemyUnitForMutalisk = null; 
 				enemyUnitForMutalisk = findAttackTargetForMutalisk();
 				
-				if(enemyUnitForMutalisk != null){
-					System.out.println("targetUnit    : " + enemyUnitForMutalisk.getID() + " " + enemyUnitForMutalisk.getType());
-				}
-				System.out.println("*************************************************");
-				System.out.println();
+//				if(enemyUnitForMutalisk != null){
+//					System.out.println("targetUnit    : " + enemyUnitForMutalisk.getID() + " " + enemyUnitForMutalisk.getType());
+//				}
+//				System.out.println("*************************************************");
+//				System.out.println();
 				
 				for(Unit unit : myCombatUnitType4List){
 					// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
@@ -2225,8 +2322,43 @@ public class StrategyManager {
 	        	if(unit.getType().isBuilding()) continue;
 	        	
 	        	if (unit.getType().canAttack()) {
-	                target = unit;
-	                break;
+	        		
+	        		if(Race.Terran == enemyRace){
+	        			if(unit.getType() == UnitType.Terran_Dropship){
+		        			target = unit;
+		        			break;
+	        			}else if(unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode){
+		        			target = unit;
+		        			break;
+	        			}else if(unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Vulture_Spider_Mine){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Vulture){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Marine){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Firebat){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Medic){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_SCV){
+			        		target = unit;
+			        		break;
+	        			}else{
+	        				target = unit;
+			        		break;
+	        			}
+	        		}else{
+	        			target = unit;
+	        			break;
+	        		}
 	        	}
         	}
         }
@@ -2253,13 +2385,28 @@ public class StrategyManager {
     private Unit findAttackTargetForQueen() {
         Unit target = null;
         for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-        	if (unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode 
-        		  || unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode
-//        		  || unit.getType() == UnitType.Terran_Vulture
-//        		  || unit.getType() == UnitType.Terran_Goliath
-        	){
-                target = unit;
-                break;
+        	if(commandUtil.IsValidUnit(unit)){
+	        	if(unit.getType().isWorker()) continue;
+	        	if(unit.getType().isBuilding()) continue;
+	        	
+	        	if (unit.getType().canAttack()) {
+	        		
+	        		if(Race.Terran == enemyRace){
+	        			if(unit.getType() == UnitType.Terran_Siege_Tank_Siege_Mode){
+		        			target = unit;
+		        			break;
+	        			}else if(unit.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+			        		target = unit;
+			        		break;
+	        			}else{
+	        				target = unit;
+			        		break;
+	        			}
+	        		}else{
+	        			target = unit;
+	        			break;
+	        		}
+	        	}
         	}
         }
         
@@ -2279,14 +2426,16 @@ public class StrategyManager {
 			return;
 		}
 		
+		MyBotModule.Broodwar.drawTextScreen(440, 20, red + "avail m : " + BuildManager.Instance().getAvailableMinerals());
+		MyBotModule.Broodwar.drawTextScreen(540, 20, red + "avail g : " + BuildManager.Instance().getAvailableGas());
 		// 전투 상황
-		MyBotModule.Broodwar.drawTextScreen(440, 20, red + "CombatState : " + combatState.toString());
-		MyBotModule.Broodwar.drawTextScreen(440, 30, red + "BuildState : " + "normal");
-		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "Attak Pos. : " + TARGET_TILEPOSITION + TARGET_POSITION);
-		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Defence Pos. : " + DEFENCE_TILEPOSITION + DEFENCE_POSITION);
+		MyBotModule.Broodwar.drawTextScreen(440, 30, red + "CombatState : " + combatState.toString());
+		MyBotModule.Broodwar.drawTextScreen(440, 40, red + "BuildState : " + "normal");
+		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Attak Pos. : " + TARGET_TILEPOSITION + TARGET_POSITION);
+		MyBotModule.Broodwar.drawTextScreen(440, 60, red + "Defence Pos. : " + DEFENCE_TILEPOSITION + DEFENCE_POSITION);
 		
-		MyBotModule.Broodwar.drawTextScreen(440, 60, "is Defence Num. : " + isNecessaryNumberOfDefencedUnitType());
-		MyBotModule.Broodwar.drawTextScreen(440, 70, "is Combat Num. : " + isNecessaryNumberOfCombatUnitType() + "(" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +")");
+		MyBotModule.Broodwar.drawTextScreen(440, 70, "is Defence Num. : " + isNecessaryNumberOfDefencedUnitType());
+		MyBotModule.Broodwar.drawTextScreen(440, 80, "is Combat Num. : " + isNecessaryNumberOfCombatUnitType() + "(" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +")");
 
 		
 		int y = 170;
@@ -2757,14 +2906,14 @@ public class StrategyManager {
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
 			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
-			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) < 2){
+			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}else{
 				// 테란일때, 럴커를 위주로
 				if(enemyRace == Race.Terran){
-					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 3, 4, 1, 1, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 2, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
 			}
 			
@@ -2776,13 +2925,17 @@ public class StrategyManager {
 				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2){
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 3, 2, 5, 1, 2, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 5, 1, 2, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
 				
 		}
 		else{
 			// 기본
-			buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
+			}else{
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			}
 			
 		}
 		
@@ -2910,7 +3063,7 @@ public class StrategyManager {
 			// 최적의 일꾼 수 = 미네랄 * (1~1.5) + 가스 * 3
 			int optimalWorkerCount = 0;
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(myPlayer)) {
-				optimalWorkerCount += baseLocation.getMinerals().size() * 1.8;
+				optimalWorkerCount += baseLocation.getMinerals().size() * Config.optimalWorkerCount; // 1.8;
 				optimalWorkerCount += baseLocation.getGeysers().size() * 3;
 			}
 						
@@ -3055,35 +3208,30 @@ public class StrategyManager {
 		int numberOfMyDefenseBuildingType1 = 0; 
 		int numberOfMyDefenseBuildingType2 = 0;
 		
-		if (myRace == Race.Protoss) {
-		}
-		else if (myRace == Race.Terran) {
-		}
-		else if (myRace == Race.Zerg) {
-			// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
-			numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType1);
-			numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1);
-			numberOfMyDefenseBuildingType1 += ConstructionManager.Instance().getConstructionQueueItemCount(myDefenseBuildingType1, null);
-			numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType2);
-			numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
-			numberOfMyDefenseBuildingType2 += myPlayer.allUnitCount(myDefenseBuildingType2);
-			numberOfMyDefenseBuildingType2 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
+		// 저그의 경우 크립 콜로니 갯수를 셀 때 성큰 콜로니 갯수까지 포함해서 세어야, 크립 콜로니를 지정한 숫자까지만 만든다
+		numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType1);
+		numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1);
+		numberOfMyDefenseBuildingType1 += ConstructionManager.Instance().getConstructionQueueItemCount(myDefenseBuildingType1, null);
+		numberOfMyDefenseBuildingType1 += myPlayer.allUnitCount(myDefenseBuildingType2);
+		numberOfMyDefenseBuildingType1 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
+		numberOfMyDefenseBuildingType2 += myPlayer.allUnitCount(myDefenseBuildingType2);
+		numberOfMyDefenseBuildingType2 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
 
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
-				isPossibleToConstructDefenseBuildingType1 = true;	
-			}
-			if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) {
-				isPossibleToConstructDefenseBuildingType2 = true;	
-			}
-			
-			// sc76.choi TODO 히드라의 갯수로 해처리를 더 지을지 말지 결정한다.
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) < necessaryNumberOfDefenceUnitType2
-				|| myPlayer.completedUnitCount(UnitType.Zerg_Zergling) < necessaryNumberOfDefenceUnitType1){
-				isPossibleToConstructCombatUnitTrainingBuildingType = true;
-			}else{
-				isPossibleToConstructCombatUnitTrainingBuildingType = false;
-			}
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
+			isPossibleToConstructDefenseBuildingType1 = true;	
 		}
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) {
+			isPossibleToConstructDefenseBuildingType2 = true;	
+		}
+		
+		// sc76.choi TODO 히드라의 갯수로 해처리를 더 지을지 말지 결정한다.
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) < necessaryNumberOfDefenceUnitType2
+			|| myPlayer.completedUnitCount(UnitType.Zerg_Zergling) < necessaryNumberOfDefenceUnitType1){
+			isPossibleToConstructCombatUnitTrainingBuildingType = true;
+		}else{
+			isPossibleToConstructCombatUnitTrainingBuildingType = false;
+		}
+	
 
 		if (isPossibleToConstructDefenseBuildingType1 == true 
 			&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
@@ -3109,13 +3257,17 @@ public class StrategyManager {
 //		numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType());
 //		numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null);
 		
-		int numberOfMyCombatUnitTrainingBuilding = InformationManager.Instance().getTotalHatcheryCount() +
-				myPlayer.incompleteUnitCount(UnitType.Zerg_Hatchery);
+		int numberOfMyCombatUnitTrainingBuilding = InformationManager.Instance().getTotalHatcheryCount();
+		numberOfMyCombatUnitTrainingBuilding += BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType());
+		numberOfMyCombatUnitTrainingBuilding += ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null);
+		
+		System.out.println("Config.numberOfMyCombatUnitTrainingBuilding : " + Config.numberOfMyCombatUnitTrainingBuilding);
+		System.out.println("numberOfMyCombatUnitTrainingBuilding : " + numberOfMyCombatUnitTrainingBuilding);
 		
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 8개 까지만
 		if (isPossibleToConstructCombatUnitTrainingBuildingType == true
 			&& BuildManager.Instance().getAvailableMinerals() > 300){
-			if (numberOfMyCombatUnitTrainingBuilding < Config.numberOfMyCombatUnitTrainingBuilding) { // 8
+			if (numberOfMyCombatUnitTrainingBuilding < Config.numberOfMyCombatUnitTrainingBuilding) { // 10
 				
 				// 3개 까지는 main location 주변에 나머지는 확장한다.
 				if (numberOfMyCombatUnitTrainingBuilding < 3
@@ -3136,6 +3288,7 @@ public class StrategyManager {
 					System.out.println("**********************************************************");
 					System.out.println("                  add hatchery 1");
 					System.out.println("**********************************************************");
+					System.out.println();
 				}
 				// 확장지역에 건설한다.
 				else{
@@ -3146,6 +3299,7 @@ public class StrategyManager {
 							System.out.println("**********************************************************");
 							System.out.println("                  add hatchery 2");
 							System.out.println("**********************************************************");
+							System.out.println();
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
 									BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified,  false);
@@ -3161,40 +3315,33 @@ public class StrategyManager {
 	
 	// sc76.choi TODO 확장할 가장 좋은 곳을 찾는다.
 	// sc76.choi TODO 확장 방어와 확장된 곳에 drone 생산, 가스 건설 등등을 해결해야 한다.
-	
+	BaseLocation bestMultiLocation = null;
 	public BaseLocation getBestMultiLocation(){
 		double tempDistFromMyMainLocation = 100000000.0;
-		BaseLocation bestMultiLocation = null;
 		
 		BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
 		BaseLocation enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
 		BaseLocation enemyFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
 		
-//		System.out.println();
-//		System.out.println("myMainBaseLocation : " + myMainBaseLocation.getTilePosition());
-//		System.out.println("BWTA.getStartLocations() : " + BWTA.getStartLocations().size());
-		
 		for(BaseLocation b : BWTA.getStartLocations()){
 			
-//			System.out.println("bbbbbbbbbbbbbb 111111111 : " + b.getTilePosition());
-			
-			//if(b.isIsland()) continue;
+			// sc76.choi 나의 본진
 			if(b.equals(myMainBaseLocation)
 				|| (b.getX() == myMainBaseLocation.getX() && b.getY() == myMainBaseLocation.getY())) {
 				continue;
 			}
 			
+			// sc76.choi 적의 본진
 			if(b.equals(enemyMainBaseLocation)
 				|| (b.getX() == enemyMainBaseLocation.getX() && b.getY() == enemyMainBaseLocation.getY())) {
 				continue;
 			}
 			
+			// sc76.choi 적의 확장
 			if(b.equals(enemyFirstExpansionLocation)
 				|| (b.getX() == enemyFirstExpansionLocation.getX() && b.getY() == enemyFirstExpansionLocation.getY())) {
 				continue;
 			}
-			
-//			System.out.println("bbbbbbbbbbbbbb 222222222 : " + b.getTilePosition());
 			
 			double nowDist = myMainBaseLocation.getAirDistance(b);
 			if(nowDist > 0 && nowDist < tempDistFromMyMainLocation){
@@ -3203,13 +3350,165 @@ public class StrategyManager {
 			}
 		}
 
-//		System.out.println("bestMultiLocation : " + bestMultiLocation);
-//		System.out.println("bestMultiLocation.getTilePosition() : " + bestMultiLocation.getTilePosition());
-//		System.out.println("bestMultiLocation.getTilePosition() : " + bestMultiLocation.getTilePosition());
-//		System.out.println();
+		int numberOfMyCombatUnitTrainingBuilding = InformationManager.Instance().getTotalHatcheryCount() 
+				                                   + myPlayer.incompleteUnitCount(UnitType.Zerg_Hatchery);
 		
+		// sc76.choi 해처리가 충분하면 다음 확장 포지션
+		if(numberOfMyCombatUnitTrainingBuilding >= 3 && numberOfMyCombatUnitTrainingBuilding < 4){
+			bestMultiLocation = bestMultiLocation;
+		}else if(numberOfMyCombatUnitTrainingBuilding >= 4 && numberOfMyCombatUnitTrainingBuilding < 5){
+			if(bestMultiLocation2 != null){
+				bestMultiLocation = getBestMultiLocation2();
+			}
+		}else if(numberOfMyCombatUnitTrainingBuilding >= 5){
+			if(bestMultiLocation3 != null){
+				bestMultiLocation = getBestMultiLocation3();
+			}
+		}
 		
 		return bestMultiLocation;
+	}
+	
+	// sc76.choi TODO 확장할 가장 좋은 곳을 찾는다.
+	// sc76.choi TODO 확장 방어와 확장된 곳에 drone 생산, 가스 건설 등등을 해결해야 한다.
+	BaseLocation bestMultiLocation2 = null;
+	public BaseLocation getBestMultiLocation2(){
+		double tempDistFromMyMainLocation = 100000000.0;
+		
+		BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		BaseLocation enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
+		BaseLocation enemyFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
+		
+		// 그냥 베이스에서 찾는다.
+		for(BaseLocation b : BWTA.getBaseLocations()){
+			
+			
+			System.out.println("getBestMultiLocation2 111111111 : " + b.getTilePosition());
+			
+			// sc76.choi 나의 본진
+			if(b.equals(myMainBaseLocation)
+				|| (b.getX() == myMainBaseLocation.getX() && b.getY() == myMainBaseLocation.getY())) {
+				continue;
+			}
+
+			System.out.println("getBestMultiLocation2 222222222 : " + b.getTilePosition());
+			// sc76.choi 나의 확장			
+			if(b.equals(myFirstExpansionLocation)
+					|| (b.getX() == myFirstExpansionLocation.getX() && b.getY() == myFirstExpansionLocation.getY())) {
+					continue;
+			}
+			
+			System.out.println("getBestMultiLocation2 333333333 : " + b.getTilePosition());
+			// sc76.choi 적의 본진			
+			if(b.equals(enemyMainBaseLocation)
+				|| (b.getX() == enemyMainBaseLocation.getX() && b.getY() == enemyMainBaseLocation.getY())) {
+				continue;
+			}
+			
+			System.out.println("getBestMultiLocation2 444444444 : " + b.getTilePosition());
+			// sc76.choi 적의 확장			
+			if(b.equals(enemyFirstExpansionLocation)
+				|| (b.getX() == enemyFirstExpansionLocation.getX() && b.getY() == enemyFirstExpansionLocation.getY())) {
+				continue;
+			}
+			
+			System.out.println("getBestMultiLocation2 555555555 : " + b.getTilePosition());
+			// sc76.choi 첫번째 멀티			
+			if(bestMultiLocation != null &&
+				(b.equals(bestMultiLocation)
+					|| (b.getX() == bestMultiLocation.getX() && b.getY() == bestMultiLocation.getY()))
+			) {
+				continue;
+			}
+			
+			double nowDist = myMainBaseLocation.getAirDistance(b);
+			if(nowDist > 0 && nowDist < tempDistFromMyMainLocation){
+				tempDistFromMyMainLocation = nowDist;
+				bestMultiLocation2 = b;
+			}
+		}
+		
+		System.out.println("bestMultiLocation     666666666 : " + bestMultiLocation.getTilePosition());
+		System.out.println("getBestMultiLocation2 777777777 : " + bestMultiLocation2.getTilePosition());
+
+		return bestMultiLocation2;
+	}
+	
+	// sc76.choi TODO 확장할 가장 좋은 곳을 찾는다.
+	// sc76.choi TODO 확장 방어와 확장된 곳에 drone 생산, 가스 건설 등등을 해결해야 한다.
+	BaseLocation bestMultiLocation3 = null;
+	public BaseLocation getBestMultiLocation3(){
+		double tempDistFromMyMainLocation = 0.0;
+		
+		BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		BaseLocation enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
+		BaseLocation enemyFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
+		
+		// 그냥 베이스에서 찾는다.
+		for(BaseLocation b : BWTA.getBaseLocations()){
+			
+			// 가스가 없다면 skip
+			if(b.getGeysers().isEmpty() || b.getGeysers().size() == 0){
+				continue;
+			}
+			
+			System.out.println("getBestMultiLocation3 111111111 : " + b.getTilePosition());
+			// sc76.choi 나의본진
+			if(b.equals(myMainBaseLocation)
+				|| (b.getX() == myMainBaseLocation.getX() && b.getY() == myMainBaseLocation.getY())) {
+				continue;
+			}
+
+			System.out.println("getBestMultiLocation3 222222222 : " + b.getTilePosition());
+			
+			// sc76.choi 나의확장			
+			if(b.equals(myFirstExpansionLocation)
+					|| (b.getX() == myFirstExpansionLocation.getX() && b.getY() == myFirstExpansionLocation.getY())) {
+					continue;
+			}
+			
+			System.out.println("getBestMultiLocation3 333333333 : " + b.getTilePosition());
+			// sc76.choi 적의 본진
+			if(b.equals(enemyMainBaseLocation)
+				|| (b.getX() == enemyMainBaseLocation.getX() && b.getY() == enemyMainBaseLocation.getY())) {
+				continue;
+			}
+			
+			System.out.println("getBestMultiLocation3 444444444 : " + b.getTilePosition());
+			// sc76.choi 적의 확장
+			if(b.equals(enemyFirstExpansionLocation)
+				|| (b.getX() == enemyFirstExpansionLocation.getX() && b.getY() == enemyFirstExpansionLocation.getY())) {
+				continue;
+			}
+			
+			System.out.println("getBestMultiLocation3 555555555 : " + b.getTilePosition());
+			// sc76.choi 첫번째 멀티
+			if(b.equals(bestMultiLocation)
+					|| (b.getX() == bestMultiLocation.getX() && b.getY() == bestMultiLocation.getY())) {
+				continue;
+			}
+			
+			System.out.println("getBestMultiLocation3 555555555 : " + b.getTilePosition());
+			// sc76.choi 두번째 멀티
+			if(bestMultiLocation2 != null && 
+				(b.equals(bestMultiLocation2)
+					|| (b.getX() == bestMultiLocation2.getX() && b.getY() == bestMultiLocation2.getY()))
+			) {
+				continue;
+			}
+			
+			//double nowDist = enemyMainBaseLocation.getAirDistance(b);
+			int nowDist = BWTA.getGroundDistance2(enemyMainBaseLocation.getTilePosition(), b.getTilePosition());
+			if(nowDist > 0 && nowDist > tempDistFromMyMainLocation){
+				tempDistFromMyMainLocation = nowDist;
+				bestMultiLocation3 = b;
+			}
+		}
+		
+		System.out.println("bestMultiLocation     666666666 : " + bestMultiLocation.getTilePosition());
+		System.out.println("getBestMultiLocation3 777777777 : " + bestMultiLocation3.getTilePosition());
+
+		return bestMultiLocation3;
 	}
 	
 	/// 업그레이드 및 테크 리서치를 실행합니다
@@ -3295,11 +3594,10 @@ public class StrategyManager {
 			return;
 		}
 		
-		// 전투 상황에 맞게 뽑을 유닛을 컨트롤 한다.(CombatNeedUnitState)
+		// sc76.choi 전투 상황에 맞게 뽑을 유닛을 컨트롤 한다.(CombatNeedUnitState)
 		updatebuildOrderArray();
 		
-		if (myPlayer.supplyUsed() <= 390 ) 
-		{
+		if (myPlayer.supplyUsed() <= 390 ){
 			// 공격 유닛 생산
 			UnitType nextUnitTypeToTrain = getNextCombatUnitTypeToTrain();
 			
@@ -3316,7 +3614,14 @@ public class StrategyManager {
 							boolean isLowestPriority = false; // sc76.choi Priority를 조정한다.
 							if (nextUnitTypeToTrain == UnitType.Zerg_Zergling ) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
-									isPossibleToTrain = true;
+									
+									// sc76.choi 생산 제한
+									int allCountOfCombatUnitType1 = this.getCurrentTrainUnitCount(myCombatUnitType1);
+									if (allCountOfCombatUnitType1 <= maxNumberOfTrainUnitType1) {
+										isPossibleToTrain = true;
+									}else{
+										isPossibleToTrain = false;
+									}
 									isLowestPriority = false;
 								}							
 							}
@@ -3326,7 +3631,9 @@ public class StrategyManager {
 									isLowestPriority = false;
 								}							
 							}
+							
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Lurker) {
+								
 								if (unit.getType() == UnitType.Zerg_Hydralisk 
 									&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
 									&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true) {
@@ -3357,7 +3664,14 @@ public class StrategyManager {
 							}
 							
 							if (isPossibleToTrain) {
-								BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, isLowestPriority);
+								// sc76.choi TODO 주의 럴커일 경우에는 히드라가 반드시 있어야 한다. 히드라 체크를 해야한다.
+								if (nextUnitTypeToTrain == UnitType.Zerg_Lurker){
+									if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2 ){
+										BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, isLowestPriority);
+									}
+								}else{
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, isLowestPriority);
+								}
 							}
 							
 							nextTargetIndexOfBuildOrderArray++;
