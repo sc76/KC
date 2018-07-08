@@ -53,7 +53,7 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstProtoss = 1; // 디파일러
 	
 	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 8; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 8;  // 히드라
+	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
