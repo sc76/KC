@@ -477,6 +477,7 @@ public class InformationManager {
 				if (ui.getType().isBuilding()) {
 					
 					if(!commandUtil.IsValidUnit(ui.getUnit())) continue;
+					if(ui.getType() == UnitType.Zerg_Infested_Command_Center) continue;
 					
 					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
 					
@@ -690,7 +691,15 @@ public class InformationManager {
 		}
 	}
 
-	// 해당 종족의 UnitType 중 Observer 에 해당하는 UnitType을 리턴합니다
+	// 해당 종족의 UnitType 중 Basic Combat Unit 을 생산하기 위해 건설해야하는 UnitType을 리턴합니다
+	public boolean isDepotType(UnitType type) {
+		if(type == UnitType.Zerg_Hatchery || type == UnitType.Zerg_Lair || type == UnitType.Zerg_Hive){
+			return true;
+		}
+		return false;
+	}
+
+	// sc76.choi 해당 종족의 UnitType 중 Observer 에 해당하는 UnitType을 리턴합니다
 	public UnitType getObserverUnitType() {
 		return getObserverUnitType(MyBotModule.Broodwar.self().getRace());
 	}
@@ -790,7 +799,7 @@ public class InformationManager {
 		if (race == Race.Protoss) {
 			return UnitType.Protoss_Pylon;
 		} else if (race == Race.Terran) {
-			return UnitType.Terran_Bunker;
+			return UnitType.Terran_Missile_Turret;
 		} else if (race == Race.Zerg) {
 			return UnitType.Zerg_Creep_Colony;
 		} else {
@@ -808,7 +817,7 @@ public class InformationManager {
 		if (race == Race.Protoss) {
 			return UnitType.Protoss_Photon_Cannon;
 		} else if (race == Race.Terran) {
-			return UnitType.Terran_Missile_Turret;
+			return UnitType.Terran_Bunker;
 		} else if (race == Race.Zerg) {
 			return UnitType.Zerg_Sunken_Colony;
 		} else {

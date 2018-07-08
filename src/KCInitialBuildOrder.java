@@ -356,7 +356,7 @@ public class KCInitialBuildOrder {
 	
 	public void setInitialBuildOrderAgainstRandom(){
 		
-		getDefencePosition();
+		getDefencePosition(); 
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//5
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//6
@@ -372,7 +372,7 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//11
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//12
 		
-
+		// 2 번째 해처리
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 				StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType()); //10 해처리
 
@@ -394,8 +394,8 @@ public class KCInitialBuildOrder {
 		//		seedPositionStrategyOfMyDefenseBuildingType);	//16
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost); // 저글링 속도업(Faster Zergling movement)
-					
 		
+		// 3 번째 해처리
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 				BuildOrderItem.SeedPositionStrategy.FirstChokePoint); //14 해처리
 		
@@ -419,7 +419,8 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.FirstChokePoint);	//20
+				firstDefenceBuildingPos, true);
+//				BuildOrderItem.SeedPositionStrategy.FirstChokePoint);	//20
 //		StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
@@ -428,7 +429,8 @@ public class KCInitialBuildOrder {
 
 
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
+				secondDefenceBuildingPos, true);
+//				StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 		
@@ -438,7 +440,7 @@ public class KCInitialBuildOrder {
 
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, 
-				BuildOrderItem.SeedPositionStrategy.FirstChokePoint);
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//25
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
@@ -460,13 +462,12 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber, false); //26
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
 		
-		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);		
+		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);			
 	}
 	
 	public void getDefencePosition(){

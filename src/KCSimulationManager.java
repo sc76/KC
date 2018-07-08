@@ -227,17 +227,14 @@ public class KCSimulationManager {
 	
 	/*
 	UnitType.Protoss_Pylon;
-	UnitType.Terran_Bunker;
+	UnitType.Terran_Missile_Turret;
 	UnitType.Zerg_Creep_Colony;
 	 */
 	public int getBasicDefenceBuildingTypePoint(Unit unit){
 		if (enemyRace == Race.Protoss) {
-			return 8;
+			return 0;
 		} else if (enemyRace == Race.Terran) {
-			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 9;
-			}
-			return 18;
+			return 0;
 		} else if (enemyRace == Race.Zerg) {
 			return 8;
 		} else {
@@ -247,7 +244,7 @@ public class KCSimulationManager {
 	
 	/*
 	UnitType.Protoss_Photon_Cannon;
-	UnitType.Terran_Missile_Turret;
+	UnitType.Terran_Bunker;
 	UnitType.Zerg_Sunken_Colony;
 	 */
 	public int getAdvencedDefenceBuildingTypePoint(Unit unit){
@@ -258,7 +255,10 @@ public class KCSimulationManager {
 			}		
 			return 30;
 		} else if (enemyRace == Race.Terran) {
-			return 0;
+			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
+				return 9;
+			}
+			return 18;			
 		} else if (enemyRace == Race.Zerg) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 0;
