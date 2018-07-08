@@ -107,7 +107,7 @@ public class Config {
 	// sc76.choi 아군 최대 생산 제한 유닛수
 	public static int maxNumberOfTrainUnitType1AgainstProtoss = 20; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstProtoss = 16; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstProtoss = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstProtoss = 4;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstProtoss = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstProtoss = 3;  // 울트라
 	
@@ -118,7 +118,7 @@ public class Config {
 	
 	public static int maxNumberOfTrainUnitType1AgainstZerg = 20; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstZerg = 16; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstZerg = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstZerg = 4;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstZerg = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstZerg = 3;  // 울트라
 	
@@ -129,7 +129,7 @@ public class Config {
 	
 	public static int maxNumberOfTrainUnitType1AgainstTerran = 20; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 16; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstTerran = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstTerran = 5;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstTerran = 3;  // 울트라
 	
@@ -142,8 +142,8 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding1AgainstProtoss = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 2; 			
 	
-	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
-	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
+	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 3;
+	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 3;
 	
 	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	

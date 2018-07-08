@@ -505,18 +505,14 @@ public class StrategyManager {
 	/// 경기 진행 중 매 프레임마다 경기 전략 관련 로직을 실행합니다
 	public void update() {
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi start
-		// 베이스 정보를 업데이트 합니다.
+		// sc76.choi 베이스 정보를 업데이트 합니다.
 		updateKCBaseInfo();
-		// 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다. 
-		commandMyWorkerToAttack();
-		
-		// sc76.choi end
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		/// 변수 값을 업데이트 합니다
 		updateVariables();
+		
+		// sc76.choi 일꾼도 주변에 적의 공격 유닛이 있다면 공격한다. 
+		commandMyWorkerToAttack();
 		
 		// sc76.choi 공격 타겟 유닛 할당 
 		// updateVariablesForAttackUnit();
@@ -985,12 +981,9 @@ public class StrategyManager {
 		// sc76.choi 프로토스나 랜덤 일 때...
 		else {
 			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
-			if(isInitialBuildOrderFinished == false){
-				
-				// sc76.choi defence저글링수만 초반 러쉬를 한번 간다.
-				isNecessaryNumberOfCombatUnitType = myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1;
-						
-			}else{
+//			if(isInitialBuildOrderFinished == false){
+//				isNecessaryNumberOfCombatUnitType = myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1;
+//			}else{
 				isNecessaryNumberOfCombatUnitType = 
 					(
 						// 히드라
@@ -1010,7 +1003,7 @@ public class StrategyManager {
 					    // 울트라
 					    || (myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)
 					); 
-			}
+//			}
 		}
 		return isNecessaryNumberOfCombatUnitType;
 	}
@@ -1529,10 +1522,14 @@ public class StrategyManager {
 		}
 		
 		// sc76.choi 멀리나간 일꾼은 돌아오게 한다.
-		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
-			if(!commandUtil.IsValidSelfUnit(worker)) return;
-			if(worker.getDistance(myMainBaseLocation.getPoint()) > Config.TILE_SIZE*25){
-				WorkerManager.Instance().setIdleWorker(worker);
+		if(isInitialBuildOrderFinished == false && myMainBaseLocation != null){
+			for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
+				if(!commandUtil.IsValidSelfUnit(worker)) return;
+				if(worker.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*35){
+					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
+						WorkerManager.Instance().setIdleWorker(worker);
+					}
+				}
 			}
 		}
 	}
@@ -2786,9 +2783,8 @@ public class StrategyManager {
 		MyBotModule.Broodwar.drawTextScreen(440, 50, red + "Attak Pos. : " + TARGET_TILEPOSITION + TARGET_POSITION);
 		MyBotModule.Broodwar.drawTextScreen(440, 60, red + "Defence Pos. : " + DEFENCE_TILEPOSITION + DEFENCE_POSITION);
 		
-		MyBotModule.Broodwar.drawTextScreen(440, 70, "is Defence Num. : " + isNecessaryNumberOfDefencedUnitType());
-		MyBotModule.Broodwar.drawTextScreen(440, 80, "is Combat Num. : " + isNecessaryNumberOfCombatUnitType() + "(" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +")");
-
+		MyBotModule.Broodwar.drawTextScreen(440, 70, "isDefence : " + isNecessaryNumberOfDefencedUnitType());
+		MyBotModule.Broodwar.drawTextScreen(440, 80, "isCombat : " + isNecessaryNumberOfCombatUnitType() + "[" + myCombatUnitType1List.size() + "/" + necessaryNumberOfCombatUnitType1 +"]" + "[" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +"]");
 
 		if(!Config.IS_DRAW){
 			return;
@@ -3110,8 +3106,19 @@ public class StrategyManager {
 		// 4 : 뮤탈
 		// 5 : 울트라
 		
+		// sc76.choi 럴커 개발되고, 스파이어 없을 때,
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+			&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true
+			&& myCombatUnitType2List.size() >= 2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) <= 0){
+			if(selfGas < 200){
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}
+		}
 		// sc76.choi 스파이어만 올라가 있을 때,
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
 			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
@@ -3147,16 +3154,10 @@ public class StrategyManager {
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
 			}else{
-				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 1, 2, 2, 1, 3, 1, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+				buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
 			}
 			
 		}
-		
-		//buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커
-		
-		//System.out.println("buildOrderArrayOfMyCombatUnitType : " + Arrays.toString(buildOrderArrayOfMyCombatUnitType));
-		//System.out.println();
-		//System.out.println();
 	}
 	
 //	void updateVariablesForAttackUnit(){
@@ -3881,28 +3882,29 @@ public class StrategyManager {
 									isLowestPriority = false;
 								}							
 							}
-//							
-//							else if (nextUnitTypeToTrain == UnitType.Zerg_Lurker) {
-//								
-//								if (unit.getType() == UnitType.Zerg_Hydralisk 
-//									&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
-//									&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true) {
-//									
-//									// sc76.choi 럴커의 생산제한을 한다.
-//									int allCountOfCombatUnitType3 = this.getCurrentTrainUnitCount(myCombatUnitType3);
-//									if (allCountOfCombatUnitType3 <= maxNumberOfTrainUnitType3) {
-//										isPossibleToTrain = true;
-//									}else{
-//										isPossibleToTrain = false;
-//									}
-//									
-//									if(myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1){
-//										isLowestPriority = false;
-//									}else{
-//										isLowestPriority = true;
-//									}
-//								}							
-//							}
+							// sc76.choi 럴커 생산 시, 주의 히드라가 없으면 락이 걸린다.
+							else if (nextUnitTypeToTrain == UnitType.Zerg_Lurker) {
+								
+								if (unit.getType() == UnitType.Zerg_Hydralisk 
+									&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+									&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true) {
+									
+									// sc76.choi 럴커의 생산제한을 한다.
+									int allCountOfCombatUnitType3 = this.getCurrentTrainUnitCount(myCombatUnitType3);
+									if (allCountOfCombatUnitType3 <= maxNumberOfTrainUnitType3 
+											&& myCombatUnitType2List.size() >= 2) {
+										isPossibleToTrain = true;
+									}else{
+										isPossibleToTrain = false;
+									}
+									
+									if(myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1){
+										isLowestPriority = false;
+									}else{
+										isLowestPriority = true;
+									}
+								}							
+							}
 							// sc76.choi TODO 가스가 작으면 만들지 않는다.
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Mutalisk) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0) {
@@ -3921,7 +3923,7 @@ public class StrategyManager {
 							if (isPossibleToTrain) {
 								// sc76.choi TODO 주의 럴커일 경우에는 히드라가 반드시 있어야 한다. 히드라 체크를 해야한다.
 								if (nextUnitTypeToTrain == UnitType.Zerg_Lurker){
-									if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2 ){
+									if(myCombatUnitType2List.size() >= 2){
 										BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, isLowestPriority);
 									}
 								}else{
@@ -3985,44 +3987,45 @@ public class StrategyManager {
 			// 럴커 유닛 생산
 			// TODO 자원이 없을 때는 True로 생산하면 lock이 걸린다.
 			// sc76.choi TODO 가스가 작으면 만들지 않는다.
-			if (BuildManager.Instance().buildQueue.getItemCount(myCombatUnitType3) == 0) {	
-				
-				boolean isPossibleToTrain = false;
-
-				if (myCombatUnitType3 == UnitType.Zerg_Lurker) {
-					if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-						  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 1) {
-						if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
-							isPossibleToTrain = true;
-						}
-					}							
-				}
-				
-				boolean isNecessaryToTrainMore = false;
-				int allCountOfCombatUnitType3 = this.getCurrentTrainUnitCount(myCombatUnitType3);
-				
-				if (allCountOfCombatUnitType3 < maxNumberOfCombatUnitType3) {
-					isNecessaryToTrainMore = true;
-				}							
-				
-				if (isPossibleToTrain && isNecessaryToTrainMore) {
-					producerType = (new MetaType(myCombatUnitType3)).whatBuilds();
-					for(Unit unit : myPlayer.getUnits()) {
-						if (unit.getType() == producerType) {
-							if (unit.isTraining() == false && unit.isMorphing() == false) {
-								
-								if(allCountOfCombatUnitType3 <= 0 && selfGas >= 100){
-									BuildManager.Instance().buildQueue.queueAsHighestPriority(myCombatUnitType3, true);
-								}else{
-									BuildManager.Instance().buildQueue.queueAsLowestPriority(myCombatUnitType3, false);									
-								}
-								break;
-							}
-							
-						}
-					}
-				}
-			}
+//			if (BuildManager.Instance().buildQueue.getItemCount(myCombatUnitType3) == 0) {	
+//				
+//				boolean isPossibleToTrain = false;
+//
+//				if (myCombatUnitType3 == UnitType.Zerg_Lurker) {
+//					if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+//						  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 1) {
+//						if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
+//							isPossibleToTrain = true;
+//						}
+//					}							
+//				}
+//				
+//				boolean isNecessaryToTrainMore = false;
+//				int allCountOfCombatUnitType3 = this.getCurrentTrainUnitCount(myCombatUnitType3);
+//				
+//				if (allCountOfCombatUnitType3 < maxNumberOfCombatUnitType3) {
+//					isNecessaryToTrainMore = true;
+//				}							
+//				
+//				if (isPossibleToTrain && isNecessaryToTrainMore) {
+//					producerType = (new MetaType(myCombatUnitType3)).whatBuilds();
+//					for(Unit unit : myPlayer.getUnits()) {
+//						if (unit.getType() == producerType) {
+//							if (unit.isTraining() == false && unit.isMorphing() == false) {
+//								
+//								if(allCountOfCombatUnitType3 <= 0 && selfGas >= 100){
+//									//System.out.println("allCountOfCombatUnitType3 : " + allCountOfCombatUnitType3);
+//									BuildManager.Instance().buildQueue.queueAsHighestPriority(myCombatUnitType3, false);
+//								}else{
+//									BuildManager.Instance().buildQueue.queueAsLowestPriority(myCombatUnitType3, false);									
+//								}
+//								break;
+//							}
+//							
+//						}
+//					}
+//				}
+//			}
 			
 			// 특수 유닛 생산 - 2 디파일러
 			// TODO 자원이 없을 때는 True로 생산하면 lock이 걸린다.
@@ -4197,14 +4200,19 @@ public class StrategyManager {
 		int allCountOfSpecialUnitType3 = myPlayer.allUnitCount(type) + BuildManager.Instance().buildQueue.getItemCount(type);
 		if (type.getRace() == Race.Zerg) {
 			for(Unit unit : myPlayer.getUnits()) {
-
+				
+				// unit.getBuildType() 이 럴커로 나오지 않고 히드라로 나온다.
+//				if(unit.getType() == UnitType.Zerg_Egg && type == UnitType.Zerg_Lurker){
+//					System.out.println("unit.getBuildType("+type+") "+allCountOfSpecialUnitType3+ ": " + unit.getID() + " " + unit.getBuildType());
+//				}
+				
 				if (unit.getType() == UnitType.Zerg_Egg && unit.getBuildType() == type) {
 					allCountOfSpecialUnitType3++;
 				}
 				// 갓태어난 유닛은 아직 반영안되어있을 수 있어서, 추가 카운트를 해줘야함
-				//if (unit.getType() == mySpecialUnitType2 && unit.isConstructing()) {
-				//	allCountOfSpecialUnitType2++;
-				//}
+				if (unit.getType() == mySpecialUnitType2 && unit.isConstructing()) {
+					allCountOfSpecialUnitType3++;
+				}
 			}
 			  
 		}
