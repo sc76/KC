@@ -121,6 +121,8 @@ public class StrategyManager {
 	ArrayList<Unit> mySpecialUnitType3List = new ArrayList<Unit>(); // 스커지
 	ArrayList<Unit> mySpecialUnitType4List = new ArrayList<Unit>(); // 퀸
 	
+	ArrayList<Unit> myCombatUnitType1ScoutList = new ArrayList<Unit>(); // 저글링 정찰용
+	
 	// 아군 방어 건물 첫번째, 두번째 타입
 	UnitType myDefenseBuildingType1;			/// 파일런 벙커 크립콜로니
 	UnitType myDefenseBuildingType2;			/// 포톤  터렛  성큰콜로니
@@ -541,6 +543,9 @@ public class StrategyManager {
 		/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 		executeCombat();
 
+		// sc76.choi 정찰용 저그링이 움직인다.
+		executeRandomScout();
+		
 		// sc76.choi 각종 보수 작업을 한다.
 		executeMaintenance();
 		
@@ -560,8 +565,86 @@ public class StrategyManager {
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 		
 		//printUintData();
+		
+		//System.out.println("isUnitTypeInRegion Hatchery : " + getCountUnitTypeInRegion(myPlayer, UnitType.Zerg_Sunken_Colony, BWTA.getRegion(myFirstExpansionLocation.getPosition())) + " " + existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition())));
 	}
 
+	/**
+	 * 해당 지역에 type이 있는지 검사
+	 * 
+	 * @author sc76.choi
+	 * @param player
+	 * @param type
+	 * @param region
+	 * @return
+	 */
+	public boolean existUnitTypeInRegion(Player player, UnitType type, Region region){
+
+		if (region == null || player == null || type == null) {
+			return false;
+		}
+		
+		UnitData unitData = InformationManager.Instance().getUnitData(player);
+				
+		Iterator<Integer> it = unitData.getUnitAndUnitInfoMap().keySet().iterator();
+
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.getUnitAndUnitInfoMap().get(it.next());
+			if (ui.getType() == type) {
+				
+//				if(player == enemyPlayer){
+//					System.out.println("enemyPlayer existsPlayerBuildingInRegion : " + ui.getUnitID() + " " + ui.getType());
+//				}
+				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
+				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
+
+				if (BWTA.getRegion(ui.getLastPosition()) == region) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 해당 지역에 type이 몇개 있는지 검사
+	 * 
+	 * @author sc76.choi
+	 * @param player
+	 * @param type
+	 * @param region
+	 * @return
+	 */
+	public int getCountUnitTypeInRegion(Player player, UnitType type, Region region){
+
+		if (region == null || player == null || type == null) {
+			return 0;
+		}
+		
+		int existTypeCount = 0;
+		
+		UnitData unitData = InformationManager.Instance().getUnitData(player);
+				
+		Iterator<Integer> it = unitData.getUnitAndUnitInfoMap().keySet().iterator();
+
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.getUnitAndUnitInfoMap().get(it.next());
+			if (ui.getType() == type) {
+				
+//				if(player == enemyPlayer){
+//					System.out.println("enemyPlayer existsPlayerBuildingInRegion : " + ui.getUnitID() + " " + ui.getType());
+//				}
+				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
+				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
+
+				if (BWTA.getRegion(ui.getLastPosition()) == region) {
+					existTypeCount++;
+				}
+			}
+		}
+		return existTypeCount;
+	}	
+	
 	/**
 	 * getUnitAndUnitInfoMap 중에 target으로 부터 가장 가까운 공격 유닛을 찾는다.
 	 * 단, 주어진 거리 (closeDistance) 보다 가까이 있는 유닛을 찾을 때 사용한다.
@@ -681,6 +764,31 @@ public class StrategyManager {
 		return closestUnit;
 	}
 	
+	// sc76.choi target 으로부터 가장 가까운 Unit를 리턴합니다.
+	public Unit getClosestUnitType(UnitType type, Position target)
+	{
+		Unit closestUnit = null;
+		double closestDist = 1000000000;
+
+		Iterator<Integer> it = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		while (it.hasNext()) {
+			UnitInfo ui = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().get(it.next());
+			
+			if(!commandUtil.IsValidUnit(ui.getUnit())) continue;
+				
+			if(ui.getType() == type){
+				double dist = ui.getUnit().getDistance(target);
+				if (closestUnit == null || dist < closestDist){
+					closestUnit = ui.getUnit();
+					closestDist = dist;
+				}
+				return closestUnit;
+			}
+		}
+
+		return closestUnit;
+	}
+	
 	//내림차순(Desc) 정렬
 	static class CompareSeqDesc implements Comparator<UnitInfo>{
         @Override
@@ -793,6 +901,29 @@ public class StrategyManager {
 			if (isTimeToStartDefense()) {
 				combatState = CombatState.defenseMode;
 			}	
+		}
+	}
+	
+	/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
+	public void executeRandomScout() {
+		
+		if(isInitialBuildOrderFinished == false || enemyMainBaseLocation == null) return;
+		
+		Position rPosition = getRandomPosition();
+		
+		int scoutSize = myCombatUnitType1ScoutList.size();
+		if(scoutSize <= 0) return;
+		
+		Unit scoutUnit = myCombatUnitType1ScoutList.get(0);
+		if(!commandUtil.IsValidUnit(scoutUnit)) return;
+		
+		// sc76.choi 나의 본진과 적의 본진 가까이는 가지 않는다.
+		if(rPosition.getDistance(enemyMainBaseLocation) > Config.TILE_SIZE*35
+			&& rPosition.getDistance(myMainBaseLocation) > Config.TILE_SIZE*35){
+			if (scoutUnit.isIdle()) {
+				System.out.println("myCombatUnitType1ScoutList " + myCombatUnitType1ScoutList.size() + " " + (myCombatUnitType1ScoutList.get(0)).getID() + " " + (myCombatUnitType1ScoutList.get(0)).getType() + " " + rPosition);
+				commandUtil.move(scoutUnit, rPosition);
+			}
 		}
 	}
 	
@@ -2307,7 +2438,7 @@ public class StrategyManager {
 				}
 				
 				Unit enemyFlyerUnit = findAttackTargetForScourge();
-				if(!unit.isMoving() || unit.isIdle()){
+				if(unit.isIdle()){
 					if(enemyFlyerUnit == null){
 						commandUtil.attackMove(unit, targetPosition);
 					}else{
@@ -2321,11 +2452,13 @@ public class StrategyManager {
 			}
 			// 공격 모드 일때
 			else{
-				Unit enemyFlyerUnit = findAttackTargetForScourge();
-				if(enemyFlyerUnit == null){
-					commandUtil.attackMove(unit, targetPosition);
-				}else{
-					commandUtil.attackUnit(unit, enemyFlyerUnit);
+				if(unit.isIdle()){
+					Unit enemyFlyerUnit = findAttackTargetForScourge();
+					if(enemyFlyerUnit == null){
+						commandUtil.attackMove(unit, targetPosition);
+					}else{
+						commandUtil.attackUnit(unit, enemyFlyerUnit);
+					}
 				}
 							
 			}
@@ -2362,18 +2495,22 @@ public class StrategyManager {
 					}
 					
 					Unit enemyUnit = findAttackTargetForQueen();
-					if(enemyUnit == null){
-						commandUtil.move(unit, targetPosition);
-					}else{
-						// sc76.choi 가까이 있으면 
-						if(myMainBaseLocation.getDistance(enemyUnit) < Config.TILE_SIZE * maxDistForScourgePatrol){
-							System.out.println("defence Use Spawn_Broodlings enemyUnitCount total : " + unit.getID() + " " + enemyUnit.getID());
-							unit.useTech(TechType.Spawn_Broodlings, enemyUnit);
+					if(unit.isIdle()){
+						if(enemyUnit == null){
+							commandUtil.move(unit, targetPosition);
+						}else{
+							// sc76.choi 가까이 있으면 
+							if(myMainBaseLocation.getDistance(enemyUnit) < Config.TILE_SIZE * maxDistForScourgePatrol){
+								System.out.println("defence Use Spawn_Broodlings enemyUnitCount total : " + unit.getID() + " " + enemyUnit.getID());
+								unit.useTech(TechType.Spawn_Broodlings, enemyUnit);
+							}
 						}
-						}
+					}
 	
 				}else{
-					commandUtil.move(unit, DEFENCE_POSITION);
+					if(unit.isIdle()){
+						commandUtil.move(unit, DEFENCE_POSITION);
+					}
 				}
 			}
 			// 공격 모드 일때
@@ -2385,16 +2522,18 @@ public class StrategyManager {
 //				}
 				
 				if (unit.getEnergy() > 150 && myPlayer.hasResearched(TechType.Spawn_Broodlings)) {
-					Unit enemyUnit = findAttackTargetForQueen();
+					if(unit.isIdle()){
+						Unit enemyUnit = findAttackTargetForQueen();
 						if(enemyUnit == null){
 							commandUtil.move(unit, targetPosition);
 						}else{
 							// sc76.choi 가까이 있으면 
 							//if(myMainBaseLocation.getDistance(enemyUnit) < Config.TILE_SIZE * maxDistForScourgePatrol){
-								System.out.println("attak Use Spawn_Broodlings enemyUnitCount total : " + unit.getID() + " " + enemyUnit.getID());
+								System.out.println("attack Use Spawn_Broodlings enemyUnitCount total : " + unit.getID() + " " + enemyUnit.getID() + " " + enemyUnit.getType() + " " + enemyUnit.getPosition());
 								unit.useTech(TechType.Spawn_Broodlings, enemyUnit);
 							//}
 						}
+					}
 				}else{
 					commandUtil.move(unit, DEFENCE_POSITION);
 				}
@@ -2962,6 +3101,7 @@ public class StrategyManager {
 		myCombatUnitType3List.clear(); // 럴커
 		myCombatUnitType4List.clear(); // 뮤탈
 		myCombatUnitType5List.clear(); // 울트라
+		myCombatUnitType1ScoutList.clear(); // 저글링 정찰용
 		
 		mySpecialUnitType1List.clear(); // 오버로드
 		mySpecialUnitType2List.clear(); // 디파일러
@@ -2993,8 +3133,24 @@ public class StrategyManager {
 	        	unit = ui.getUnit();
 	        }		
 			
+			// 저글링 정찰용
+			if (unit.getType() == myCombatUnitType1) {
+				// sc76.choi 초반 빌더 진행 후
+				if(isInitialBuildOrderFinished == true){
+					if(myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4){
+						if(myCombatUnitType1ScoutList.size() <= 0){
+							myCombatUnitType1ScoutList.add(unit);
+						}
+					}
+				}
+			}
+			
 			// 저글링
-			if (unit.getType() == myCombatUnitType1) { 
+			if (unit.getType() == myCombatUnitType1) {
+				
+				// sc76.choi 정찰용 저글링은 제외한다.
+				if(myCombatUnitType1ScoutList.contains(unit)) continue;
+				
 				myCombatUnitType1List.add(unit);
 				myAllCombatUnitList.add(unit);
 			}
@@ -3078,6 +3234,9 @@ public class StrategyManager {
 				myDefenseBuildingType2List.add(unit); 
 			}			
 		}
+		
+		
+
 		
 		selfMinerals = InformationManager.Instance().selfPlayer.minerals();
 		selfGas = InformationManager.Instance().selfPlayer.gas();
