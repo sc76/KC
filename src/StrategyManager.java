@@ -2661,10 +2661,73 @@ public class StrategyManager {
         Unit target = null;
         for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
         	if(commandUtil.IsValidUnit(unit)){
-
-       			if(unit.getType().isFlyer()){
-       				isTimeToAirDefence = true;
-       			}
+        		if(Race.Terran == enemyRace){
+        			if(unit.getType() == UnitType.Terran_Starport){
+	       				isTimeToAirDefence = true;
+	       				break;
+	       			}else if(unit.getType() == UnitType.Terran_Wraith){
+	       				isTimeToAirDefence = true;
+	       				break;
+	       			}else if(unit.getType() == UnitType.Terran_Dropship){
+	       				isTimeToAirDefence = true;
+	       				break;
+	       			}else if(unit.getType() == UnitType.Terran_Valkyrie){
+	       				isTimeToAirDefence = true;
+	       				break;
+	       			}else if(unit.getType() == UnitType.Terran_Science_Vessel){
+	       				isTimeToAirDefence = true;
+	       				break;
+	       			}else if(unit.getType() == UnitType.Terran_Battlecruiser){
+	       				isTimeToAirDefence = true;
+	       				break;
+	       			}
+        		}else if (Race.Protoss == enemyRace){
+        			if(unit.getType() == UnitType.Protoss_Stargate){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Protoss_Shuttle){
+        				isTimeToAirDefence = true;
+	        			break;
+        			}else if(unit.getType() == UnitType.Protoss_Observer){
+        				isTimeToAirDefence = true;
+	        			break;
+        			}else if(unit.getType() == UnitType.Protoss_Scout){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Protoss_Corsair){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Protoss_Carrier){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Protoss_Fleet_Beacon){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Protoss_Interceptor){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}
+        			
+        		}else if (Race.Zerg == enemyRace){
+        			if(unit.getType() == UnitType.Zerg_Spire){
+        				isTimeToAirDefence = true;
+	        			break;
+        			}else if(unit.getType() == UnitType.Zerg_Mutalisk){
+        				isTimeToAirDefence = true;
+	        			break;
+        			}else if(unit.getType() == UnitType.Zerg_Scourge){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Zerg_Guardian){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}else if(unit.getType() == UnitType.Zerg_Devourer){
+        				isTimeToAirDefence = true;
+		        		break;
+        			}
+        		}else{
+	       			// 	
+	       		}
         	}
         }
     }
