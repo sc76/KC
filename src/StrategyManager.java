@@ -921,8 +921,8 @@ public class StrategyManager {
 		if(rPosition.getDistance(enemyMainBaseLocation) > Config.TILE_SIZE*35
 			&& rPosition.getDistance(myMainBaseLocation) > Config.TILE_SIZE*35){
 			if (scoutUnit.isIdle()) {
-				System.out.println("myCombatUnitType1ScoutList " + myCombatUnitType1ScoutList.size() + " " + (myCombatUnitType1ScoutList.get(0)).getID() + " " + (myCombatUnitType1ScoutList.get(0)).getType() + " " + rPosition);
-				commandUtil.move(scoutUnit, rPosition);
+				//System.out.println("myCombatUnitType1ScoutList " + myCombatUnitType1ScoutList.size() + " " + (myCombatUnitType1ScoutList.get(0)).getID() + " " + (myCombatUnitType1ScoutList.get(0)).getType() + " " + rPosition);
+				commandUtil.attackMove(scoutUnit, rPosition);
 			}
 		}
 	}
@@ -2685,6 +2685,12 @@ public class StrategyManager {
 			        		target = unit;
 			        		break;
 	        			}else if(unit.getType() == UnitType.Zerg_Lurker){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Zerg_Sunken_Colony){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Zerg_Spore_Colony){
 			        		target = unit;
 			        		break;
 	        			}else if(unit.getType() == UnitType.Zerg_Zergling){
