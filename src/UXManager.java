@@ -202,7 +202,7 @@ public class UXManager {
 		
 		Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
 		
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<self Regions>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<my Regions>");
 		y += 10;
 		
 		Iterator<Region> it1 = selfRegions.iterator();
