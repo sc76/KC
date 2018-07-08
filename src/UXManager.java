@@ -80,17 +80,17 @@ public class UXManager {
 		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
-//		int yy = 15;
-//		yy += 12;
-//		yy += 12;
+		// sc76.choi APM
 		drawAPM(5, 5);
-		drawLocalSpeep(5 + 100, 5);
 		
+		// sc76.choi speed
+		drawLocalSpeed(5 + 100, 5);
+		
+		// player, map, A/D
 		drawGameInformationOnScreen(5, 15);
 		
-		// build order array
-		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
-		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		// Resions
+		drawResionStateOnScreen(5, 160);
 		
 		if(!Config.IS_DRAW){
 			return;
@@ -195,12 +195,39 @@ public class UXManager {
 			//distanceFromSelfMainBase = MapTools.Instance().getGroundDistance(selfBaseLocation.getPosition(), MyBotModule.Broodwar.getMousePosition());
 			//MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)distanceFromSelfMainBase + ")");
 		}
-
-
 	}
 
+	public void drawResionStateOnScreen(int x, int y){
+		
+		
+		Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
+		
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<self Regions>");
+		y += 10;
+		
+		Iterator<Region> it1 = selfRegions.iterator();
+		while (it1.hasNext()) {
+			Region selfRegion = it1.next();
+			MyBotModule.Broodwar.drawTextScreen(x, y, white + "" + selfRegion.getCenter().toTilePosition());
+			y += 10;
+		}
+
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<enemy Regions>");
+		y += 10;
+
+		Set<Region> enemyRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer);
+		
+		Iterator<Region> it2 = enemyRegions.iterator();
+		while (it2.hasNext()) {
+			Region enemyRegion = it2.next();
+			MyBotModule.Broodwar.drawTextScreen(x, y, white + "" + enemyRegion.getCenter().toTilePosition());
+			y += 10;
+		}		
+	}
+	
 	// 게임 개요 정보를 Screen 에 표시합니다
 	public void drawGameInformationOnScreen(int x, int y) {
+		
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "Players : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 50, y, MyBotModule.Broodwar.self().getTextColor() + MyBotModule.Broodwar.self().getName() + "(" + InformationManager.Instance().selfRace + ") " + white + " vs.  " + 
 				InformationManager.Instance().enemyPlayer.getTextColor() + InformationManager.Instance().enemyPlayer.getName() + "(" + InformationManager.Instance().enemyRace + ")");
@@ -218,6 +245,12 @@ public class UXManager {
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "A/D : ");
 		MyBotModule.Broodwar.drawTextScreen(x + 50, y, "" + white + StrategyManager.Instance().getCountAttack() + "/" + StrategyManager.Instance().getCountDefence());
 		
+		// build order array
+		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
+		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+
+		
+		
 	}
 
 	// sc76.choi APM (Action Per Minute) 숫자를 Screen 에 표시합니다
@@ -231,7 +264,7 @@ public class UXManager {
 	}
 	
 	// sc76.choi local speed를 표시 한다.
-	public void drawLocalSpeep(int x, int y) {
+	public void drawLocalSpeed(int x, int y) {
 		int localSpeed = Config.getSetLocalSpeed();
 		MyBotModule.Broodwar.drawTextScreen(x, y, "Speed : " + localSpeed);
 	}
