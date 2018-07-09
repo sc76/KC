@@ -17,6 +17,7 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
+import bwapi.WalkPosition;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
@@ -180,13 +181,14 @@ public class UXManager {
 			mouseY+=10;
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "(" + (int)mouseX + ", " +  (int)mouseY + ")");
 			
-			boolean isValid = new Position(mouseX, mouseY).isValid();
+			//boolean isValid = new Position(mouseX, mouseY).isValid();
+			boolean isValid = MyBotModule.Broodwar.isWalkable(new WalkPosition(mouseX, mouseY));
 			mouseY+=10;
 			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "isValid : " + isValid);
 
-			boolean isValidTP = new Position(mouseX, mouseY).toTilePosition().isValid();
-			mouseY+=10;
-			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "isValidTP : " + isValidTP);
+//			boolean isValidTP = new Position(mouseX, mouseY).toTilePosition().isValid();
+//			mouseY+=10;
+//			MyBotModule.Broodwar.drawTextMap(mouseX + 20, mouseY, "isValidTP : " + isValidTP);
 			
 			
 			//mouseY+=10;
