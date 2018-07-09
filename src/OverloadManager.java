@@ -45,6 +45,9 @@ public class OverloadManager {
 	private Unit enemySecondChokeOverload;
 	private Unit enemyBasePatrolOverload;
 	
+    private BaseLocation firstScoutTargetBaseLocation = null;
+    private BaseLocation secondScoutTargetBaseLocation = null;
+	
 	private boolean isFinishedInitialScout = false;
 	
 	public enum ScoutStatus {
@@ -84,6 +87,12 @@ public class OverloadManager {
 		return instance;
 	}
 	
+    public void onStart() {
+        // assign a scout to go scout it
+        firstScoutTargetBaseLocation = getClosestBaseLocation();
+
+    }
+	
 	/// 경기가 시작되면 오버로드를 정찰합니다.
 	public void update() {
 		
@@ -99,12 +108,13 @@ public class OverloadManager {
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
 		assignFirstScoutOverload(); // firstScoutOverload를 지정한다.
-		
 		initialFirstScoutOverload(); // 지정된 오버로드를 정찰 시킨다.
 		
+        // 두번째 scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
+        moveScoutUnit();
 		setMainBasePatrolOverload(); // 본진 patrol
-		
 		setMainExpansionBasePatrolOverload(); // 앞마당 patrol
+        
 	}
 	
 	/// 게임 시작시에 정찰 오버로드을 필요하면 새로 지정합니다
@@ -138,7 +148,7 @@ public class OverloadManager {
 					//	if(Config.DEBUG) System.out.println("- firstOverload ID        : " + firstScoutOverload.getID());
 					//}
 					// set unit as scout unit
-					OverloadManager.Instance().setScoutOverload(firstScoutOverload);
+					setScoutOverload(firstScoutOverload);
 				}
 			}
 		//}
@@ -190,10 +200,11 @@ public class OverloadManager {
 			
 			// 현재 정찰할 가장 가까운 Target base 지정
 			currentScoutTargetBaseLocation = closestBaseLocation;
-
+			
 			if (currentScoutTargetBaseLocation != null && firstScoutOverload != null) {
 				currentOverloadScoutStatus = ScoutStatus.MovingToAnotherBaseLocation.ordinal();
 				//System.out.println("move scout overload : " + currentScoutTargetBaseLocation.getPosition());
+				firstScoutTargetBaseLocation = closestBaseLocation;
 				commandUtil.move(firstScoutOverload, closestBaseLocation.getPosition());
 			}
 		}
@@ -304,7 +315,11 @@ public class OverloadManager {
 		if (unit.getType() == UnitType.Zerg_Overlord 
 			&& commandUtil.IsValidSelfUnit(unit)){
 			overloadData.addOverload(unit);
-			setOverloadsBasicPosition(unit);
+			if(secondScoutOverload == null){
+				assignScoutIfNeeded(unit);
+			}else{
+				setOverloadsBasicPosition(unit);
+			}
 		}
 	}
 	
@@ -339,7 +354,7 @@ public class OverloadManager {
 	
 	// sc76.choi 오버로드가 본진을 patrol 한다.
 	public void setMainBasePatrolOverload(){
-		if(myMainBasePatrolOverload != null){
+		if(secondScoutOverload != null && myMainBasePatrolOverload != null){
 			
 			if(!commandUtil.IsValidUnit(myMainBasePatrolOverload)) return;
 			
@@ -387,7 +402,13 @@ public class OverloadManager {
 		Center,
 		Default 		///< 기본. 미설정 상태.  
 	 */
+	
+    private Unit secondScoutOverload;
+    
+    
 	public void setOverloadsBasicPosition(Unit unit){
+		
+		if(secondScoutOverload == null) return;
 
 		Position selfMainBaseLocationPosition = selfMainBaseLocation.getPosition();
 		Position selfExpansionBaseLocationPosition = selfFirstExpansionLocation.getPosition();
@@ -402,6 +423,9 @@ public class OverloadManager {
 			enemySecondChokePosition = enemySecondChokePoint.getCenter();
 		}
 		
+//		if(secondScoutOverload != null){
+//			//secondScoutOverload = unit;
+//		}
 		// 나의 본진 patrol position
 		if(myMainBasePatrolOverload == null){
 			myMainBasePatrolOverload = unit;
@@ -440,6 +464,117 @@ public class OverloadManager {
 		*/
 	}
 	
+    // [참고] sc76.choi 정찰 유닛을 필요하면 새로 지정합니다
+    // [참고] sc76.choi AD_fastMutalBot의 두번째 정찰 오버로드를 수정하였습니다.	
+    public void assignScoutIfNeeded(Unit unit) {
+        BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.enemy());
+        if (firstScoutOverload != null && enemyBaseLocation == null && secondScoutOverload == null) {
+            secondScoutOverload = unit;
+            overloadData.setOverloadJob(unit, OverloadData.OverloadJob.SecondScout, (Unit)null);
+            // System.out.println("setOverloadsBasicPosition secondScoutUnit : " + secondScoutOverload.getID());
+        }
+    }
+
+    // [참고] sc76.choi 두번째 정찰 유닛을 이동시킵니다
+    // [참고] sc76.choi AD_fastMutalBot의 두번째 정찰 오버로드를 수정하였습니다.
+    private void moveScoutUnit() {
+        BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+        if (enemyBaseLocation == null) {
+            // assign a scout to go scout it
+            if (secondScoutOverload != null) {
+                if (secondScoutTargetBaseLocation == null) {
+                    secondScoutTargetBaseLocation = getClosestBaseLocation();
+                    
+                    
+                } else {
+                    if (MyBotModule.Broodwar.isExplored(secondScoutTargetBaseLocation.getTilePosition())) {
+                        secondScoutTargetBaseLocation = getClosestBaseLocation();
+                        //System.out.println("moveScoutUnit secondScoutTargetBaseLocation : " + secondScoutTargetBaseLocation.getTilePosition());
+                    } else {
+                        commandUtil.move(secondScoutOverload, secondScoutTargetBaseLocation.getPosition());
+                    }
+                }
+            }
+
+//            if (MyBotModule.Broodwar.isExplored(firstScoutTargetBaseLocation.getTilePosition())) {
+//                // assign a scout to go scout it
+//                firstScoutTargetBaseLocation = getClosestBaseLocation();
+//                commandUtil.move(firstScoutOverload, firstScoutTargetBaseLocation.getPosition());
+//            }
+        } else {
+        	
+        	centerChokeOverload = secondScoutOverload;
+			overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
+			commandUtil.move(secondScoutOverload, new Position(2000, 2000));
+			
+//            boolean isHydraliskDen = false;
+//            for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
+//                // morphing hydralisk_den
+//                if (unit.getBuildType().equals(UnitType.Zerg_Hydralisk_Den)) {
+//                    isHydraliskDen = true;
+//                    break;
+//                }
+//
+//                // complete hydralisk_den
+//                if (unit.getType().equals(UnitType.Zerg_Hydralisk_Den)) {
+//                    isHydraliskDen = true;
+//                    break;
+//                }
+//            }
+//
+//            if (MyBotModule.Broodwar.enemy().getRace().equals(Race.Terran) || isHydraliskDen) {
+//                moveScoutUnitToMyBaseLocation();
+//            }
+//
+//            if (firstScoutOverload.isUnderAttack()) {
+//                moveScoutUnitToMyBaseLocation();
+//            }
+//
+//            if (secondScoutOverload != null && secondScoutOverload.isUnderAttack()) {
+//                BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+//                commandUtil.move(secondScoutOverload, myMainBaseLocation.getPosition());
+//            }
+        }
+    }
+    
+    private BaseLocation getClosestBaseLocation() {
+        double closestDistance = 1000000000;
+        double tempDistance;
+        BaseLocation closestBaseLocation = null;
+        // 아군 MainBaseLocation 으로부터 가장 가까운 미정찰 BaseLocation 을 새로운 정찰 대상 currentScoutTargetBaseLocation 으로 잡아서 이동
+        for (BaseLocation startLocation : BWTA.getStartLocations()) {
+            if (MyBotModule.Broodwar.isExplored(startLocation.getTilePosition())) {
+                continue;
+            }
+
+            if (startLocation == firstScoutTargetBaseLocation) {
+                continue;
+            }
+
+            if (startLocation == secondScoutTargetBaseLocation) {
+                continue;
+            }
+
+            tempDistance = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self()).getGroundDistance(startLocation) + 0.5;
+            if (tempDistance > 0 && tempDistance < closestDistance) {
+                closestBaseLocation = startLocation;
+                closestDistance = tempDistance;
+            }
+        }
+
+        return closestBaseLocation;
+    }
+    
+    private void moveScoutUnitToMyBaseLocation() {
+        BaseLocation myFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+        commandUtil.move(firstScoutOverload, myFirstExpansionLocation.getPoint());
+        if (secondScoutOverload != null) {
+            BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+            commandUtil.move(secondScoutOverload, myMainBaseLocation.getPosition());
+        }
+    }
+
+    
 	// sc76.choi 추가하려면 별개로 함수를 둔다.
 	// 메인 patrol을 위한 매소드
 	public Position getScoutFleePositionFromSelfMainBaseRegionVertices(BaseLocation baseLocationParam, Unit overloadParam)

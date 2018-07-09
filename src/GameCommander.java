@@ -22,6 +22,7 @@ public class GameCommander {
 		if (startLocation == TilePosition.None || startLocation == TilePosition.Unknown) {
 			return;
 		}
+		OverloadManager.Instance().onStart();
 		StrategyManager.Instance().onStart();
 	}
 
@@ -47,7 +48,7 @@ public class GameCommander {
 		Config.DrawUnitTargetInfo = false;
 		//Config.DrawUnitHealthBars = false;
 		
-		// sc76.choi 20180609 1. 오버로드 최초 탐색 추가
+		// sc76.choi 20180609 1. 첫번째 오버로드 최초 탐색 추가
 		OverloadManager.Instance().update();
 
 		if ( isToFindError) System.out.print("(a");
