@@ -670,7 +670,7 @@ public class StrategyManager {
 			//Unit enemyUnit = unit;
 			
 			if(!commandUtil.IsValidUnit(enemyUnit)) continue;
-				
+			if(enemyUnit.getType().isFlyer()) continue;	
 			
 			if(type != null && enemyUnit.getType() == type){
 				double dist = enemyUnit.getDistance(target);
@@ -690,6 +690,7 @@ public class StrategyManager {
 				double dist = enemyUnit.getDistance(target);
 				
 				if(dist > closeDistance) continue; // 설정한 거리보다 멀리 있으면 return
+				
 				
 				//System.out.println("checked enemyUnit : " + enemyUnit.getID() + " " + enemyUnit.getType());
 				
@@ -921,8 +922,11 @@ public class StrategyManager {
 		if(rPosition.getDistance(enemyMainBaseLocation) > Config.TILE_SIZE*35
 			&& rPosition.getDistance(myMainBaseLocation) > Config.TILE_SIZE*35){
 			if (scoutUnit.isIdle()) {
-				//System.out.println("myCombatUnitType1ScoutList " + myCombatUnitType1ScoutList.size() + " " + (myCombatUnitType1ScoutList.get(0)).getID() + " " + (myCombatUnitType1ScoutList.get(0)).getType() + " " + rPosition);
-				commandUtil.attackMove(scoutUnit, rPosition);
+				// sc76.choi 중앙이 아니면
+				if(BWTA.getRegion(rPosition) != BWTA.getRegion(new Position(2000, 2000))){
+					//System.out.println("myCombatUnitType1ScoutList " + myCombatUnitType1ScoutList.size() + " " + (myCombatUnitType1ScoutList.get(0)).getID() + " " + (myCombatUnitType1ScoutList.get(0)).getType() + " " + rPosition);
+					commandUtil.attackMove(scoutUnit, rPosition);
+				}
 			}
 		}
 	}
@@ -1623,7 +1627,7 @@ public class StrategyManager {
 					if(worker.getDistance(enemyUnit) < Config.DISTANCE_WORKER_CANATTACK){
 
 						// 공격 투입
-						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
+						//if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
 							if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 							
 							remainHitPoint = (worker.getHitPoints()*1.0)/40.0;
@@ -1636,7 +1640,7 @@ public class StrategyManager {
 									break;
 								}
 							}
-						}
+						//}
 					}
 				}
 			} // while
@@ -1978,8 +1982,28 @@ public class StrategyManager {
 							nearEnemyUnitPosition = enemyUnit.getPosition();
 						}
 					}
+					
+					
 					if (nearEnemyUnitPosition == null) {
-						unit.unburrow();
+						int myUnitCount = 0;
+						for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
+							if(who.getPlayer() == myPlayer){
+								// 
+								// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
+								
+								if(who.getType() == UnitType.Zerg_Lurker) continue; 
+								
+								if(who.getType().canAttack() && !who.getType().isBuilding()){
+									myUnitCount++;
+								}
+							}
+						}
+						
+						if(myUnitCount > 4){
+							unit.burrow();
+						}else{
+							unit.unburrow();
+						}
 					}else{
 						unit.burrow();
 					}
@@ -2014,14 +2038,26 @@ public class StrategyManager {
 			// 버로우 되어 있으면
 			else {
 				if (nearEnemyUnitPosition == null) {
-					// sc76.choi Config.TILE_SIZE*6 거리 만큼 적이 있으면 burrow를 하면 안된다.
-					//for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
-					//	if(who.getPlayer() == enemyPlayer && !who.getType().isFlyer()){
-					//		unit.burrow();
-					//	}else{
-							unit.unburrow();
-					//	}
-					//}
+					
+					// sc76.choi 주변에 우리편이 있으면 버로우 푼다, 아니면 계속 버로우
+					int myUnitCount = 0;
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
+						if(who.getPlayer() == myPlayer){
+							
+							if(who.getType() == UnitType.Zerg_Lurker) continue;
+							
+							// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
+							if(who.getType().canAttack() && !who.getType().isBuilding()){
+								myUnitCount++;
+							}
+						}
+					}
+					
+					if(myUnitCount >= 2){
+						unit.unburrow();
+					}else{
+						unit.burrow();
+					}
 				}
 				hasCommanded = true;
 			}
