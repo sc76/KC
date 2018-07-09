@@ -1992,6 +1992,8 @@ public class StrategyManager {
 								// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
 								
 								if(who.getType() == UnitType.Zerg_Lurker) continue; 
+								if(who.getType().isWorker()) continue;
+								if(who.getType() == UnitType.Zerg_Overlord) continue;
 								
 								if(who.getType().canAttack() && !who.getType().isBuilding()){
 									myUnitCount++;
@@ -2000,7 +2002,15 @@ public class StrategyManager {
 						}
 						
 						if(myUnitCount > 4){
-							unit.burrow();
+							
+							// sc76.choi 적이 가까이에 왔으면 다시 언버로우 한다.
+							if(getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*50) != null){
+								unit.unburrow();
+							}else{
+								unit.burrow();	
+							}
+							
+							
 						}else{
 							unit.unburrow();
 						}
@@ -2041,10 +2051,12 @@ public class StrategyManager {
 					
 					// sc76.choi 주변에 우리편이 있으면 버로우 푼다, 아니면 계속 버로우
 					int myUnitCount = 0;
-					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
+					for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*7)){
 						if(who.getPlayer() == myPlayer){
 							
 							if(who.getType() == UnitType.Zerg_Lurker) continue;
+							if(who.getType().isWorker()) continue;
+							if(who.getType() == UnitType.Zerg_Overlord) continue;
 							
 							// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
 							if(who.getType().canAttack() && !who.getType().isBuilding()){
@@ -2054,7 +2066,13 @@ public class StrategyManager {
 					}
 					
 					if(myUnitCount >= 2){
-						unit.unburrow();
+						// sc76.choi 적이 가까이에 왔으면 다시 언버로우 한다.
+						if(getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*50) != null){
+							unit.unburrow();
+						}else{
+							unit.burrow();	
+						}
+
 					}else{
 						unit.burrow();
 					}

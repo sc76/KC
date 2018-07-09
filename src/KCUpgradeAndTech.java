@@ -736,7 +736,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Carapace 지상 갑피 업그레이드 1 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-			&& (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 2 || myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2)				
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lurker)) >= 2				
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
