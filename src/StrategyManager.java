@@ -1793,7 +1793,8 @@ public class StrategyManager {
 					//System.out.println("Defence Move 3");
 					commandUtil.move(unit, DEFENCE_POSITION);
 				}
-				hasCommanded = true;}else{
+				hasCommanded = true;
+			}else{
 				// 공격할때
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
 				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*6));
