@@ -348,7 +348,11 @@ public class StrategyManager {
 		// 2초에 1번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 24 * 5 != 0) return;
 		
-		if(enemyMainBaseLocation == null) return;
+		// sc76.choi 아직 발견 전이면, 앞마당을 지정
+		if(enemyMainBaseLocation == null){
+			TARGET_POSITION = mySecondChokePoint.getCenter();
+			TARGET_TILEPOSITION = mySecondChokePoint.getCenter().toTilePosition();
+		}
 		
 		// sc76.choi TODO 해당지역에 건물이 없으면 그냥 본진을 타켓을 잡아야 한다. (Basic Bot 버그)
 		// sc76.choi TODO 적 본진이 정확히 보이지 않았다면(오버로드가 정찰을 깊숙히 못했을 경우) 본진으로 타켓이 이동하지 않는다.
