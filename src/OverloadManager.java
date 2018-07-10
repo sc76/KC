@@ -44,6 +44,7 @@ public class OverloadManager {
 	private Unit enemyFirstChokeOverload;
 	private Unit enemySecondChokeOverload;
 	private Unit enemyBasePatrolOverload;
+	private Unit dropOverload;
 	
     private BaseLocation firstScoutTargetBaseLocation = null;
     private BaseLocation secondScoutTargetBaseLocation = null;
@@ -444,6 +445,12 @@ public class OverloadManager {
 			commandUtil.move(centerChokeOverload, centerLocationPosition);
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		} 
+		// KTH. Drop 오버로드 Position
+		else if(dropOverload == null){
+			dropOverload = unit;
+			overloadData.setOverloadJob(dropOverload, OverloadData.OverloadJob.Drop, (Unit)null);
+			commandUtil.move(dropOverload, selfFirstChokePosition);
+		}		
 		// 나의 두번째 choke position
 		/*
 		else if(mySecondChokeOverload == null){
@@ -998,5 +1005,13 @@ public class OverloadManager {
 
 	public void setFirstScoutOverload(Unit firstScoutOverload) {
 		this.firstScoutOverload = firstScoutOverload;
+	}	
+	
+	public void setDropOverload(Unit dropOverload) {
+		this.dropOverload = dropOverload;
+	}	
+
+	public Unit getDropOverload() {
+		return dropOverload;
 	}	
 }
