@@ -7,7 +7,7 @@ import bwapi.UnitType;
 public class Config {
 	
 	/// KC custom start
-	public static boolean DEBUG = false; // debug show 여부를 판단할 boolean
+	public static boolean DEBUG = true; // debug show 여부를 판단할 boolean
 	
 	public static boolean IS_DRAW = false; // draw를 그릴지 말지 여부 
 	
@@ -141,15 +141,11 @@ public class Config {
 	// 방어 건물 종류 및 건설 갯수 설정
 	public static int necessaryNumberOfDefenseBuilding1AgainstProtoss = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 2; 			
-	
 	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 3;
 	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 3;
-	
 	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	
-	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
-		
 
 	public static int numberOfMyCombatUnitTrainingBuilding = 10;
 	
@@ -206,7 +202,7 @@ public class Config {
 	public static int WorkersPerRefinery = 3;
 	
 	/// 건물과 건물간 띄울 최소한의 간격 - 일반적인 건물의 경우
-	public static int BuildingSpacing = 2;
+	public static int BuildingSpacing = 1;
 	
 	/// 건물과 건물간 띄울 최소한의 간격 - ResourceDepot 건물의 경우 (Nexus, Hatchery, Command Center)
 	public static int BuildingResourceDepotSpacing = 0;
