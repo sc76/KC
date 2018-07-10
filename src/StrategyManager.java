@@ -395,8 +395,8 @@ public class StrategyManager {
 				TARGET_POSITION = targetBaseLocation.getPosition();
 				TARGET_TILEPOSITION = targetBaseLocation.getTilePosition();
 			}else{
-				TARGET_POSITION = enemyMainBaseLocation.getPosition();
-				TARGET_TILEPOSITION = enemyMainBaseLocation.getTilePosition();
+				TARGET_POSITION = mySecondChokePoint.getCenter();
+				TARGET_TILEPOSITION = mySecondChokePoint.getCenter().toTilePosition();
 			}
 		}
 		
