@@ -277,7 +277,7 @@ public class StrategyManager {
 		mySpecialUnitType4 = UnitType.Zerg_Queen;
 
 		// 공격 유닛 생산 순서 설정
-		buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커 ...
+		buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커 ...
 		nextTargetIndexOfBuildOrderArray = 0; 			    	// 다음 생산 순서 index
 
 //		// 일반 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
@@ -344,53 +344,58 @@ public class StrategyManager {
 	private boolean isPassOKSecondChokePoint = false;
 	
 	public void getTargetPositionForAttack(){
-		
+		  
 		// 2초에 1번만 실행합니다
-		if (MyBotModule.Broodwar.getFrameCount() % 24 * 5 != 0) return;
-		
+		if (MyBotModule.Broodwar.getFrameCount() % 24 * 2 != 0) return;
+
 		// sc76.choi 아직 발견 전이면, 앞마당을 지정
 		if(enemyMainBaseLocation == null){
 			TARGET_POSITION = mySecondChokePoint.getCenter();
 			TARGET_TILEPOSITION = mySecondChokePoint.getCenter().toTilePosition();
 		}
-		
+		  
 		// sc76.choi TODO 해당지역에 건물이 없으면 그냥 본진을 타켓을 잡아야 한다. (Basic Bot 버그)
 		// sc76.choi TODO 적 본진이 정확히 보이지 않았다면(오버로드가 정찰을 깊숙히 못했을 경우) 본진으로 타켓이 이동하지 않는다.
 		// sc76.choi 본진 근처에 적이 있으면 그 pos로 타겟을 잡는다.
-		
-		// sc76.choi 적진에 가까운 적 유닛이 있는지
 		Unit urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*50);
-		
-//		if(commandUtil.IsValidUnit(urgentUnit)){
-//			System.out.println("urgentUnit : " + urgentUnit.getID() + " " + urgentUnit.getType() + urgentUnit.getTilePosition());
-//			System.out.println("urgentUnit : " + urgentUnit.getID() + " " + urgentUnit.getType() + urgentUnit.getTilePosition());
-//			System.out.println();
-//		}
-		
+
+		// sc76.choi 본진에 없으면 멀티를 확인 가까운 적 유닛이 있는지
+		if(urgentUnit == null){
+			Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
+			Iterator<Region> it1 = selfRegions.iterator();
+			while (it1.hasNext()) {
+				Region selfRegion = it1.next();
+
+				urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, selfRegion.getCenter(), Config.TILE_SIZE*50);
+		    
+				// sc76.choi 발견되면 바로 그 지역을 타켓을 잡는다, 찾으면 리턴하는 로직
+				if(commandUtil.IsValidUnit(urgentUnit)){
+					TARGET_POSITION = urgentUnit.getPosition();
+					TARGET_TILEPOSITION = urgentUnit.getTilePosition();
+					return;
+				}
+			}
+		}
+		  
 		// sc76.choi 공격모드라도, 본진 가까이에 적이 있으면 그 곳으로 타겟을 잡는다.
 		if(commandUtil.IsValidUnit(urgentUnit)){
 			TARGET_POSITION = urgentUnit.getPosition();
 			TARGET_TILEPOSITION = urgentUnit.getTilePosition();
-		}else{
+		}
+		else{
 			BaseLocation targetBaseLocation = enemyMainBaseLocation;
 			double closestDistance = 100000000;
-			
-			closestDistance = 100000000;
-			
+
 			// 나의 MainBaseLocation 와 적진의 BaseLocation중, 가장 가까운 곳을 선정한다.
 			for (BaseLocation baseLocation : InformationManager.Instance().getOccupiedBaseLocations(enemyPlayer)) {
-				
-				//System.out.println("enemy baseLocation : " + baseLocation.getTilePosition());
-				// start와 end의 거리
-				//double distance = BWTA.getGroundDistance(myMainBaseLocation.getTilePosition(), baseLocation.getTilePosition());
 				double distance = (myMainBaseLocation.getPosition()).getDistance(baseLocation.getPosition());
-				
+		    
 				if (distance < closestDistance) {
 					closestDistance = distance;
 					targetBaseLocation = baseLocation;
 				}
 			}
-			
+
 			if(targetBaseLocation != null){
 				TARGET_POSITION = targetBaseLocation.getPosition();
 				TARGET_TILEPOSITION = targetBaseLocation.getTilePosition();
@@ -399,82 +404,63 @@ public class StrategyManager {
 				TARGET_TILEPOSITION = mySecondChokePoint.getCenter().toTilePosition();
 			}
 		}
-		
-		//System.out.println("TARGET_POSITION : " + TARGET_POSITION);
-		//System.out.println();
-		//System.out.println();
 	}
-	
+
 	// 현재 나의 거주 지역 중 가장 방어해야할 곳을 찾아 DEFENCE_POSITION으로 지정한다.
 	public void getTargetPositionForDefence(){
-		
-			// 1초에 4번만 실행합니다
-			if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
-		
-			Position myDefenseBuildingPosition = myMainBaseLocation.getPosition();
-			TilePosition myDefenseBuildingTilePosition = myMainBaseLocation.getTilePosition();
-			
-			// sc76.choi 앞마당에 해처리가 있는지 확인 한다.
-			boolean existHatcheryInFirstExpansionRegion = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(myFirstExpansionLocation.getTilePosition()), myPlayer, UnitType.Zerg_Hatchery);
-			boolean existLairInFirstExpansionRegion = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(myFirstExpansionLocation.getTilePosition()), myPlayer, UnitType.Zerg_Lair);
-			boolean existHiveInFirstExpansionRegion = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(myFirstExpansionLocation.getTilePosition()), myPlayer, UnitType.Zerg_Hive);
-						
-			if (existHatcheryInFirstExpansionRegion || existLairInFirstExpansionRegion || existHiveInFirstExpansionRegion) {
-			
-//				System.out.println("existHatcheryInFirstExpansionRegion : " + existHatcheryInFirstExpansionRegion);
-//				System.out.println("existLairInFirstExpansionRegion     : " + existLairInFirstExpansionRegion);
-//				System.out.println("existHiveInFirstExpansionRegion     : " + existHiveInFirstExpansionRegion);
-//				System.out.println();
-//				System.out.println();
-				
-				// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
-				// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
-				Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
-				if(myDefenseBuildingUnit != null){
-					
-//					System.out.println("myDefenseBuildingUnit                                      : " + myDefenseBuildingUnit.getPosition());
-//					System.out.println("BWTA.getRegion(myDefenseBuildingUnit.getPosition()         : " + BWTA.getRegion(myDefenseBuildingUnit.getPosition().getPoint().toTilePosition()).toString());
-//					System.out.println("BWTA.getRegion(myMainBaseLocation.getTilePosition())       : " + BWTA.getRegion(myMainBaseLocation.getTilePosition()).toString());
-//					System.out.println("BWTA.getRegion(myFirstExpansionLocation.getTilePosition()) : " + BWTA.getRegion(myFirstExpansionLocation.getTilePosition()).toString());
-//					System.out.println();
-					
-					// sc76.choi second choke에서 가장 가까운 성큰이 앞마당이면
-					if(BWTA.getRegion(myDefenseBuildingUnit.getPosition()) == BWTA.getRegion(myFirstExpansionLocation.getTilePosition())){
-						
-						double d1 = myFirstExpansionLocation.getDistance(mySecondChokePoint); // 확장포인트와 center와의 거리
-						double d2 = myDefenseBuildingUnit.getDistance(mySecondChokePoint); // 방어 타워와 center화의 거리
-						// sc76.choi 방어 타워가 앞마당 헤처리보다 센터로 부터 더 멀리 있으면, 그냥 앞마당으로 모인다. 
-						if(d1 > d2){
-							myDefenseBuildingPosition = myDefenseBuildingUnit.getPosition();
-							myDefenseBuildingTilePosition = myDefenseBuildingUnit.getTilePosition();
-						}else{
-							myDefenseBuildingPosition = myFirstExpansionLocation.getPosition();
-							myDefenseBuildingTilePosition = myFirstExpansionLocation.getTilePosition();
-						}
+
+		// 1초에 4번만 실행합니다
+		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
+
+		// sc76.choi 최초 본진이 디펜스 위치
+		DEFENCE_POSITION = myMainBaseLocation.getPosition();
+		DEFENCE_TILEPOSITION = myMainBaseLocation.getTilePosition();
+	  
+		// sc76.choi 앞마당에 해처리가 있는지 확인 한다.
+		boolean existHatcheryInFirstExpansionRegion = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(myFirstExpansionLocation.getTilePosition()), myPlayer, UnitType.Zerg_Hatchery);
+		boolean existLairInFirstExpansionRegion = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(myFirstExpansionLocation.getTilePosition()), myPlayer, UnitType.Zerg_Lair);
+		boolean existHiveInFirstExpansionRegion = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(myFirstExpansionLocation.getTilePosition()), myPlayer, UnitType.Zerg_Hive);
+ 
+		if (existHatcheryInFirstExpansionRegion || existLairInFirstExpansionRegion || existHiveInFirstExpansionRegion) {
+	  
+			// sc76.choi 방어 모드시에 만약 성큰이 지어졌다면 그쪽으로 이동한다. 방어에 약간의 우세한 전략 
+			// sc76.choi 앞마당으로 부터 가장 가까운 성큰이기 때문에 좀더 미세한 판단이 필요하다.
+			Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
+			if(myDefenseBuildingUnit != null){
+	    
+				// sc76.choi second choke에서 가장 가까운 성큰이 앞마당이면
+				if(BWTA.getRegion(myDefenseBuildingUnit.getPosition()) == BWTA.getRegion(myFirstExpansionLocation.getTilePosition())){
+	     
+					double d1 = myFirstExpansionLocation.getDistance(mySecondChokePoint); // 확장포인트와 center와의 거리
+					double d2 = myDefenseBuildingUnit.getDistance(mySecondChokePoint); // 방어 타워와 center화의 거리
+	     
+					// sc76.choi 방어 타워가 앞마당 헤처리보다 센터로 부터 더 멀리 있으면, 그냥 앞마당으로 모인다. 
+					if(d1 > d2){
+						DEFENCE_POSITION = myDefenseBuildingUnit.getPosition();
+						DEFENCE_TILEPOSITION = myDefenseBuildingUnit.getTilePosition();
 					}else{
-						myDefenseBuildingPosition = myFirstExpansionLocation.getPosition();
-						myDefenseBuildingTilePosition = myFirstExpansionLocation.getTilePosition();
+						DEFENCE_POSITION = myFirstExpansionLocation.getPosition();
+						DEFENCE_TILEPOSITION = myFirstExpansionLocation.getTilePosition();
 					}
-				}
-				// sc76.choi 앞마당에 헤처리는 있으나, 성큰이 없으면
-				else{
-					myDefenseBuildingPosition = myFirstExpansionLocation.getPosition();
-					myDefenseBuildingTilePosition = myFirstExpansionLocation.getTilePosition();
+				}else{
+					DEFENCE_POSITION = myFirstExpansionLocation.getPosition();
+					DEFENCE_TILEPOSITION = myFirstExpansionLocation.getTilePosition();
 				}
 			}
-			// sc76.choi TODO 앞마당에 없으면, 다시 성큰 위치를 찾는다 , 성큰이 있어야 한다.
+			// sc76.choi 앞마당에 헤처리는 있으나, 성큰이 없으면
 			else{
-				Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
-				if(myDefenseBuildingUnit != null){
-					myDefenseBuildingPosition = myDefenseBuildingUnit.getPosition();
-					myDefenseBuildingTilePosition = myDefenseBuildingUnit.getTilePosition();
-				}
+				DEFENCE_POSITION = myFirstExpansionLocation.getPosition();
+				DEFENCE_TILEPOSITION = myFirstExpansionLocation.getTilePosition();
 			}
-			
-			
-			DEFENCE_POSITION = myDefenseBuildingPosition;
-			DEFENCE_TILEPOSITION = myDefenseBuildingTilePosition;
-			
+		}
+		// sc76.choi TODO 앞마당에 없으면, 다시 성큰 위치를 찾는다 , 성큰이 있어야 한다.
+		else{
+			Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
+			if(myDefenseBuildingUnit != null){
+				DEFENCE_POSITION = myDefenseBuildingUnit.getPosition();
+				DEFENCE_TILEPOSITION = myDefenseBuildingUnit.getTilePosition();
+			}
+		}
 	}
 	
 	public Position getRandomPosition(){
@@ -3233,7 +3219,7 @@ public class StrategyManager {
 	/**
 	 * 전투 상황에 맞게 뽑을 유닛을 컨트롤 한다.(CombatNeedUnitState)
 	 * buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 3};
-	 * buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2};
+	 * buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3};
 	 * @ sc76.choi
 	 */
 	void updatebuildOrderArray(){
@@ -3251,11 +3237,13 @@ public class StrategyManager {
 			&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true
 			&& myCombatUnitType2List.size() >= 2
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) <= 0){
+			
 			if(selfGas < 200){
-				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
-			}else{
 				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}
+			
 		}
 		// sc76.choi 스파이어만 올라가 있을 때,
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
@@ -3268,12 +3256,12 @@ public class StrategyManager {
 				// 테란일때, 럴커를 위주로
 				if(enemyRace == Race.Terran){
 					if(selfGas < 200){
-						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 1, 1, 1, 2, 3, 1, 1}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					}else{
 						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					}
 				}else{
-					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 2, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
 			}
 			
