@@ -141,10 +141,10 @@ public class Config {
 	// 방어 건물 종류 및 건설 갯수 설정
 	public static int necessaryNumberOfDefenseBuilding1AgainstProtoss = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 2; 			
-	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 3;
-	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 3;
-	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
-	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	
+	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
+	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
+	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 3;
+	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 3;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
 	public static int numberOfMyCombatUnitTrainingBuilding = 10;

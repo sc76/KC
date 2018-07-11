@@ -61,7 +61,8 @@ public class KCUpgradeAndTech {
 			isTimeToStartUpgradeType5 = true;
 		}			
 		
-		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+		if (isTimeToStartUpgradeType5 &&
+				(myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 //				&& myPlayer.isResearching(necessaryTechType1) == true
@@ -608,7 +609,8 @@ public class KCUpgradeAndTech {
 		// sc76.choi 히드라 사정 업그레이드, 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1) {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
@@ -690,7 +692,7 @@ public class KCUpgradeAndTech {
 		}
 
 		// KTH 오버로드 수송업
-		System.out.println("isTimeToStartUpgradeType5 = " + isTimeToStartUpgradeType5 + " " + necessaryUpgradeType5);
+		// System.out.println("isTimeToStartUpgradeType5 = " + isTimeToStartUpgradeType5 + " " + necessaryUpgradeType5);
 		if (isTimeToStartUpgradeType5) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType5) == 0 

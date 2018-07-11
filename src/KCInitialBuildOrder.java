@@ -108,7 +108,7 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber, 
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //26
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation); //26
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
@@ -155,6 +155,9 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//12
 
 
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
+				BuildOrderItem.SeedPositionStrategy.MainBaseLocation); //31
+
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation); //14 해처리
 
@@ -199,8 +202,6 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27			
 
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
-				BuildOrderItem.SeedPositionStrategy.MainBaseLocation); //31
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 다섯번째 오버로드
 		
@@ -256,71 +257,32 @@ public class KCInitialBuildOrder {
 					
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//17
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//21
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Lair);
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//21
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
 		
 		// sc76.choi 확장 가스
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);	//20
-//		StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//22
-
-//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-//				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);	//20
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//22
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//23
-			
-//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//25
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27			
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 다섯번째 오버로드
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//28
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//29
-
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber,
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation); //31
-		
-//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-//				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);	//20
-//		StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
-		
-//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-//		
-//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-//				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);	//20
-//		StrategyManager.Instance().getSeedPositionStrategyOfMyDefenseBuildingType());	//20
-		
-//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//27
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//27	
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27	
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//34
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//35
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//36
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//37
 	}
 	
 	public void setInitialBuildOrderAgainstRandom(){
