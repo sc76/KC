@@ -672,7 +672,9 @@ public class StrategyManager {
 			//Unit enemyUnit = unit;
 			
 			if(!commandUtil.IsValidUnit(enemyUnit)) continue;
-			if(enemyUnit.getType().isFlyer()) continue;	
+			if(enemyUnit.getType() == UnitType.Zerg_Overlord) continue;	
+			if(enemyUnit.getType() == UnitType.Protoss_Observer) continue;
+			if(enemyUnit.getType() == UnitType.Terran_Science_Vessel) continue;
 			
 			if(type != null && enemyUnit.getType() == type){
 				double dist = enemyUnit.getDistance(target);
@@ -2380,18 +2382,12 @@ public class StrategyManager {
 		boolean hasCommanded = false;
 		
 		if (unit.getType() == UnitType.Zerg_Scourge) {
-			Random random = new Random();
 			
-			int mapHeight = Config.TILE_SIZE * 128;	// sc76.choi 좌표이기 때문에 전체 맵에서 추출되어야 한다.
-			int mapWidth = Config.TILE_SIZE * 128;	// sc76.choi 좌표이기 때문에 전체 맵에서 추출되어야 한다.
+			Position rPosition = getRandomPosition();
 			
-			int rMapWidth = random.nextInt(mapWidth);
-			int rMapHeight = random.nextInt(mapHeight);
-			
-			Position rPosition = new Position(rMapWidth, rMapHeight);
-			//System.out.println();
 			int maxDistForScourgePatrol = 35;
 			int minDistForScourgePatrol = 20;
+
 			// defenseMode 일 경우
 			if (combatState == CombatState.defenseMode) {
 				
@@ -2410,18 +2406,17 @@ public class StrategyManager {
 					enemyUnitForScourge = findAttackTargetForScourge();
 				}
 				
-				if(unit.isIdle()){
-					if(enemyUnitForScourge == null){
+				if(enemyUnitForScourge == null){
+					if(unit.isIdle()){
 						commandUtil.attackMove(unit, rPosition);
-					}else{
-						// sc76.choi 가까이 있으면 
-						if(myMainBaseLocation.getDistance(enemyUnitForScourge) < Config.TILE_SIZE * maxDistForScourgePatrol){
-//							System.out.println("findAttackTargetForScourge : " + enemyFlyerUnit);
-							commandUtil.attackUnit(unit, enemyUnitForScourge);
-							if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForScourge.getTargetPosition(), Color.Red);
-						}
 					}
-				}	
+				}else{
+					// sc76.choi 가까이 있으면 
+					if(myMainBaseLocation.getDistance(enemyUnitForScourge) < Config.TILE_SIZE * maxDistForScourgePatrol){
+						commandUtil.attackUnit(unit, enemyUnitForScourge);
+						if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForScourge.getTargetPosition(), Color.Red);
+					}
+				}
 			}
 			// 공격 모드 일때
 			else{
