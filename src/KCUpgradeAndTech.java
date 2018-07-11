@@ -15,6 +15,7 @@ public class KCUpgradeAndTech {
 	UpgradeType necessaryUpgradeType2 = UpgradeType.Muscular_Augments; // 히드라 발업
 	UpgradeType necessaryUpgradeType3 = UpgradeType.Pneumatized_Carapace; // 오버로드 속도업
 	UpgradeType necessaryUpgradeType4 = UpgradeType.Adrenal_Glands; // 저글링 아드레날린
+	UpgradeType necessaryUpgradeType5 = UpgradeType.Ventral_Sacs; // 오버로드 수송업
 	
 	TechType necessaryTechType1 = TechType.Lurker_Aspect; // 럴커
 	TechType necessaryTechType2 = TechType.Consume; // 컨슘
@@ -26,6 +27,7 @@ public class KCUpgradeAndTech {
 	boolean			isTimeToStartUpgradeType2 = false;	/// 업그레이드할 타이밍인가, 히드라 발업
 	boolean			isTimeToStartUpgradeType3 = false;	/// 업그레이드할 타이밍인가, 오버로드 속도업
 	boolean			isTimeToStartUpgradeType4 = false;	/// 업그레이드할 타이밍인가, 저글링 아드레날린
+	boolean			isTimeToStartUpgradeType5 = false;	/// 업그레이드할 타이밍인가, 오버로드 수송업
 	
 	boolean			isTimeToStartResearchTech1 = false;	/// 리서치할 타이밍인가, 럴커
 	boolean			isTimeToStartResearchTech2 = false;	/// 리서치할 타이밍인가, 디파일러 컴슘
@@ -49,9 +51,16 @@ public class KCUpgradeAndTech {
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
 		// sc76.choi 오버로드 속도업
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
-		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
+		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.(KTH 수송업 업그레이드 먼저 하도록 추가)
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
 		// sc76.choi Lair 갯수를 체크 할때는 Hive(completedUnitCount, incompleteUnitCount)도 같이 체크를 해야 한다.
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+		) {
+			isTimeToStartUpgradeType5 = true;
+		}			
+		
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
@@ -145,6 +154,18 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+			}
+		}
+
+		// 오버로드 수송업 
+		// KTH necessaryUpgradeType5 : Ventral_Sacs
+		if (isTimeToStartUpgradeType5) 
+		{
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType5) == 0 
+				&& myPlayer.isUpgrading(necessaryUpgradeType5) == false
+				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType5) == 0)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType5, true);
 			}
 		}
 
@@ -326,8 +347,15 @@ public class KCUpgradeAndTech {
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
 		// sc76.choi 오버로드 속도업
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
-		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
+		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.(KTH 수송업 업그레이드 먼저 하도록 추가)
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				&& myPlayer.isResearching(necessaryTechType1) == true) {
+			isTimeToStartUpgradeType5 = true;
+		}		
+
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
@@ -594,8 +622,13 @@ public class KCUpgradeAndTech {
 		// 업그레이드 / 리서치를 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 러커 리서치 후 업그레이드한다
 		// sc76.choi 오버로드 속도업
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
-		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.
+		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.(KTH 수송업 업그레이드 먼저 하도록 추가)
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+			   && myPlayer.isResearching(necessaryTechType1) == true) {
+			isTimeToStartUpgradeType5 = true;
+		}		
+
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 			   && myPlayer.isResearching(necessaryTechType1) == true) {
 			isTimeToStartUpgradeType3 = true;
@@ -653,6 +686,20 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+			}
+		}
+
+		// KTH 오버로드 수송업
+		System.out.println("isTimeToStartUpgradeType5 = " + isTimeToStartUpgradeType5 + " " + necessaryUpgradeType5);
+		if (isTimeToStartUpgradeType5) 
+		{
+			if (myPlayer.getUpgradeLevel(necessaryUpgradeType5) == 0 
+				&& myPlayer.isUpgrading(necessaryUpgradeType5) == false
+				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType5) == 0)
+			{
+				if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType5, true);
+				}
 			}
 		}
 

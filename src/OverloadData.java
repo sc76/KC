@@ -32,7 +32,8 @@ public class OverloadData {
 		EnemySecondChoke,
 		EnemyBasePatrol,
 		Center,
-		Default 		///< 기본. 미설정 상태. 
+		Default, 		///< 기본. 미설정 상태. 
+		Drop
 	};
 	
 	/// overload 목록
@@ -216,6 +217,8 @@ public class OverloadData {
 		if (ol == OverloadData.OverloadJob.Center) return 'S';
 		if (ol == OverloadData.OverloadJob.EnemySecondChoke) return 'S';
 		if (ol == OverloadData.OverloadJob.EnemyBase) return 'E';
+		if (ol == OverloadData.OverloadJob.Drop) return 'R';   // KTH. Drop 오버로드 지정 
+		
 		return 'X';
 	}
 	
