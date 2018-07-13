@@ -551,7 +551,7 @@ public class InformationManager {
 		// for (const auto & kv : unitData.get(self).getUnits())
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
-			if (ui.getType().isBuilding() && ui.getType() == type) {
+			if (ui.getType().isBuilding() && ui.getUnit().isCompleted() && ui.getType() == type) {
 				
 				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
 				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
