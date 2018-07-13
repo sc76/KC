@@ -113,7 +113,8 @@ public class WorkerManager {
 			if (unit.getType().isRefinery() && unit.isCompleted() )	{
 				
 				// 미네랄3이 가스보다 많고 현재 미네랄이 200 이상이 있으면 가스를 계속 캔다. 
-				if(selfMinerals*3 >= selfGas || selfMinerals > 200){
+				if(workerData.getNumWorkers() > 7
+					&& (selfMinerals*3 >= selfGas || selfMinerals > 200)){
 					Config.WorkersPerRefinery = 3; // sc76.choi 필요가스 일꾼 조정 3
 					// get the number of workers currently assigned to it 
 					int numAssigned = workerData.getNumAssignedWorkers(unit);

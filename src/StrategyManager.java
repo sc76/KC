@@ -572,7 +572,7 @@ public class StrategyManager {
 	}
 
 	/**
-	 * 해당 지역에 type이 있는지 검사
+	 * 해당 지역에 type이 있는지 검사, type이 null 이면 전체 type 대상
 	 * 
 	 * @author sc76.choi
 	 * @param player
@@ -603,6 +603,14 @@ public class StrategyManager {
 				if (BWTA.getRegion(ui.getLastPosition()) == region) {
 					return true;
 				}
+			}else if (type == null){
+				
+				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
+
+				if (BWTA.getRegion(ui.getLastPosition()) == region) {
+					return true;
+				}
+				
 			}
 		}
 		return false;
@@ -930,7 +938,21 @@ public class StrategyManager {
 				// sc76.choi 중앙이 아니면
 				if(BWTA.getRegion(rPosition) != BWTA.getRegion(new Position(2000, 2000))){
 					//System.out.println("myCombatUnitType1ScoutList " + myCombatUnitType1ScoutList.size() + " " + (myCombatUnitType1ScoutList.get(0)).getID() + " " + (myCombatUnitType1ScoutList.get(0)).getType() + " " + rPosition);
-					commandUtil.attackMove(scoutUnit, rPosition);
+					
+					// sc76.choi 정찰 저글링이 moving으로 이동할지, 어택으로 이동할지 결정
+					boolean isOnlyMoving = false;
+					for(Unit enemyUnit : scoutUnit.getUnitsInRadius(Config.TILE_SIZE*5)){
+						if(enemyUnit.getType().canAttack()){
+							isOnlyMoving = true;
+						}
+					}
+					
+					// sc76.choi 적이 있으면 그냥 miving으로 이동
+					if(isOnlyMoving){
+						commandUtil.move(scoutUnit, rPosition);
+					}else{
+						commandUtil.attackMove(scoutUnit, rPosition);
+					}
 				}
 			}
 		}
@@ -1503,7 +1525,6 @@ public class StrategyManager {
 						targetPosition = targetEnemyBuilding.getPosition();
 					}
 					else {
-						//targetPosition = new Position(random.nextInt(mapWidth * Config.TILE_SIZE), random.nextInt(mapHeight * Config.TILE_SIZE));
 						targetPosition = getRandomPosition();
 					}
 
@@ -1677,7 +1698,7 @@ public class StrategyManager {
 						
 						//  sc76.choi TODO Config.TILE_SIZE*35가 적당한가?
 						if(DEFENCE_POSITION != null && unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*35){
-							commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
+							commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
 						}else{
 							// sc76.choi 나의 유닛의 주변, 적군의 공격 포인트 판단.
 							List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*4);
@@ -1709,7 +1730,7 @@ public class StrategyManager {
 					// sc76.choi 본진에 적이 있으면, DEFENCE_POSITION 까지 후퇴한다.				
 					else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence)){
 						//System.out.println("Defence Move 2");
-							commandUtil.attackUnit(unit, enemyUnitForMainDefence);
+							commandUtil.attackMove(unit, enemyUnitForMainDefence.getPosition());
 					}
 					// sc76.choi 적이 없으면 모이는데, 확장이 시작되었으면 태어난 자리에 있게 한다.
 					else{
@@ -1734,34 +1755,22 @@ public class StrategyManager {
 			
 			if (combatState == CombatState.defenseMode) {
 				
-//				if(unit.isUnderAttack()){
-//					System.out.println("isUnderAttacking : " + unit.getID());
-//				}
-				
 				Unit enemyUnitForMainDefence = findAttackTargetForMainDefence();
 				Unit enemyUnitForExpansionDefence = findAttackTargetForExpansionDefence();
 				
 				// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.				
 				if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
-					//System.out.println("Defence Move 1");
+
 					// sc76.choi 유닛이 디펜스 지점보다 멀리 있으면, 와리가리 아니면 그냥 싸운다.
-//					System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
-//					System.out.println();
-					
-					//  sc76.choi TODO Config.TILE_SIZE*35가 적당한가?
+					// sc76.choi TODO Config.TILE_SIZE*35가 적당한가?
 					if(DEFENCE_POSITION != null && unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*35){
-						commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
+						commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
 					}else{
 						// sc76.choi 나의 유닛의 주변, 적군의 공격 포인트 판단.
-						List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*4);
-						boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
-						
-						//System.out.println("canAttackNow : " + canAttackNow);
-						//System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
-						//System.out.println("my Unit                      : " + unit.getID());
-						
-						if(canAttackNow){
-							commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
+						boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*5));
+
+						if(canAttackNow && unit.isUnderAttack() == false){
+							commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
 						}else{
 							// sc76.choi 본진 가까이 있으면 그냥 싸운다.
 							if(unit.getDistance(myMainBaseLocation.getPoint()) < Config.TILE_SIZE*5){
@@ -1773,7 +1782,7 @@ public class StrategyManager {
 							}
 							// sc76.choi 본진 좀 거리가 있으면 move로 움직인다.
 							else{
-								commandUtil.move(unit, DEFENCE_POSITION);
+								commandUtil.attackMove(unit, DEFENCE_POSITION);
 							}
 						}
 					}
@@ -1781,22 +1790,21 @@ public class StrategyManager {
 				}
 				// sc76.choi 본진에 적이 있으면, DEFENCE_POSITION 까지 후퇴한다.				
 				else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence)){
-					//System.out.println("Defence Move 2");
-					commandUtil.attackUnit(unit, enemyUnitForMainDefence);
+					commandUtil.attackMove(unit, enemyUnitForMainDefence.getPosition());
 				}
 				// sc76.choi 적이 없으면,
 				else{
 					//System.out.println("Defence Move 3");
-					commandUtil.move(unit, DEFENCE_POSITION);
+					commandUtil.attackMove(unit, DEFENCE_POSITION);
 				}
 				hasCommanded = true;
 			}else{
 				// 공격할때
 				// sc76.choi cooldown 시간을 이용한 침 뿌리고, 도망가기
 				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*6));
-				//System.out.println("hydra canAttackNow ["+unit.getID()+"] : " + canAttackNow);
-				//System.out.println("-------------------------------------------------------------");
+
 				if(canAttackNow 
+					&& unit.isUnderAttack() == false 
 					&& unit.getGroundWeaponCooldown() == 0 
 					&& unit.getHitPoints() > 10
 				){
@@ -1853,41 +1861,20 @@ public class StrategyManager {
 						
 							// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
 							// 12시
-							Position calPosition = myFirstExpansionLocation.getPosition();
+							Position calPosition = calcuatePosition(unit);
 							
-							if(unit.getID() % 4 == 0){
-								calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
-								//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 12");
-							}
-							// 3시
-							else if(unit.getID() % 4 == 1){
-								calPosition = new Position(unit.getPosition().getX() + Config.TILE_SIZE*4, unit.getPosition().getY());
-								//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 3");
-							}
-							// 6시ㅣ
-							else if(unit.getID() % 4 == 2){
-								calPosition = new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*4);
-								//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 6");
-							}
-							// 9시
-							else{
-								calPosition = new Position(unit.getPosition().getX()  - Config.TILE_SIZE*4, unit.getPosition().getY());
-								//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 9");
-							}
+//							double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
+//							double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
+//							
+//							// 가야할 곳이 전진과 더 가깝다면, 그냥 본진 방향
+//							if(d1 > d2){
+//								targetPosition = calPosition;;
+//							}else{
+//								targetPosition = TARGET_POSITION;
+//							}
 							
-							double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
-							double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
-							
-							// 가야할 곳이 전진과 더 가깝다면, 그냥 본진 방향
-							if(d1 > d2){
-								//targetPosition = myFirstExpansionLocation.getPosition();
-								targetPosition = TARGET_POSITION;
-							}else{
-								targetPosition = calPosition;;
-							}
-							
-							// sc76.choi TODO 계속 무브를 하면 벽에서 멍청하게 서 있는다, 이 때는 공격을 할 수 있게 해야 한다.
-							commandUtil.move(unit, targetPosition);
+							// sc76.choi TODO 계속 무브를 하면 벽에서 멍청하게 서 있는다.
+							commandUtil.move(unit, calPosition);
 						}
 					}
 				}
@@ -1897,6 +1884,28 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
+	Position calcuatePosition(Unit unit){
+		
+		if(unit.getID() % 4 == 0){
+			return new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
+			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 12");
+		}
+		// 3시
+		else if(unit.getID() % 4 == 1){
+			return  new Position(unit.getPosition().getX() + Config.TILE_SIZE*4, unit.getPosition().getY());
+			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 3");
+		}
+		// 6시ㅣ
+		else if(unit.getID() % 4 == 2){
+			return  new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*4);
+			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 6");
+		}
+		// 9시
+		else{
+			return  new Position(unit.getPosition().getX()  - Config.TILE_SIZE*4, unit.getPosition().getY());
+			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 9");
+		}
+	}
 	/// 러커 유닛에 대해 컨트롤 명령을 내립니다
 	boolean controlCombatUnitType3(Unit unit){
 		
@@ -2040,7 +2049,7 @@ public class StrategyManager {
 						if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForMutalisk.getTargetPosition(), Color.Yellow);
 						
 					}else{
-						commandUtil.attackMove(unit, DEFENCE_POSITION);
+						commandUtil.move(unit, DEFENCE_POSITION);
 					}
 				}
 				hasCommanded = true;

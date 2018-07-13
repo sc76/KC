@@ -166,7 +166,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType5) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType5) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType5, true);
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType5, false);
 			}
 		}
 
@@ -178,7 +178,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
 			}
 		}
 		
@@ -469,7 +469,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
 			}
 		}
 
@@ -715,7 +715,9 @@ public class KCUpgradeAndTech {
 				// sc76.choi 테란일 경우 럴커 테크 연구를 먼저 진행한다.
 //				System.out.println("myPlayer.hasResearched(TechType.Lurker_Aspect) : " + myPlayer.hasResearched(TechType.Lurker_Aspect));
 				if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType3, true);
+					
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
+					
 				}
 			}
 		}
