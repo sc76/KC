@@ -553,13 +553,11 @@ public class InformationManager {
 			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
 			if (ui.getType().isBuilding() && ui.getType() == type) {
 				
-//				if(player == enemyPlayer){
-//					System.out.println("enemyPlayer existsPlayerBuildingInRegion : " + ui.getUnitID() + " " + ui.getType());
-//				}
 				// Terran 종족의 Lifted 건물의 경우, BWTA.getRegion 결과가 null 이다
 				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
 
-				if (BWTA.getRegion(ui.getLastPosition()) == region) {
+				//if (BWTA.getRegion(ui.getLastPosition()) == region) {
+				if (BWTA.getRegion(ui.getUnit().getPosition()) == region) {
 					return true;
 				}
 			}

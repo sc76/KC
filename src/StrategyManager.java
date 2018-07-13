@@ -536,9 +536,6 @@ public class StrategyManager {
 		/// 공격유닛을 계속 추가 생산합니다
 		executeCombatUnitTraining();
 
-		// sc76.choi 공중 공격을 대비한, 스포어 클로니 
-		executeAirDefence();
-		
 		/// 전반적인 전투 로직 을 갖고 전투를 수행합니다
 		executeCombat();
 
@@ -683,6 +680,7 @@ public class StrategyManager {
 			if(enemyUnit.getType() == UnitType.Zerg_Overlord) continue;	
 			if(enemyUnit.getType() == UnitType.Protoss_Observer) continue;
 			if(enemyUnit.getType() == UnitType.Terran_Science_Vessel) continue;
+			if(enemyUnit.getType() == UnitType.Terran_Medic) continue;
 			
 			if(type != null && enemyUnit.getType() == type){
 				double dist = enemyUnit.getDistance(target);
@@ -959,12 +957,15 @@ public class StrategyManager {
 		}
 	}
 	
-	boolean isExecuteAirDefence = false;
-	public void executeAirDefence(){
+	boolean bTimeToAirDefence;
+	public void buildAirDefenceUnit(){
 		
-		if(isExecuteAirDefence) return;
-		
-		boolean bTimeToAirDefence = isTimeToAirDefence();
+		// sc76.choi 챔버가 없으면 실행하지 않는다.
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) <= 0){
+			return;
+		}
+				
+		bTimeToAirDefence = isTimeToAirDefence();
 		
 		int countSelfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).size();
 		
@@ -974,15 +975,27 @@ public class StrategyManager {
 			while (it1.hasNext()) {
 				Region selfRegion = it1.next();
 
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spore_Colony);
+				// creep colony가 없으면
+				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
+						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
+						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
+					
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
+				}
+
+				// creep colony가 있고, spore colony가 없으면
+				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == true
+					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spore_Colony) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spore_Colony, null) == 0){
+					
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Spore_Colony, false);
+					
+				}
 			}
-			
-			isExecuteAirDefence = true;
 		}
 		
-		
-//		
 //		for(Unit unit : myPlayer.getUnits()){
 //			if(InformationManager.Instance().isDepotType(unit.getType())){
 //				Unit myDepot = unit;
@@ -1013,11 +1026,9 @@ public class StrategyManager {
 							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
 				}
 			}
-		}
 		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi 일꾼양이 7마리 이하이면, 가스 채취를 중단하고, 미네랄을 캔다.
-		if(isInitialBuildOrderFinished == true){
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// sc76.choi 일꾼양이 7마리 이하이면, 가스 채취를 중단하고, 미네랄을 캔다.
 			if(WorkerManager.Instance().getWorkerData().getNumWorkers() <= 7){
 				for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Gas){
@@ -1025,51 +1036,51 @@ public class StrategyManager {
 					}
 				}
 			}
-		}
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi 스포닝 풀이 파괴되었을 때, 재건한다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) <= 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
-				&& myPlayer.allUnitCount(UnitType.Zerg_Spawning_Pool) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spawning_Pool) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spawning_Pool, null) == 0) 
-		{
-				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool, 
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-		}
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi 히드라덴이 파괴되었을 때, 재건한다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
-				&& myPlayer.allUnitCount(UnitType.Zerg_Hydralisk_Den) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hydralisk_Den) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hydralisk_Den, null) == 0) 
-		{
-				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hydralisk_Den, 
-						BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
-		}		
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi 쳄버가 파괴되었을 때, 재건한다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) <= 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
-				&& myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber) == 0
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Evolution_Chamber) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber, null) == 0) 
-		{
-				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber, 
-						BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
-		}
-		
 
+		
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// sc76.choi 스포닝 풀이 파괴되었을 때, 재건한다.
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) <= 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+					&& myPlayer.allUnitCount(UnitType.Zerg_Spawning_Pool) == 0
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spawning_Pool) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spawning_Pool, null) == 0) 
+			{
+					// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spawning_Pool, 
+							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+			}
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// sc76.choi 히드라덴이 파괴되었을 때, 재건한다.
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+					&& myPlayer.allUnitCount(UnitType.Zerg_Hydralisk_Den) == 0
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hydralisk_Den) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hydralisk_Den, null) == 0) 
+			{
+					// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hydralisk_Den, 
+							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
+			}		
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// sc76.choi 쳄버가 파괴되었을 때, 재건한다.
+			if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) <= 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+					&& myPlayer.allUnitCount(UnitType.Zerg_Evolution_Chamber) == 0
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Evolution_Chamber) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Evolution_Chamber, null) == 0) 
+			{
+					// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber, 
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+			}
+		
+		}
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi TODO 각 본진별로 가스가 없으면 가스를 재건한다.		
@@ -1862,7 +1873,7 @@ public class StrategyManager {
 						
 							// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
 							// 12시
-							Position calPosition = calcuatePosition(unit);
+							Position calPosition = getCalcuatePosition(unit);
 							
 //							double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
 //							double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
@@ -1885,7 +1896,7 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
-	Position calcuatePosition(Unit unit){
+	Position getCalcuatePosition(Unit unit){
 		
 		if(unit.getID() % 4 == 0){
 			return new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
@@ -2180,7 +2191,7 @@ public class StrategyManager {
 								
 									// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
 									// 12시
-									Position calPosition = calcuatePosition(unit);
+									Position calPosition = getCalcuatePosition(unit);
 									
 									double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
 									double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
@@ -2830,9 +2841,9 @@ public class StrategyManager {
     
 	// sc76.choi Defence 모드 일때, 실행한다. 
 	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
-    
     private boolean isTimeToAirDefence() {
-    	boolean bTimeToAirDefence = false;
+    	
+    	if(bTimeToAirDefence) return true;
         Unit target = null;
         
         for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
@@ -3061,6 +3072,7 @@ public class StrategyManager {
 		
 		MyBotModule.Broodwar.drawTextScreen(440, 70, "isDefence : " + isNecessaryNumberOfDefencedUnitType());
 		MyBotModule.Broodwar.drawTextScreen(440, 80, "isCombat : " + isNecessaryNumberOfCombatUnitType() + "[" + myCombatUnitType1List.size() + "/" + necessaryNumberOfCombatUnitType1 +"]" + "[" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +"]");
+		MyBotModule.Broodwar.drawTextScreen(440, 90, "Time Air Defence : " + bTimeToAirDefence);		
 
 		if(!Config.IS_DRAW){
 			return;
@@ -3792,7 +3804,9 @@ public class StrategyManager {
 				}			
 			}
 		}
-
+		
+		// sc76.choi 공중 공격을 대비한, 스포어 클로니 
+		buildAirDefenceUnit();
 	}
 	
 	/// 공격유닛 생산 건물을 건설합니다
@@ -4261,16 +4275,14 @@ public class StrategyManager {
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Ultralisk) {
 								if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) {
 									isPossibleToTrain = true;
-									isLowestPriority = true;
+									isLowestPriority = false;
 								}							
 							}
 							
 							if (isPossibleToTrain) {
 								// sc76.choi TODO 주의 럴커일 경우에는 히드라가 반드시 있어야 한다. 히드라 체크를 해야한다.
-								if (nextUnitTypeToTrain == UnitType.Zerg_Lurker){
-									if(myCombatUnitType2List.size() >= 2){
-										BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, isLowestPriority);
-									}
+								if (nextUnitTypeToTrain == UnitType.Zerg_Lurker && myCombatUnitType2List.size() >= 2){
+									BuildManager.Instance().buildQueue.queueAsHighestPriority(nextUnitTypeToTrain, isLowestPriority);
 								}else{
 									BuildManager.Instance().buildQueue.queueAsLowestPriority(nextUnitTypeToTrain, isLowestPriority);
 								}
