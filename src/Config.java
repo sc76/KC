@@ -45,7 +45,7 @@ public class Config {
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 10; // 히드라
+	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
