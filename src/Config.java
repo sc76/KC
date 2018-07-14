@@ -36,8 +36,8 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 6; // 히드라
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 6; // 저글링
+	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstTerran = 0; // 울트라
@@ -143,8 +143,8 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 2; 			
 	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
 	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
-	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 3;
-	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 3;	
+	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
+	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
 	public static int numberOfMyCombatUnitTrainingBuilding = 10;

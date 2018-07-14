@@ -57,6 +57,7 @@ public class KCUpgradeAndTech {
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				&& myPlayer.isResearching(necessaryTechType1) == true
 		) {
 			isTimeToStartUpgradeType5 = true;
 		}			
@@ -626,8 +627,11 @@ public class KCUpgradeAndTech {
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.(KTH 수송업 업그레이드 먼저 하도록 추가)
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
-		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
-			   && myPlayer.isResearching(necessaryTechType1) == true) {
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) + 
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+			  && myPlayer.isResearching(necessaryTechType1) == true
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2) {
 			isTimeToStartUpgradeType5 = true;
 		}		
 
@@ -714,7 +718,8 @@ public class KCUpgradeAndTech {
 			{
 				// sc76.choi 테란일 경우 럴커 테크 연구를 먼저 진행한다.
 //				System.out.println("myPlayer.hasResearched(TechType.Lurker_Aspect) : " + myPlayer.hasResearched(TechType.Lurker_Aspect));
-				if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
+				if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true
+					 && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1){
 					
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
 					

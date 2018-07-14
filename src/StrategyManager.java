@@ -976,7 +976,8 @@ public class StrategyManager {
 				Region selfRegion = it1.next();
 
 				// creep colony가 없으면
-				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
+				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
 						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
 						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
@@ -985,7 +986,8 @@ public class StrategyManager {
 				}
 
 				// creep colony가 있고, spore colony가 없으면
-				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == true
+				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == true
 					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
 					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spore_Colony) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spore_Colony, null) == 0){
@@ -1665,30 +1667,35 @@ public class StrategyManager {
 		if (unit.getType() == UnitType.Zerg_Zergling) {			
 			if (!commandUtil.IsValidUnit(unit)) return true;
 			
-			Position targetPosition = null;
 			if(combatState == CombatState.attackStarted){
 				
-				targetPosition = TARGET_POSITION;
-				
-				// sc76.choi 공격 모드 이나, 아직 적진을 발견 못했을 때는 앞다당(DEFENCE_POSITION) 으로 이동해 놓는다.
-				if(targetPosition == null){
-					//System.out.println("Attack Move 1");
-					commandUtil.attackMove(unit, mySecondChokePoint.getCenter());
-				}else{
-					List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*7);
-					boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
-					
-					// sc76.choi 공격이 가능하면
-					if(canAttackNow){
-						commandUtil.attackMove(unit, targetPosition);
+				if(isInitialBuildOrderFinished == false && enemyRace == Race.Terran){
+					if(enemyMainBaseLocation == null){
+						commandUtil.attackMove(unit, new Position(2000, 2000));
 					}else{
-						// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
-						if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
-							commandUtil.move(unit, DEFENCE_POSITION);
-						}
-						// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
-						else{
-							commandUtil.attackMove(unit, DEFENCE_POSITION);
+						commandUtil.attackMove(unit, TARGET_POSITION);
+					}
+				}else{
+					// sc76.choi 공격 모드 이나, 아직 적진을 발견 못했을 때는 앞다당(DEFENCE_POSITION) 으로 이동해 놓는다.
+					if(TARGET_POSITION == null){
+						//System.out.println("Attack Move 1");
+						commandUtil.attackMove(unit, mySecondChokePoint.getCenter());
+					}else{
+						List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*7);
+						boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
+						
+						// sc76.choi 공격이 가능하면
+						if(canAttackNow){
+							commandUtil.attackMove(unit, TARGET_POSITION);
+						}else{
+							// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
+							if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
+								commandUtil.move(unit, DEFENCE_POSITION);
+							}
+							// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
+							else{
+								commandUtil.attackMove(unit, DEFENCE_POSITION);
+							}
 						}
 					}
 				}
@@ -1733,7 +1740,7 @@ public class StrategyManager {
 								}
 								// sc76.choi 본진 좀 거리가 있으면 move로 움직인다.
 								else{
-									commandUtil.move(unit, DEFENCE_POSITION);
+									commandUtil.attackMove(unit, DEFENCE_POSITION);
 								}
 							}
 						}
@@ -1931,7 +1938,7 @@ public class StrategyManager {
 			
 			// sc76.choi 버로우 되어 있지 않고, 나의 지역과 가까이 있으면 (35), 버로우 한다.
 			if (unit.isBurrowed() == false) {			
-				if (unit.getDistance(DEFENCE_POSITION) < Config.TILE_SIZE*6){
+				if (unit.getDistance(DEFENCE_POSITION) < Config.TILE_SIZE*2){
 					unit.burrow();
 				}
 				// sc76.choi 나의 본거지와 멀리 있으면 귀환
@@ -2004,6 +2011,7 @@ public class StrategyManager {
 			for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
 				
 				if (enemyUnit.isFlying()) continue;
+				if (enemyUnit.getType().isWorker()) continue;
 				if (enemyUnit.getType() == UnitType.Terran_Medic) continue;
 				
 				tempDistance = unit.getDistance(enemyUnit.getPosition());
@@ -2026,7 +2034,9 @@ public class StrategyManager {
 			else {
 				if (nearEnemyUnitPosition == null) {
 					// sc76.choi 적이 가까이에 왔으면 다시 언버로우 한다.
-					unit.unburrow();
+					if(unit.getDistance(enemyFirstChokePoint) > Config.TILE_SIZE*3){
+						unit.unburrow();
+					}
 				}
 				hasCommanded = true;
 			}
@@ -2399,12 +2409,12 @@ public class StrategyManager {
 						unit.useTech(TechType.Dark_Swarm, targetPosition);
 						hasCommanded = true;
 					}
-					
 				}
 			}
 			
+			// sc76.choi 아무 명령이 없으면 (에너지가 없으면) 본진 귀환
 			if(hasCommanded == false){
-				commandUtil.move(unit, targetPosition);
+				commandUtil.move(unit, DEFENCE_POSITION);
 				hasCommanded = true;
 			}
 		}
@@ -2631,9 +2641,6 @@ public class StrategyManager {
 			        		break;
 	        			}else if(unit.getType() == UnitType.Terran_Medic){
 			        		target = unit;
-			        		break;
-	        			}else{
-	        				target = unit;
 			        		break;
 	        			}
 	        		}else if (Race.Protoss == enemyRace){
@@ -3619,12 +3626,16 @@ public class StrategyManager {
 								// std.cout + "worker enqueue" + std.endl;
 								
 								// sc76.choi 30마리 이상이면, 확장에서 일꾼을 생산한다.
-								if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 30){
-									BuildManager.Instance().buildQueue.queueAsLowestPriority(
-											new MetaType(InformationManager.Instance().getWorkerType()), false);
+								if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 26){
+									if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+										|| myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
+										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
+										BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+									}else{
+										BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+									}
 								}else{
-									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(), 
-											BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified);
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(), BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified);
 								}
 							}
 						}
@@ -3744,6 +3755,13 @@ public class StrategyManager {
 			return;
 		}
 		
+		// sc76.choi 테란일 경우, 럴커 개발이 시작되어야 지을 수 있다.
+		if(enemyRace == Race.Terran 
+			&& myPlayer.isResearching(TechType.Lurker_Aspect) == false
+			&& myPlayer.hasResearched(TechType.Lurker_Aspect) == false){
+			return;
+		}
+		
 		boolean			isPossibleToConstructDefenseBuildingType1 = false;
 		boolean			isPossibleToConstructDefenseBuildingType2 = false;	
 		
@@ -3802,6 +3820,40 @@ public class StrategyManager {
 								seedPositionStrategyOfMyInitialBuildingType, false);
 					}
 				}			
+			}
+		}
+		
+		
+		// sc76.choi 확장된 지역에 성큰을 건설한다.
+		int countSelfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).size();
+		if(countSelfRegions >= 2){
+			Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
+			Iterator<Region> it1 = selfRegions.iterator();
+			while (it1.hasNext()) {
+				Region selfRegion = it1.next();
+
+				if(selfRegion == BWTA.getRegion(myMainBaseLocation.getPosition())) continue;
+				
+				// creep colony가 없으면
+				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
+						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Sunken_Colony) == false
+						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
+					
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
+				}
+
+				// creep colony가 있고, spore colony가 없으면
+				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == true
+					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Sunken_Colony) == false
+					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Sunken_Colony) == 0
+					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Sunken_Colony, null) == 0){
+					
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, false);
+					
+				}
 			}
 		}
 		
@@ -3872,7 +3924,7 @@ public class StrategyManager {
 				}
 				// 확장지역에 건설한다.
 				else{
-					if(combatState == CombatState.attackStarted || combatState == CombatState.eliminateEnemy){
+					if(combatState == CombatState.attackStarted || combatState == CombatState.defenseMode){
 						if(BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0
 							&& ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0){
 							
