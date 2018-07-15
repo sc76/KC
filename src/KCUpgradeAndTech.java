@@ -54,21 +54,21 @@ public class KCUpgradeAndTech {
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.(KTH 수송업 업그레이드 먼저 하도록 추가)
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
 		// sc76.choi Lair 갯수를 체크 할때는 Hive(completedUnitCount, incompleteUnitCount)도 같이 체크를 해야 한다.
+		
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
+						myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+						myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+//				&& myPlayer.isResearching(necessaryTechType1) == true
+			) {
+			isTimeToStartUpgradeType3 = true;
+		}	
+		
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 				&& myPlayer.isResearching(necessaryTechType1) == true
 		) {
 			isTimeToStartUpgradeType5 = true;
-		}			
-		
-		if (isTimeToStartUpgradeType5 &&
-				(myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
-				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
-				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
-//				&& myPlayer.isResearching(necessaryTechType1) == true
-		) {
-			isTimeToStartUpgradeType3 = true;
 		}			
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
@@ -194,19 +194,63 @@ public class KCUpgradeAndTech {
 			}
 		}		
 
-		// BWAPI 4.1.2 의 버그때문에, 오버로드 업그레이드를 위해서는 반드시 Zerg_Lair 가 있어야함	
-		// sc76.choi 오버로드 이동속도
-		//if (myRace == Race.Zerg) {
-		//	if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
-		//		if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0 
-		//			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
-		//			&& (myPlayer.allUnitCount(UnitType.Zerg_Hive) < 1
-		//			|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) < 1)) 
-		//		{
-		//			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);					
-		//		}
-		//	}
-		//}
+		// 뮤탈 방어 1 업
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) == 0
+			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Carapace) == false
+			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Carapace) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Carapace, false);
+		}	
+		
+		// 뮤탈 공격 1 업
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) > 0
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) == 0
+			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Attacks) == false
+			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Attacks) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Attacks, false);
+		}
+		
+		// 울트라 벙어 1업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) == 0
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}	
+		
+		// 울트라 벙어 2업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) > 0
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}
+		
+		// 울트라 벙어 3업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) > 1
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}		
 	}
 	
 	/**
@@ -354,17 +398,17 @@ public class KCUpgradeAndTech {
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
-				&& myPlayer.isResearching(necessaryTechType1) == true) {
-			isTimeToStartUpgradeType5 = true;
+//				&& myPlayer.isResearching(necessaryTechType1) == true
+			) {
+			isTimeToStartUpgradeType3 = true;
 		}		
-
+		
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 				&& myPlayer.isResearching(necessaryTechType1) == true) {
-			isTimeToStartUpgradeType3 = true;
+			isTimeToStartUpgradeType5 = true;
 		}		
-		
 		
 		// 저글링 아드레날린
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
@@ -474,19 +518,63 @@ public class KCUpgradeAndTech {
 			}
 		}
 
-		// BWAPI 4.1.2 의 버그때문에, 오버로드 업그레이드를 위해서는 반드시 Zerg_Lair 가 있어야함	
-		// sc76.choi 오버로드 이동속도
-		//if (myRace == Race.Zerg) {
-		//	if (BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Pneumatized_Carapace) > 0) {
-		//		if (myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0 
-		//			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
-		//			&& (myPlayer.allUnitCount(UnitType.Zerg_Hive) < 1
-		//			|| BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) < 1)) 
-		//		{
-		//			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, false);					
-		//		}
-		//	}
-		//}
+		// 뮤탈 방어 1 업
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) == 0
+			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Carapace) == false
+			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Carapace) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Carapace, false);
+		}	
+		
+		// 뮤탈 공격 1 업
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) > 0
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) == 0
+			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Attacks) == false
+			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Attacks) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Attacks, false);
+		}
+		
+		// 울트라 벙어 1업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) == 0
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}	
+		
+		// 울트라 벙어 2업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) > 0
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}
+		
+		// 울트라 벙어 3업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) > 1
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}		
 	}
 	
 	public void chamberUpgradeAgainstZerg(){
@@ -627,18 +715,21 @@ public class KCUpgradeAndTech {
 		// sc76.choi myPlayer.hasResearched(TechType.Lurker_Aspect) 조건을 제거 했다. 이동속도는 빠르게 연구한다.
 		// sc76.choi 럴커가 하나라도 있다면, 빠른 드랍을 위해 업그레이드 한다.(KTH 수송업 업그레이드 먼저 하도록 추가)
 		// sc76.choi  myPlayer.hasResearched(necessaryTechType1) 럴커가 연구와 동시에 오버로드 속도업을 한다.
+		
+		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
+				myPlayer.completedUnitCount(UnitType.Zerg_Hive) + 
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				&& myPlayer.isResearching(necessaryTechType1) == true) {
+			isTimeToStartUpgradeType3 = true;
+		}		
+		
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) + 
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 			  && myPlayer.isResearching(necessaryTechType1) == true
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2) {
 			isTimeToStartUpgradeType5 = true;
-		}		
-
-		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
-			   && myPlayer.isResearching(necessaryTechType1) == true) {
-			isTimeToStartUpgradeType3 = true;
-		}		
+		}
 		
 		// 저글링 아드레 날린
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
@@ -669,7 +760,6 @@ public class KCUpgradeAndTech {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0) {
 			isTimeToStartResearchTech4 = true;
 		}	
-		
 
 		
 		// sc76.choi 히드라 사정 업그레이드
@@ -784,6 +874,63 @@ public class KCUpgradeAndTech {
 				}
 			}
 		}
+		
+		// 뮤탈 방어 1 업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) == 0
+			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Carapace) == false
+			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Carapace) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Carapace, false);
+		}	
+		
+		// 뮤탈 공격 1 업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) > 0
+			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) == 0
+			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Attacks) == false
+			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Attacks) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Attacks, false);
+		}
+		
+		// 울트라 벙어 1업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) == 0
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}	
+		
+		// 울트라 벙어 2업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) > 0
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}
+		
+		// 울트라 벙어 3업
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 4
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) > 1
+				  && myPlayer.getUpgradeLevel(UpgradeType.Chitinous_Plating) <= 3
+				  && myPlayer.isUpgrading(UpgradeType.Chitinous_Plating) == false
+				  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Chitinous_Plating) == 0
+		) {
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Chitinous_Plating, false);
+		}		
 	}
 	
 	public void chamberUpgradeAgainstTerran(){

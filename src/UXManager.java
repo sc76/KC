@@ -249,7 +249,8 @@ public class UXManager {
 		
 		// build order array
 		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
-		MyBotModule.Broodwar.drawTextScreen(5, 50, "Build Order : " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		int seqBuildOrderStep = StrategyManager.Instance().seqBuildOrderStep;
+		MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : " + seqBuildOrderStep + " " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
 
 		
 		
@@ -276,6 +277,7 @@ public class UXManager {
 		
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 20, Color.White);
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 35, Color.White);
+		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 80, Color.White);
 		
 		// 가장 앞선 히드라
 		int iClosestHydra = 0;

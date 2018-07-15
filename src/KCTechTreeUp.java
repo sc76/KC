@@ -52,6 +52,17 @@ public class KCTechTreeUp {
 		
 		// sc76.choi 빠른 spire 테크 작성예정					
 		
+		// sc76.choi 기본 greater spire 테크 작성예정
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 >= 10
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+				&& myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Greater_Spire, null) == 0) 
+		{
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Greater_Spire, true);
+		}
 		
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
@@ -150,6 +161,17 @@ public class KCTechTreeUp {
 		
 		// sc76.choi 빠른 spire 테크 작성예정					
 		
+		// sc76.choi 기본 greater spire 테크 작성예정
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 >= 10
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+				&& myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Greater_Spire, null) == 0) 
+		{
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Greater_Spire, true);
+		}
 		
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
@@ -221,7 +243,7 @@ public class KCTechTreeUp {
 				&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0) 
-			{
+		{
 				// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
 				if (myPlayer.allUnitCount(UnitType.Zerg_Hive) > 0 ||
 					(myPlayer.completedUnitCount(UnitType.Zerg_Hive) + myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 ||
@@ -232,7 +254,10 @@ public class KCTechTreeUp {
 				}else{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Lair, true);
 				}
-			}
+		}
+		
+		// sc76.choi 빠른 Lair 테크(상황에 따라) 작성 예정
+		
 		
 		// sc76.choi 기본 spire 테크 작성예정
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
@@ -250,7 +275,17 @@ public class KCTechTreeUp {
 		
 		// sc76.choi 빠른 spire 테크 작성예정	
 		
-		// sc76.choi 빠른 Lair 테크(상황에 따라) 작성 예정
+		// sc76.choi 기본 greater spire 테크 작성예정
+		if (StrategyManager.Instance().myKilledCombatUnitCount3 >= 10
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+				&& myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) == 0
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Greater_Spire, null) == 0) 
+		{
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Greater_Spire, true);
+		}
 		
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
