@@ -227,6 +227,15 @@ public class OverloadManager {
 			double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
 			if(distanceFromEnemyMainBaseLocation <= (double)TilePosition.SIZE_IN_PIXELS*3){
 				commandUtil.patrol(firstScoutOverload, enemySecondChokePoint.getCenter());
+				
+				// sc76.choi 공격을 당하면, 본진귀환
+	            if (firstScoutOverload.isUnderAttack()) {
+	            	if(commandUtil.IsValidUnit(firstScoutOverload)){
+		            	overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.Idle , (Unit)null);
+		                moveScoutUnitToMyBaseLocation(firstScoutOverload);
+	            	}
+	            }
+	            
 			}else{
 				
 				if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음, 
@@ -533,9 +542,13 @@ public class OverloadManager {
 //                moveScoutUnitToMyBaseLocation();
 //            }
 //
-//            if (firstScoutOverload.isUnderAttack()) {
-//                moveScoutUnitToMyBaseLocation();
-//            }
+			// sc76.choi 공격을 당하면, 본진귀환
+            if (centerChokeOverload.isUnderAttack()) {
+            	if(commandUtil.IsValidUnit(centerChokeOverload)){
+	            	overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Idle , (Unit)null);
+	                moveScoutUnitToMyBaseLocation(centerChokeOverload);
+            	}
+            }
 //
 //            if (secondScoutOverload != null && secondScoutOverload.isUnderAttack()) {
 //                BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
@@ -572,13 +585,13 @@ public class OverloadManager {
         return closestBaseLocation;
     }
     
-    private void moveScoutUnitToMyBaseLocation() {
+    private void moveScoutUnitToMyBaseLocation(Unit overload) {
         BaseLocation myFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
-        commandUtil.move(firstScoutOverload, myFirstExpansionLocation.getPoint());
-        if (secondScoutOverload != null) {
-            BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
-            commandUtil.move(secondScoutOverload, myMainBaseLocation.getPosition());
-        }
+        commandUtil.move(overload, myFirstExpansionLocation.getPoint());
+//        if (secondScoutOverload != null) {
+//            BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+//            commandUtil.move(secondScoutOverload, myMainBaseLocation.getPosition());
+//        }
     }
 
     

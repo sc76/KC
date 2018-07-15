@@ -1673,29 +1673,29 @@ public class StrategyManager {
 					if(enemyMainBaseLocation == null){
 						commandUtil.attackMove(unit, new Position(2000, 2000));
 					}else{
-						commandUtil.attackMove(unit, TARGET_POSITION);
+						Unit enemyUnitForExpansionDefence = findAttackTargetForExpansionDefence();
+						// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.	
+						if (commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
+							commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
+						}else{
+							commandUtil.attackMove(unit, TARGET_POSITION);
+						}
 					}
 				}else{
-					// sc76.choi 공격 모드 이나, 아직 적진을 발견 못했을 때는 앞다당(DEFENCE_POSITION) 으로 이동해 놓는다.
-					if(TARGET_POSITION == null){
-						//System.out.println("Attack Move 1");
-						commandUtil.attackMove(unit, mySecondChokePoint.getCenter());
+					boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unit.getUnitsInRadius(Config.TILE_SIZE*3));
+					// sc76.choi 공격이 가능하면
+					if(canAttackNow){
+						commandUtil.attackMove(unit, TARGET_POSITION);
 					}else{
-						List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*7);
-						boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
-						
-						// sc76.choi 공격이 가능하면
-						if(canAttackNow){
-							commandUtil.attackMove(unit, TARGET_POSITION);
-						}else{
-							// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
-							if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
-								commandUtil.move(unit, DEFENCE_POSITION);
-							}
-							// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
-							else{
-								commandUtil.attackMove(unit, DEFENCE_POSITION);
-							}
+						// sc76.choi 저글링으로부터 디펜스까지 거리가 Config.TILE_SIZE*7 보다 크면 moving, 적진에 가까이 있으면 계속 moving 이동
+						if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
+							
+							Position calPosition = getCalcuatePosition(unit);
+							commandUtil.move(unit, calPosition);
+						}
+						// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
+						else{
+							commandUtil.attackMove(unit, DEFENCE_POSITION);
 						}
 					}
 				}
@@ -1710,10 +1710,6 @@ public class StrategyManager {
 				// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.	
 				
 					if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
-						//System.out.println("Defence Move 1");
-						// sc76.choi 유닛이 디펜스 지점보다 멀리 있으면, 와리가리 아니면 그냥 싸운다.
-	//					System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
-	//					System.out.println();
 						
 						//  sc76.choi TODO Config.TILE_SIZE*35가 적당한가?
 						if(DEFENCE_POSITION != null && unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*35){
@@ -1906,22 +1902,22 @@ public class StrategyManager {
 	Position getCalcuatePosition(Unit unit){
 		
 		if(unit.getID() % 4 == 0){
-			return new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*4);
+			return new Position(unit.getPosition().getX(), unit.getPosition().getY() - Config.TILE_SIZE*5);
 			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 12");
 		}
 		// 3시
 		else if(unit.getID() % 4 == 1){
-			return  new Position(unit.getPosition().getX() + Config.TILE_SIZE*4, unit.getPosition().getY());
+			return  new Position(unit.getPosition().getX() + Config.TILE_SIZE*5, unit.getPosition().getY());
 			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 3");
 		}
 		// 6시ㅣ
 		else if(unit.getID() % 4 == 2){
-			return  new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*4);
+			return  new Position(unit.getPosition().getX(), unit.getPosition().getY()  + Config.TILE_SIZE*5);
 			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 6");
 		}
 		// 9시
 		else{
-			return  new Position(unit.getPosition().getX()  - Config.TILE_SIZE*4, unit.getPosition().getY());
+			return  new Position(unit.getPosition().getX()  - Config.TILE_SIZE*5, unit.getPosition().getY());
 			//System.out.println("controlCombatUnitType2 ["+unit.getID()+"] go -->> 9");
 		}
 	}
@@ -2050,7 +2046,9 @@ public class StrategyManager {
 	}
 	
 	/// 뮤탈 유닛에 대해 컨트롤 명령을 내립니다
-	Unit enemyUnitForMutalisk = null; 
+	Unit enemyUnitForMutalisk = null;
+	Unit lastMutalisk = null;
+	Unit closestOverloadWithIdle = null;
 	boolean controlCombatUnitType4(Unit unitType4){
 		boolean hasCommanded = false; 
 		Position targetPosition = null;
@@ -2094,14 +2092,18 @@ public class StrategyManager {
 			else{
 				
 				if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) < 4){
+					for(Unit unit : myCombatUnitType4List){
+						commandUtil.move(unit, DEFENCE_POSITION);
+					}
 					return true;
 				}
 				
+				// sc76.choi 뮤탈 리스크의 공격 대상 선정
+				if(commandUtil.IsValidUnit(enemyUnitForMutalisk) == false){
+					enemyUnitForMutalisk = findAttackTargetForMutalisk();
+				}
 				
 				// sc76.choi 뮤탈을 위한 오버로드 한마리 추가 getClosestOverload(target)
-				Unit lastMutalisk = null;
-				Unit closestOverloadWithIdle = null;
-				
 				if(closestOverloadWithIdle == null){
 					for(Unit unit : myCombatUnitType4List){
 						lastMutalisk = unit;
@@ -2116,11 +2118,6 @@ public class StrategyManager {
 					}
 				}
 
-				// sc76.choi 뮤탈 리스크의 공격 대상 선정
-				if(commandUtil.IsValidUnit(enemyUnitForMutalisk) == false){
-					enemyUnitForMutalisk = findAttackTargetForMutalisk();
-				}
-				
 				for(Unit unit : myCombatUnitType4List){
 					
 					// sc76.choi 안전한지 체크
@@ -2134,93 +2131,80 @@ public class StrategyManager {
 								isSafeAround = false;
 							}
 						}
-						
-					}else{
-						isSafeAround = true;
-					}
 					
-					// sc76.choi 공격 가능한 지역이라 판단되면 
-					if(isSafeAround){
-						// sc76.choi cooldown 시간을 이용한 공격
-						if(unit.getGroundWeaponCooldown() == 0 
-							&& unit.getHitPoints() > 10
-						){
+					
+						// sc76.choi 공격 가능한 지역이라 판단되면 
+						if(isSafeAround){
 							
-							if(enemyUnitForMutalisk != null && commandUtil.IsValidUnit(enemyUnitForMutalisk)){
-								targetPosition = enemyUnitForMutalisk.getPosition();
-								commandUtil.attackUnit(unit, enemyUnitForMutalisk);
-								if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForMutalisk.getTargetPosition(), Color.Yellow);
+							// sc76.choi cooldown 시간을 이용한 공격
+							if(unit.getGroundWeaponCooldown() == 0 
+								&& unit.getHitPoints() > 10
+							){
 								
-								// sc76.choi 뮤탈 이동
-								if(unit.getType() == UnitType.Zerg_Overlord) commandUtil.move(unit, enemyUnitForMutalisk.getPosition());
-							}else{
-								targetPosition = TARGET_POSITION;
-								commandUtil.attackMove(unit, targetPosition);
-								
-								// sc76.choi 뮤탈 이동
-								if(unit.getType() == UnitType.Zerg_Overlord) commandUtil.move(unit, targetPosition);
-							}
-							
-							commandUtil.attackMove(unit, targetPosition);
-						}
-						// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
-						else{
-							
-							// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 
-							// 건물만 있으면, 그냥 계속 공격하도록 한다.
-							int checkAroundCanAttakUnit = 0;
-							for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
-								if(who.getPlayer() == enemyPlayer){
-									//System.out.println("who ID ["+who.getID()+"] : " + who.getPlayer() + ", " + who.getType().canAttack());
-									// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
-									if(who.getType().canAttack() && !who.getType().isBuilding()){
-										checkAroundCanAttakUnit++;
-									}
-								}
-							}
-							//System.out.println("checkAroundCanAttakUnit["+unit.getID()+"] : " + checkAroundCanAttakUnit);
-							
-							// 주변에 빌딩밖에 없으면 전진 공격만 한다.
-							if(checkAroundCanAttakUnit == 0){
-								//targetPosition = enemyMainBaseLocation.getPosition();
-								targetPosition = TARGET_POSITION;
-								
-								commandUtil.attackMove(unit, targetPosition);
-								hasCommanded = true;
-								return hasCommanded;
-							}
-							// 주변에 공격 대상이 있으면 그대로 뺀다.
-							else{
-							
-								targetPosition = myFirstExpansionLocation.getPosition();
-								
-								// 적진에서 1300보다 안쪽에 있으면, 개활지가 아니다. 그래서 그냥 본진으로 뺀다.
-								if(unit.getDistance(enemyMainBaseLocation.getPoint()) < 1300){
-									commandUtil.move(unit, targetPosition);
-								}else{
-								
-									// 후퇴시 12, 3, 6, 9시 방향으로 랜덤하게 도망
-									// 12시
-									Position calPosition = getCalcuatePosition(unit);
-									
-									double d1 = unit.getDistance(enemyMainBaseLocation.getPosition()); // 유닛의 포지션에서 적진의 거리
-									double d2 = calPosition.getDistance(enemyMainBaseLocation.getPosition()); // 계산된 포지션에서 적진의 거리
-									
-									// sc76.choi 가야할 곳이 적진과 더 가깝다면, 그냥 본진 방향
-									if(d1 > d2){
-										targetPosition = TARGET_POSITION;
+								if(enemyUnitForMutalisk != null && commandUtil.IsValidUnit(enemyUnitForMutalisk)){
+									// sc76.choi 뮤탈 이동
+									if(unit.getType() == UnitType.Zerg_Overlord){
+										commandUtil.move(unit, enemyUnitForMutalisk.getPosition());
 									}else{
-										targetPosition = calPosition;;
+										commandUtil.attackUnit(unit, enemyUnitForMutalisk);
+										if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForMutalisk.getTargetPosition(), Color.Yellow);
 									}
 									
-									commandUtil.move(unit, targetPosition);
+								}else{
+									
+									// sc76.choi 뮤탈 이동
+									if(unit.getType() == UnitType.Zerg_Overlord){ 
+										commandUtil.move(unit, TARGET_POSITION);
+									}else{
+										commandUtil.attackMove(unit, TARGET_POSITION);
+									}
+								}
+								
+								commandUtil.attackMove(unit, TARGET_POSITION);
+							}
+							// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
+							else{
+								
+								// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 
+								// 건물만 있으면, 그냥 계속 공격하도록 한다.
+								int checkAroundCanAttakUnit = 0;
+								for(Unit who : unit.getUnitsInRadius(Config.TILE_SIZE*5)){
+									if(who.getPlayer() == enemyPlayer){
+										//System.out.println("who ID ["+who.getID()+"] : " + who.getPlayer() + ", " + who.getType().canAttack());
+										// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
+										if(who.getType().canAttack() && !who.getType().isBuilding()){
+											checkAroundCanAttakUnit++;
+										}
+									}
+								}
+								
+								// 주변에 빌딩밖에 없으면 전진 공격만 한다.
+								if(checkAroundCanAttakUnit == 0){
+									commandUtil.attackMove(unit, TARGET_POSITION);
+									hasCommanded = true;
+									return hasCommanded;
+								}
+								// 주변에 공격 대상이 있으면 그대로 뺀다.
+								else{
+								
+									// 적진에서 1300보다 안쪽에 있으면, 개활지가 아니다. 그래서 그냥 본진으로 뺀다.
+									if(unit.getDistance(enemyMainBaseLocation.getPoint()) < 1300){
+										commandUtil.move(unit, DEFENCE_POSITION);
+									}else{
+									
+										Position calPosition = getCalcuatePosition(unit);
+										commandUtil.move(unit, calPosition);
+									}
 								}
 							}
+						}else{
+							// sc76.choi 안전하지 않으면 본진으로 귀환
+							commandUtil.attackMove(unit, enemySecondChokePoint.getCenter());
 						}
 					}else{
-						// sc76.choi 다른 공격 유닛을 찾기 위해 null을 만들어 준다.
-						enemyUnitForMutalisk = null;
+						commandUtil.attackMove(unit, enemySecondChokePoint.getCenter());
 					}
+				
 				} // for
 				hasCommanded = true;
 			}
@@ -2605,6 +2589,7 @@ public class StrategyManager {
 	// sc76.choi Defence 모드 일때, 실행한다. 
 	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
     private Unit findAttackTargetForMutalisk() {
+    	
         Unit target = null;
         for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 	        if(commandUtil.IsValidUnit(unit)){
@@ -2642,6 +2627,18 @@ public class StrategyManager {
 	        			}else if(unit.getType() == UnitType.Terran_Medic){
 			        		target = unit;
 			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Command_Center){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Barracks){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType() == UnitType.Terran_Supply_Depot){
+			        		target = unit;
+			        		break;
+	        			}else if(unit.getType().isBuilding()){
+			        		target = unit;
+			        		break;
 	        			}
 	        		}else if (Race.Protoss == enemyRace){
 	        			if(unit.getType() == UnitType.Protoss_Shuttle){
@@ -2677,11 +2674,7 @@ public class StrategyManager {
 	        			}else if (unit.getType().isFlyer()) {
 	        				target = unit;
 			        		break;
-	        			}else{
-	        				target = unit;
-			        		break;
 	        			}
-	        			
 	        		}else if (Race.Zerg == enemyRace){
 	        			if(unit.getType() == UnitType.Zerg_Overlord){
 		        			target = unit;
@@ -2718,12 +2711,6 @@ public class StrategyManager {
 			        		break;
 	        			}else if(unit.getType() == UnitType.Zerg_Zergling){
 			        		target = unit;
-			        		break;
-	        			}else if (unit.getType().isFlyer()) {
-	        				target = unit;
-			        		break;
-	        			}else{
-	        				target = unit;
 			        		break;
 	        			}
 	        		}else if(unit.getType().isFlyer()){

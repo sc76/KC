@@ -239,7 +239,8 @@ public class KCTechTreeUp {
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 //				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1
 //				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType2
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2				
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
