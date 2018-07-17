@@ -1017,13 +1017,13 @@ public class StrategyManager {
 		// 1초에 4번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
 		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi 초기 빌드가 끝나고, 앞마당이 파괴되었으면 재건한다.
 		if(isInitialBuildOrderFinished == true){
-			// sc76.choi 앞마당에 해처리가 보이지 않으면
+			
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// sc76.choi 초기 빌드가 끝나고, 앞마당이 파괴되었으면 재건한다.
 			boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()));
+			
 			if(existHatcheryInMyFirstExpansion == false){
-				
 				if(myPlayer.incompleteUnitCount(UnitType.Zerg_Hatchery) == 0
 					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
@@ -1604,6 +1604,9 @@ public class StrategyManager {
 		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 			if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 			
+			int countWorkersToCanAttak = Config.COUNT_WORKERS_CANATTACK;
+			if(isInitialBuildOrderFinished == false) countWorkersToCanAttak = 1; // 초기빌드까지는 1마리만 공격가담
+			
 			// 각 worker의 주변 DISTANCE_WORKER_CANATTACK을 살펴 본다.
 			Iterator<Unit> iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), Config.DISTANCE_WORKER_CANATTACK).iterator();
 			while(iter.hasNext()){
@@ -1628,7 +1631,7 @@ public class StrategyManager {
 					}
 					
 					// 이미 공격일꾼이 있으면 (일꾼 공격 합세는 2마리만 한다.)
-					if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK){
+					if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= countWorkersToCanAttak){
 						break;
 					}
 					
@@ -1691,6 +1694,7 @@ public class StrategyManager {
 			
 			if(combatState == CombatState.attackStarted){
 				
+				// sc76.choi 테란일때, 저글링 한번 공격 간다.
 				if(isInitialBuildOrderFinished == false && enemyRace == Race.Terran){
 					if(enemyMainBaseLocation == null){
 						commandUtil.attackMove(unit, new Position(2000, 2000));
@@ -1713,7 +1717,8 @@ public class StrategyManager {
 						if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*7){
 							
 							Position calPosition = getCalcuatePosition(unit);
-							commandUtil.move(unit, calPosition);
+							//commandUtil.move(unit, calPosition);
+							commandUtil.move(unit, DEFENCE_POSITION);
 						}
 						// sc76.choi 아니면 방어 포지션 근처기 때문에 공격으로 moving 
 						else{
@@ -2596,6 +2601,10 @@ public class StrategyManager {
 	// sc76.choi Defence 모드 일때, 실행한다. 
 	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
     private Unit findAttackTargetForExpansionDefence() {
+    	
+    	boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()));
+    	if(existHatcheryInMyFirstExpansion == false) return null;
+    		
         Unit target = null;
         for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
         	//if(unit.getDistance(myFirstExpansionLocation.getPoint()) <= Config.TILE_SIZE*4){
@@ -3631,7 +3640,7 @@ public class StrategyManager {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 해처리가 많고 확장이 되면, 미네럴당 일꾼 수 조절을 한다.
 		if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
-			Config.optimalWorkerCount = 1.5;
+			Config.optimalWorkerCount = 2;
 		}
 
 	}
@@ -3692,12 +3701,22 @@ public class StrategyManager {
 								
 								// sc76.choi 30마리 이상이면, 확장에서 일꾼을 생산한다.
 								if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 26){
-									if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-										|| myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
-										BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
-										BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+									if(enemyRace == Race.Terran){
+										if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+											|| myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+										}else{
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+										}
 									}else{
-										BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+										if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+												&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6){
+												BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+											}else{
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+											}
 									}
 								}else{
 									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(), BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified);
@@ -3852,42 +3871,33 @@ public class StrategyManager {
 			isPossibleToConstructDefenseBuildingType2 = true;	
 		}
 		
-
-		// 방어 건물 증설을 우선적으로 실시한다
-		if (isPossibleToConstructDefenseBuildingType1 == true 
-			&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
-			if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
-				if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
-					
-					boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()));
-					if(existHatcheryInMyFirstExpansion == true){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
-								seedPositionStrategyOfMyDefenseBuildingType, false);
-					}else{
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
-								seedPositionStrategyOfMyInitialBuildingType, false);
-					}
-					
-				}			
-			}
-		}
-		if (isPossibleToConstructDefenseBuildingType2 == true
-			&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
-			if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
-				if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
-					
-					boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()));
-					if(existHatcheryInMyFirstExpansion == true){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-								seedPositionStrategyOfMyDefenseBuildingType, false);
-					}else{
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-								seedPositionStrategyOfMyInitialBuildingType, false);
-					}
-				}			
-			}
-		}
+		boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()));
 		
+		if(existHatcheryInMyFirstExpansion == true){
+			// 앞마당 방어 건물 증설을 우선적으로 실시한다
+			if (isPossibleToConstructDefenseBuildingType1 == true 
+				&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
+				if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
+					if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
+						
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
+								seedPositionStrategyOfMyDefenseBuildingType, false);
+						
+					}			
+				}
+			}
+			if (isPossibleToConstructDefenseBuildingType2 == true
+				&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
+				if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
+					if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
+						
+						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
+								seedPositionStrategyOfMyDefenseBuildingType, false);
+
+					}			
+				}
+			}
+		}	
 		
 		// sc76.choi 확장된 지역에 성큰을 건설한다.
 		int countSelfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).size();
@@ -4033,6 +4043,9 @@ public class StrategyManager {
 	BaseLocation bestMultiLocation = null;
 	BaseLocation bestMultiLocation1 = null;
 	public BaseLocation getBestMultiLocation(){
+		
+		if(isInitialBuildOrderFinished == false) return null;
+		
 		double tempDistFromMyMainLocation = 100000000.0;
 		
 		BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());

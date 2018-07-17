@@ -67,6 +67,7 @@ public class KCUpgradeAndTech {
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
 				&& myPlayer.isResearching(necessaryTechType1) == true
+  			    && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2				
 		) {
 			isTimeToStartUpgradeType5 = true;
 		}			
@@ -404,9 +405,11 @@ public class KCUpgradeAndTech {
 		}		
 		
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
-				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
-				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
-				&& myPlayer.isResearching(necessaryTechType1) == true) {
+			  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
+			  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+			  && myPlayer.isResearching(necessaryTechType1) == true
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2				
+		) {
 			isTimeToStartUpgradeType5 = true;
 		}		
 		

@@ -82,7 +82,7 @@ public class KCTechTreeUp {
 		// sc76.choi 기본  Hive 테크(상황에 따라) 작성 예정
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 0 || myPlayer.incompleteUnitCount(UnitType.Zerg_Hive) == 0)
 			&& myPlayer.allUnitCount(UnitType.Zerg_Hive) == 0

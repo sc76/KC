@@ -17,7 +17,7 @@ public class Config {
 	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
 	
 	// sc76.choi 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
-	public static int DISTANCE_WORKER_CANATTACK = 32 * 7; // TILE_SIZE
+	public static int DISTANCE_WORKER_CANATTACK = 32 * 4; // TILE_SIZE
 	
 	// sc76.choi 일꾼 공격 합세숫자
 	public static int COUNT_WORKERS_CANATTACK = 3; 
