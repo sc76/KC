@@ -338,6 +338,7 @@ public class StrategyManager {
 		return unitCount;
 	}
 	
+	
 	// sc76.choi 현재 적의 거주 지역 중 가장 가까운 곳을 찾아 TARGET_POSITION으로 지정한다.
 	// sc76.choi TODO 공격이 3번 이상 막히고, 다른 적 거주지가 있으면 그곳을 TARGET으로 잡아보자.
 	
@@ -1029,7 +1030,7 @@ public class StrategyManager {
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
 					
 					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
-							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
 				}
 			}
 		
@@ -1083,7 +1084,7 @@ public class StrategyManager {
 			{
 					// sc76.choi Hive 진행 중이면 Lair를 또 가면 안된다.
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Evolution_Chamber, 
-							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, true);
+							BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false);
 			}
 			
 			// 첫번째 멀티가 깨지면 다시 재건한다.
@@ -1600,32 +1601,43 @@ public class StrategyManager {
 		
 		boolean existEnemyAroundWorker = false;
 		double remainHitPoint = 0.0d;
+		int enemyUnitsInMyFirstExpansion = InformationManager.Instance().getCombatUnitCountInRegion(BWTA.getRegion(myFirstExpansionLocation.getPosition()), enemyPlayer);
+		int distanceWorkerCanAttak = Config.DISTANCE_WORKER_CANATTACK;
+		
+		
+		// sc76.choi 공격 투입 일꾼 수 조정
+		int countWorkersToCanAttak = Config.COUNT_WORKERS_CANATTACK;
+		if(isInitialBuildOrderFinished == false) countWorkersToCanAttak = 1; // 초기빌드까지는 1마리만 공격가담
+		if(isInitialBuildOrderFinished == false && enemyUnitsInMyFirstExpansion >= 2) {
+			countWorkersToCanAttak = 10; // 앞마당 공격이면 10 마리
+			distanceWorkerCanAttak = Config.TILE_SIZE*30;
+		}
+		
+//		System.out.println("enemyUnitsInMyFirstExpansion : " + enemyUnitsInMyFirstExpansion);
+//		System.out.println("countWorkersToCanAttak : " + countWorkersToCanAttak);
+//		System.out.println("distanceWorkerCanAttak : " + distanceWorkerCanAttak);
+		
 		// 전체 아군 유닛의 일꾼을 loop
 		for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 			if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 			
-			int countWorkersToCanAttak = Config.COUNT_WORKERS_CANATTACK;
-			if(isInitialBuildOrderFinished == false) countWorkersToCanAttak = 1; // 초기빌드까지는 1마리만 공격가담
-			
 			// 각 worker의 주변 DISTANCE_WORKER_CANATTACK을 살펴 본다.
-			Iterator<Unit> iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), Config.DISTANCE_WORKER_CANATTACK).iterator();
+			Iterator<Unit> iter = MyBotModule.Broodwar.getUnitsInRadius(worker.getPosition(), distanceWorkerCanAttak).iterator();
 			while(iter.hasNext()){
 				Unit unit = iter.next();
 				
 				// 지상공격이 가능한 적군이면 CombatWorker으로 변경한다.
 				if(commandUtil.IsValidEnemyGroundAttackUnit(unit)){
 					
-					if(!unit.getType().canAttack()) continue; // 공격력이 없으면, 메딕.. 
+					if(unit.getType().canAttack() == false) continue; // 공격력이 없으면, 메딕.. 
 					
 					Unit enemyUnit = unit;
 					existEnemyAroundWorker = true; // 적군 카운트 증
 					
 					// 부실한 공격 유닛은 해제
 					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
-						remainHitPoint = (worker.getHitPoints()*1.0)/40.0;
-						//System.out.println("combat Unit remainHitPoint : " + worker.getHitPoints() + "[" +worker.getID()+ "]");
-						if(remainHitPoint <= .7){
-							//System.out.println("remove Unit remainHitPoint : " + " " +remainHitPoint + "[" +worker.getID()+ "]");
+						remainHitPoint = (worker.getHitPoints()*1.0)/(worker.getInitialHitPoints()*1.0);
+						if(remainHitPoint <= .2){
 							WorkerManager.Instance().setIdleWorker(worker);
 						}
 					}
@@ -1637,23 +1649,23 @@ public class StrategyManager {
 					
 					// 적군과 나와의 거리가 DISTANCE_WORKER_CANATTACK내에 있는,
 					// worker(Job이 Mineral이고 체력이 온전한)를 상태를 combat으로 변경한다.
-					if(worker.getDistance(enemyUnit) < Config.DISTANCE_WORKER_CANATTACK){
+					if(worker.getDistance(enemyUnit) < distanceWorkerCanAttak){
 
-						// 공격 투입
-						//if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals){
+						// sc76.choi 공격 투입(미네럴, 가스 일꾼)
+						if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Minerals
+							|| WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Gas){
+							
 							if(!commandUtil.IsValidSelfUnit(worker)) return; // 정상유닛 체크
 							
-							remainHitPoint = (worker.getHitPoints()*1.0)/40.0;
+							remainHitPoint = (worker.getHitPoints()*1.0)/(worker.getInitialHitPoints()*1.0);
 							if(worker.isCarryingMinerals() || worker.isAttacking()) continue; // 미네랄 운반 일꾼은 제외
-							if(remainHitPoint >= .8){
+							if(remainHitPoint >= .4){
 								WorkerManager.Instance().setCombatWorker(worker);
-								//System.out.println("add Unit remainHitPoint : " + remainHitPoint + "[" +worker.getID()+ "]");
-								// 일꾼 공격 합세는 2마리만 한다.
-								if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= Config.COUNT_WORKERS_CANATTACK) { 
+								if(WorkerManager.Instance().getWorkerData().getNumCombatWorkers() >= countWorkersToCanAttak) { 
 									break;
 								}
 							}
-						//}
+						}
 					}
 				}
 			} // while
@@ -1673,7 +1685,7 @@ public class StrategyManager {
 		if(isInitialBuildOrderFinished == false && myMainBaseLocation != null){
 			for (Unit worker : WorkerManager.Instance().getWorkerData().getWorkers()) {
 				if(!commandUtil.IsValidSelfUnit(worker)) return;
-				if(worker.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*35){
+				if(worker.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*30){
 					if(WorkerManager.Instance().getWorkerData().getWorkerJob(worker) == WorkerData.WorkerJob.Combat){
 						WorkerManager.Instance().setIdleWorker(worker);
 					}
@@ -1736,53 +1748,58 @@ public class StrategyManager {
 				
 				// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.	
 				
-					if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
+				if (enemyUnitForExpansionDefence != null && commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
+					
+//					//  sc76.choi TODO Config.TILE_SIZE*35가 적당한가?
+//					if(DEFENCE_POSITION != null && unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*35){
+//						commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
+//					}else{
+						// sc76.choi 나의 유닛의 주변, 적군의 공격 포인트 판단.
+						List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*10);
+						boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
 						
-						//  sc76.choi TODO Config.TILE_SIZE*35가 적당한가?
-						if(DEFENCE_POSITION != null && unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*35){
+//						if(unit.getType() == UnitType.Zerg_Zergling){
+//							System.out.println("canAttackNow : " + canAttackNow);
+//							System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
+//							System.out.println("my Unit                      : " + unit.getID());
+//							System.out.println();
+//						}
+						
+						if(canAttackNow){
 							commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
 						}else{
-							// sc76.choi 나의 유닛의 주변, 적군의 공격 포인트 판단.
-							List<Unit> unitsAttackingRadius = unit.getUnitsInRadius(Config.TILE_SIZE*4);
-							boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(unitsAttackingRadius);
-							
-							//System.out.println("canAttackNow : " + canAttackNow);
-							//System.out.println("enemyUnitForExpansionDefence : " + enemyUnitForExpansionDefence.getID());
-							//System.out.println("my Unit                      : " + unit.getID());
-							
-							if(canAttackNow){
-								commandUtil.attackUnit(unit, enemyUnitForExpansionDefence);
-							}else{
-								// sc76.choi 본진 가까이 있으면 그냥 싸운다.
-								if(unit.getDistance(myMainBaseLocation.getPoint()) < Config.TILE_SIZE*5){
-									commandUtil.attackMove(unit, myMainBaseLocation.getPoint());
-								}
-								// sc76.choi 확장 가까이 있으면 그냥 싸운다.
-								else if(unit.getDistance(myFirstExpansionLocation.getPoint()) < Config.TILE_SIZE*5){
-									commandUtil.attackMove(unit, myFirstExpansionLocation.getPoint());
-								}
-								// sc76.choi 본진 좀 거리가 있으면 move로 움직인다.
-								else{
-									commandUtil.attackMove(unit, DEFENCE_POSITION);
-								}
-							}
+							// sc76.choi 본진 가까이 있으면 그냥 싸운다.
+							//if(unit.getDistance(myMainBaseLocation.getPoint()) < Config.TILE_SIZE*5){
+								commandUtil.move(unit, myMainBaseLocation.getPoint());
+							//}
+//							
+//							// sc76.choi 확장 가까이 있으면 그냥 싸운다.
+//							else if(unit.getDistance(myFirstExpansionLocation.getPoint()) < Config.TILE_SIZE*5){
+//								commandUtil.attackMove(unit, myFirstExpansionLocation.getPoint());
+//							}
+//							// sc76.choi 본진 좀 거리가 있으면 move로 움직인다.
+//							else{
+//								commandUtil.attackMove(unit, DEFENCE_POSITION);
+//							}
 						}
-						
+//					}
+					
+				}
+				// sc76.choi 본진에 적이 있으면, DEFENCE_POSITION 까지 후퇴한다.				
+				else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence)){
+					//System.out.println("Defence Move 2");
+						commandUtil.attackMove(unit, enemyUnitForMainDefence.getPosition());
+				}
+				// sc76.choi 적이 없으면 모이는데, 확장이 시작되었으면 태어난 자리에 있게 한다.
+				else{
+					
+					if(unit.getDistance(DEFENCE_POSITION) < Config.TILE_SIZE*35){
+							commandUtil.attackMove(unit, DEFENCE_POSITION);
+					}else{
+						//commandUtil.move(unit, DEFENCE_POSITION);
 					}
-					// sc76.choi 본진에 적이 있으면, DEFENCE_POSITION 까지 후퇴한다.				
-					else if (enemyUnitForMainDefence != null && commandUtil.IsValidUnit(enemyUnitForMainDefence)){
-						//System.out.println("Defence Move 2");
-							commandUtil.attackMove(unit, enemyUnitForMainDefence.getPosition());
-					}
-					// sc76.choi 적이 없으면 모이는데, 확장이 시작되었으면 태어난 자리에 있게 한다.
-					else{
-						
-						if(unit.getDistance(DEFENCE_POSITION) < Config.TILE_SIZE*35){
-								commandUtil.attackMove(unit, DEFENCE_POSITION);
-						}else{
-							//commandUtil.move(unit, DEFENCE_POSITION);
-						}
-					}
+				}
+				
 				hasCommanded = true;
 			}
 		}
@@ -3503,7 +3520,7 @@ public class StrategyManager {
 					}
 				}else{
 					seqBuildOrderStep = 60;
-					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 2, 2, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
 			}
 			
@@ -3748,8 +3765,8 @@ public class StrategyManager {
 		
 		// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 		// InitialBuildOrder 진행중이라도 supplyUsed 가 supplyTotal 보다 커져버리면 실행하도록 합니다
-		if (isInitialBuildOrderFinished == false 
-				&& MyBotModule.Broodwar.self().supplyUsed() < MyBotModule.Broodwar.self().supplyTotal()  ) {
+		if (isInitialBuildOrderFinished == false){
+//				&& MyBotModule.Broodwar.self().supplyUsed() < MyBotModule.Broodwar.self().supplyTotal()  ) {
 			return;
 		}
 
@@ -3916,7 +3933,7 @@ public class StrategyManager {
 						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
 					
-					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), false);
 				}
 
 				// creep colony가 있고, spore colony가 없으면

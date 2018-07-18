@@ -106,6 +106,7 @@ public class KCSimulationManager {
 		countBasicDefenceUnit = 0;
 		countAdvencedDefenceUnit = 0;
 		
+		int myWorkerUnitTypePoint = 10;
 		int myBasicCombatUnitTypePoint = 10;
 		int myAdvencedCombatUnitTypePoint = 40;
 		int myAdvencedCombatUnitType2Point = 40; // 울트라리스크
@@ -114,7 +115,9 @@ public class KCSimulationManager {
 		
 		for(Unit unit : Units){
 			if(unit.getPlayer() == selfPlayer){
-				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType()){
+				if(unit.getType() == InformationManager.Instance().getWorkerType()){
+					myPoint += myWorkerUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType()){
 					myPoint += myBasicCombatUnitTypePoint;
 				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType()){
 					myPoint += myAdvencedCombatUnitTypePoint;
@@ -174,9 +177,9 @@ public class KCSimulationManager {
 		
 		if (enemyRace == Race.Protoss) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 10;
+				return 8;
 			}
-			return 25;
+			return 14;
 		} else if (enemyRace == Race.Terran) {
 			return 8;
 		} else if (enemyRace == Race.Zerg) {

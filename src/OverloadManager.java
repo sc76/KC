@@ -543,12 +543,14 @@ public class OverloadManager {
 //            }
 //
 			// sc76.choi 공격을 당하면, 본진귀환
-            if (centerChokeOverload.isUnderAttack()) {
-            	if(commandUtil.IsValidUnit(centerChokeOverload)){
-	            	overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Idle , (Unit)null);
-	                moveScoutUnitToMyBaseLocation(centerChokeOverload);
-            	}
-            }
+			if(commandUtil.IsValidUnit(centerChokeOverload)){
+	            if (centerChokeOverload.isUnderAttack()) {
+	            	if(commandUtil.IsValidUnit(centerChokeOverload)){
+		            	overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Idle , (Unit)null);
+		                moveScoutUnitToMyBaseLocation(centerChokeOverload);
+	            	}
+	            }
+			}
 //
 //            if (secondScoutOverload != null && secondScoutOverload.isUnderAttack()) {
 //                BaseLocation myMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());

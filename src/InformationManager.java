@@ -565,6 +565,37 @@ public class InformationManager {
 		return false;
 	}
 
+	/**
+	 * getCombatUnitCountInRegion
+	 * @param pos
+	 * @param player
+	 * @return
+	 * 
+	 * 시야에 보이는 기준으로, 해당 포지션에서 player의 병력의 수를 리턴한다.
+	 */
+	public int getCombatUnitCountInRegion(Region region, Player player){
+		int unitCount = 0 ;
+		if (region == null || player == null) {
+			return 0;
+		}
+
+		Iterator<Integer> it = unitData.get(player).getUnitAndUnitInfoMap().keySet().iterator();
+
+		// for (const auto & kv : unitData.get(self).getUnits())
+		while (it.hasNext()) {
+			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
+			if (ui.getType().canAttack()) {
+				
+				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
+
+				if (BWTA.getRegion(ui.getLastPosition()) == region) {
+					unitCount++;
+				}
+			}
+		}
+		return unitCount;
+	}
+	
 	/// 해당 Player (아군 or 적군) 의 모든 유닛 목록 (가장 최근값) UnitAndUnitInfoMap 을 리턴합니다<br>	 
 	/// 파악된 정보만을 리턴하기 때문에 적군의 정보는 틀린 값일 수 있습니다
 	public final Map<Integer, UnitInfo> getUnitAndUnitInfoMap(Player player) {

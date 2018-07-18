@@ -204,7 +204,7 @@ public class WorkerManager {
 
 			if (workerData.getWorkerJob(worker) == WorkerData.WorkerJob.Combat)
 			{
-				MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 4, Color.Yellow, true);
+				MyBotModule.Broodwar.drawCircleMap(worker.getPosition().getX(), worker.getPosition().getY(), 10, Color.Yellow, false);
 				Unit target = getClosestEnemyUnitFromWorker(worker);
 
 				if (target != null)
@@ -659,7 +659,7 @@ public class WorkerManager {
 
 			// sc76.choi, dist < 400 에서 DISTANCE_WORKER_CANATTACK으로 수정
 			// combatWorker와 같은 사이즈
-			if ((dist < Config.DISTANCE_WORKER_CANATTACK) && (closestUnit == null || (dist < closestDist)))
+			if ((dist < Config.TILE_SIZE*30) && (closestUnit == null || (dist < closestDist)))
 			{
 				closestUnit = unit;
 				closestDist = dist;
