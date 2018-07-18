@@ -3657,7 +3657,7 @@ public class StrategyManager {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 해처리가 많고 확장이 되면, 미네럴당 일꾼 수 조절을 한다.
 		if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
-			Config.optimalWorkerCount = 2;
+			Config.optimalWorkerCount = 1.5;
 		}
 
 	}

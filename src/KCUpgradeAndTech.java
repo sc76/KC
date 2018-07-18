@@ -38,12 +38,13 @@ public class KCUpgradeAndTech {
 
 		// 히드라 사정 업그레이드
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6) {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
 		// 히드라 발업
-		if (myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+				&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType2 = true;
 		}
