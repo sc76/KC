@@ -586,7 +586,13 @@ public class InformationManager {
 			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
 			if (ui.getType().canAttack()) {
 				
-				if (BWTA.getRegion(ui.getLastPosition()) == null) continue;
+				if(player == selfPlayer && ui.getType().isWorker()){
+					continue;
+				}
+				
+				if (BWTA.getRegion(ui.getLastPosition()) == null) {
+					continue;
+				}
 
 				if (BWTA.getRegion(ui.getLastPosition()) == region) {
 					unitCount++;

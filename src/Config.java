@@ -38,7 +38,7 @@ public class Config {
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 6; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
-	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 0; // 럴커
+	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 2; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstTerran = 0; // 울트라
 	
@@ -49,6 +49,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
+	public static int necessaryNumberOfCombatUnitType6AgainstProtoss = 2;  // 가디언
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstProtoss = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstProtoss = 1; // 디파일러
 	
@@ -57,6 +58,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
+	public static int necessaryNumberOfCombatUnitType6AgainstZerg = 2;  // 가디언
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
@@ -65,6 +67,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
+	public static int necessaryNumberOfCombatUnitType6AgainstTerran = 2;  // 가디언
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 3; // 디파일러	
 
@@ -74,7 +77,7 @@ public class Config {
 	public static int maxNumberOfCombatUnitType2AgainstProtoss = 16; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstProtoss = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstProtoss = 8;  // 뮤탈
-	public static int maxNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
+	public static int maxNumberOfCombatUnitType5AgainstProtoss = 4;  // 울트라
 	
 	public static int maxNumberOfSpecialUnitType1AgainstProtoss = 1;  // 오버로드
 	public static int maxNumberOfSpecialUnitType2AgainstProtoss = 2; // 디파일러
@@ -85,10 +88,10 @@ public class Config {
 	public static int maxNumberOfCombatUnitType2AgainstZerg = 12; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstZerg = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈
-	public static int maxNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
+	public static int maxNumberOfCombatUnitType5AgainstZerg = 4;  // 울트라
 	
 	public static int maxNumberOfSpecialUnitType1AgainstZerg = 1;  // 오버로드
-	public static int maxNumberOfSpecialUnitType2AgainstZerg = 3; // 디파일러
+	public static int maxNumberOfSpecialUnitType2AgainstZerg = 2; // 디파일러
 	public static int maxNumberOfSpecialUnitType3AgainstZerg = 6;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstZerg = 2;  // 퀸
 	
@@ -96,12 +99,12 @@ public class Config {
 	public static int maxNumberOfCombatUnitType2AgainstTerran = 12; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstTerran = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstTerran = 8;  // 뮤탈
-	public static int maxNumberOfCombatUnitType5AgainstTerran = 3;  // 울트라
+	public static int maxNumberOfCombatUnitType5AgainstTerran = 4;  // 울트라
 	
 	public static int maxNumberOfSpecialUnitType1AgainstTerran = 2;  // 오버로드
-	public static int maxNumberOfSpecialUnitType2AgainstTerran = 3; // 디파일러
+	public static int maxNumberOfSpecialUnitType2AgainstTerran = 2; // 디파일러
 	public static int maxNumberOfSpecialUnitType3AgainstTerran = 4;  // 스커지
-	public static int maxNumberOfSpecialUnitType4AgainstTerran = 4;  // 퀸	
+	public static int maxNumberOfSpecialUnitType4AgainstTerran = 2;  // 퀸	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 아군 최대 생산 제한 유닛수

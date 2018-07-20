@@ -279,6 +279,12 @@ public class UXManager {
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 35, Color.White);
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 80, Color.White);
 		
+		if(enemyMainBaseLocation != null){
+			MyBotModule.Broodwar.drawCircleMap(enemyMainBaseLocation.getPosition(), Config.TILE_SIZE * 71, Color.Red);
+			MyBotModule.Broodwar.drawCircleMap(enemyMainBaseLocation.getPosition(), Config.TILE_SIZE * 70, Color.Red);
+			MyBotModule.Broodwar.drawCircleMap(enemyMainBaseLocation.getPosition(), Config.TILE_SIZE * 69, Color.Red);
+		}
+		
 		// 가장 앞선 히드라
 		int iClosestHydra = 0;
 		if(StrategyManager.Instance().getClosesAttackUnitFromEnemyMainBase() != null){

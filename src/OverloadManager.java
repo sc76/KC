@@ -211,40 +211,53 @@ public class OverloadManager {
 		}
 		// 적진이 발견되었다면,
 		else{
-			//if(isFinishedInitialScout) return;
-//			if (firstScoutOverload == null || firstScoutOverload.exists() == false || firstScoutOverload.getHitPoints() <= 0 ){
-//				// 다시 정찰이 필요하다면 assing해 준다.
-//				assignFirstScoutOverload();
-//			}
-
-//			if(MyBotModule.Broodwar.enemy().getRace() == Race.Terran){
-//				commandUtil.move(firstScoutOverload, enemySecondChokeLocation);
-//			}else{
-//				commandUtil.move(firstScoutOverload, enemyMainLocation);
-//			}
+			
+			if(commandUtil.IsValidUnit(firstScoutOverload) == false) return;
+				
+			// sc76.choi 안전한지 체크
+			boolean isSafeAround = true;
+			for(Unit enemyUnit : firstScoutOverload.getUnitsInRadius(Config.TILE_SIZE*8)){
+				if(enemyUnit.getPlayer() == InformationManager.Instance().enemyPlayer){
+					if(enemyUnit.getType() == UnitType.Terran_Marine
+						|| enemyUnit.getType() == UnitType.Terran_Bunker){
+						isSafeAround = false;
+					}
+				}
+			}
+			
+			//System.out.println("initialFirstScoutOverload() isSafeAround : " + firstScoutOverload.getID() + " " + isSafeAround);
 			
 			// sc76.choi 발견된 적진의 거리를 구해, patrol 할수 있도록 한다.
 			double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
 			if(distanceFromEnemyMainBaseLocation <= (double)TilePosition.SIZE_IN_PIXELS*3){
-				commandUtil.patrol(firstScoutOverload, enemySecondChokePoint.getCenter());
 				
 				// sc76.choi 공격을 당하면, 본진귀환
-	            if (firstScoutOverload.isUnderAttack()) {
+	            if (firstScoutOverload.isUnderAttack() || isSafeAround == false) {
 	            	if(commandUtil.IsValidUnit(firstScoutOverload)){
 		            	overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.Idle , (Unit)null);
 		                moveScoutUnitToMyBaseLocation(firstScoutOverload);
 	            	}
+	            }else{
+	            	commandUtil.patrol(firstScoutOverload, enemySecondChokePoint.getCenter());
 	            }
 	            
 			}else{
 				
-				if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음, 
 				
-				commandUtil.move(firstScoutOverload, enemyMainBaseLocation.getPosition());
-				currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
-				isFinishedInitialScout = true; // 초반 정찰 끝
+				if (firstScoutOverload.isUnderAttack() || isSafeAround == false) {
+	            	if(commandUtil.IsValidUnit(firstScoutOverload)){
+		            	overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.Idle , (Unit)null);
+		                moveScoutUnitToMyBaseLocation(firstScoutOverload);
+	            	}
+				}else{
+					if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음,
+					
+					commandUtil.move(firstScoutOverload, enemyMainBaseLocation.getPosition());
+					currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
+					isFinishedInitialScout = true; // 초반 정찰 끝
+					overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.EnemyBase, (Unit)null);
+				}
 			}
-			overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.EnemyBase, (Unit)null);
 		}
 	}
 
