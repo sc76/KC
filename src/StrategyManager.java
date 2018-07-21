@@ -1435,7 +1435,8 @@ public class StrategyManager {
 		}		
 
 		// 오버로드
-		// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.				
+		// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.	
+		// System.out.println("commandMyCombatUnitToAttack() mySpecialUnitType1List : " + mySpecialUnitType1List.size());
 		for(Unit unit : mySpecialUnitType1List){
 			hasCommanded = controlSpecialUnitType1(unit);
 		}
@@ -1511,6 +1512,9 @@ public class StrategyManager {
 			if (unit.getType() == myCombatUnitType3) {
 				hasCommanded = controlCombatUnitType3(unit);
 			}
+			
+			// 뮤탈은 별도로 컨트롤 한다.
+			hasCommanded = controlCombatUnitType4((Unit)null);
 			
 			// 오버로드
 			if (unit.getType() == mySpecialUnitType1) {					
@@ -2133,144 +2137,115 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
-	/// 뮤탈 유닛에 대해 컨트롤 명령을 내립니다
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 뮤탈 유닛에 대해 컨트롤 명령을 내립니다
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 	Unit enemyUnitForMutalisk = null;
 	Unit closestOverloadWithIdle = null;
+	
 	boolean controlCombatUnitType4(Unit unitType4){
 		boolean hasCommanded = false; 
-		Position targetPosition = null;
+		
+//		System.out.println("enemyUnitForMutalisk 0 : ");
+//		System.out.println();
 		
 		// sc76.choi 뮤탈이 5개 이상 죽으면, 가디언으로 전환
 		if (myKilledCombatUnitCount4 >= 5) {
 			return true;
 		}
 			
+		// sc76.choi 공격 이라도 4마리가 되지 않으면 모여 있는다. Greater Spire가 올라가 있으면 공격 중지
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) < 4 
+			|| myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) > 0){
+			for(Unit unit : myCombatUnitType4List){
+				commandUtil.move(unit, DEFENCE_POSITION);
+			}
+			return true;
+		}
+		
 		// sc76.choi 뮤탈 리스크의 공격 대상 선정
 		if(commandUtil.IsValidUnit(enemyUnitForMutalisk) == false){
 			enemyUnitForMutalisk = findAttackTargetForMutalisk();
-			//System.out.println("enemyUnitForMutalisk : " + enemyUnitForMutalisk.getID() + " " + enemyUnitForMutalisk.getType());
+			
 		}
 		
-		if (combatState == CombatState.defenseMode) {
+		
+		// sc76.choi 근처에 적이 존재 하면
+		if(commandUtil.IsValidUnit(enemyUnitForMutalisk)){
 			
-			// sc76.choi 방어중 적군이 보이면
-			if(commandUtil.IsValidUnit(enemyUnitForMutalisk)){
-				
-				for(Unit unit : myCombatUnitType4List){
-					
-					// sc76.choi 안전한지 체크
-					boolean isSafeAround = true;
-					for(Unit enemyUnit : enemyUnitForMutalisk.getUnitsInRadius(Config.TILE_SIZE*6)){
-						if(enemyUnit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace)){
-							isSafeAround = false;
-						}
-					}
-					
-					if(isSafeAround){
-						commandUtil.attackUnit(unit, enemyUnitForMutalisk);
-						if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForMutalisk.getTargetPosition(), Color.Yellow);
-						
-					}else{
-						// sc76.choi 다른 공격 유닛을 찾기 위해 null을 만들어 준다.
-						enemyUnitForMutalisk = null;
-					}
-				
-				}
-			}else{
-				// sc76.choi TODO 방어중 적군이 없으면, 정찰을 다닌다.
-				for(Unit unit : myCombatUnitType4List){
-					commandUtil.move(unit, DEFENCE_POSITION);
+//			System.out.println("enemyUnitForMutalisk 1 : " + enemyUnitForMutalisk.getID() + " " + enemyUnitForMutalisk.getType());
+//			System.out.println();
+			
+			// sc76.choi 뮤탈을 위한 오버로드 한마리 추가 getClosestOverload(target)
+			if(closestOverloadWithIdle == null){
+				closestOverloadWithIdle = getClosestOverloadWithIDLE(myMainBaseLocation.getPosition());
+				if(commandUtil.IsValidUnit(closestOverloadWithIdle)){
+					myCombatUnitType4List.add(closestOverloadWithIdle);
 				}
 			}
-			hasCommanded = true;
-		}
-		// 공격일때
-		else{
 			
-			// sc76.choi 공격 이라도 4마리가 되지 않으면 모여 있는다. Greater Spire가 올라가 있으면 공격 중지
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) < 4 
-				|| myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) > 0){
+			// sc76.choi 안전한지 체크
+			boolean isSafeAround = true;
+			// sc76.choi 뮤탈의 타겟 주변이 안전한지 검사.
+			for(Unit enemyUnit : enemyUnitForMutalisk.getUnitsInRadius(Config.TILE_SIZE*6)){
+				if(enemyUnit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace)
+						|| enemyUnit.getType() == UnitType.Zerg_Spore_Colony
+						|| enemyUnit.getType() == UnitType.Terran_Missile_Turret
+						|| enemyUnit.getType() == UnitType.Terran_Bunker
+						|| enemyUnit.getType() == UnitType.Protoss_Photon_Cannon
+						){
+					isSafeAround = false;
+				}
+			}
+			
+//			System.out.println("enemyUnitForMutalisk 2 : " + isSafeAround + " " + enemyUnitForMutalisk.getID() + " " + enemyUnitForMutalisk.getType());
+//			System.out.println();
+			
+			// sc76.choi 공격 가능한 지역이라 판단되면 
+			if(isSafeAround){
 				for(Unit unit : myCombatUnitType4List){
-					commandUtil.move(unit, DEFENCE_POSITION);
-				}
-				return true;
+					// sc76.choi cooldown 시간을 이용한 공격
+					if(unit.getGroundWeaponCooldown() == 0 && unit.getHitPoints() > 10 ){
+							// sc76.choi 뮤탈 이동
+							if(unit.getType() == UnitType.Zerg_Overlord){
+								commandUtil.move(unit, enemyUnitForMutalisk.getPosition());
+							}else{
+								
+								commandUtil.attackUnit(unit, enemyUnitForMutalisk);
+								if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForMutalisk.getTargetPosition(), Color.Yellow);
+							}
+					}
+					// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
+					else{
+						// getCalcuatePosition(unit)
+						commandUtil.move(unit, DEFENCE_POSITION);
+					}
+				} // for
 			}
-			
-			// sc76.choi 근처에 적이 존재 하면
-			if(commandUtil.IsValidUnit(enemyUnitForMutalisk)){
-				
-				// sc76.choi 뮤탈을 위한 오버로드 한마리 추가 getClosestOverload(target)
-				if(closestOverloadWithIdle == null){
-					closestOverloadWithIdle = getClosestOverloadWithIDLE(myMainBaseLocation.getPosition());
-					if(commandUtil.IsValidUnit(closestOverloadWithIdle)){
-						myCombatUnitType4List.add(closestOverloadWithIdle);
-					}
-				}
-				
-				if(commandUtil.IsValidUnit(enemyUnitForMutalisk) == false) return true;
-				
-				// sc76.choi 안전한지 체크
-				boolean isSafeAround = true;
-				// sc76.choi 뮤탈의 타겟 주변이 안전한지 검사.
-				for(Unit enemyUnit : enemyUnitForMutalisk.getUnitsInRadius(Config.TILE_SIZE*6)){
-					if(enemyUnit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace)
-							|| enemyUnit.getType() == UnitType.Zerg_Spore_Colony
-							|| enemyUnit.getType() == UnitType.Terran_Missile_Turret
-							|| enemyUnit.getType() == UnitType.Terran_Bunker
-							|| enemyUnit.getType() == UnitType.Protoss_Photon_Cannon
-							){
-						isSafeAround = false;
-					}
-				}
-				
-				// sc76.choi 공격 가능한 지역이라 판단되면 
-				if(isSafeAround){
-					for(Unit unit : myCombatUnitType4List){
-						// sc76.choi cooldown 시간을 이용한 공격
-						if(unit.getGroundWeaponCooldown() == 0 && unit.getHitPoints() > 10 ){
-								// sc76.choi 뮤탈 이동
-								if(unit.getType() == UnitType.Zerg_Overlord){
-									commandUtil.move(unit, enemyUnitForMutalisk.getPosition());
-								}else{
-									
-									commandUtil.attackUnit(unit, enemyUnitForMutalisk);
-									if(Config.DEBUG) MyBotModule.Broodwar.drawLineMap(unit.getPosition(), enemyUnitForMutalisk.getTargetPosition(), Color.Yellow);
-								}
-						}
-						// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
-						else{
-							commandUtil.move(unit, getCalcuatePosition(unit));
-						}
-					} // for
-				}
-				// sc76.choi 안전하지 않으면 본진으로 귀환
-				else{
-					
-					enemyUnitForMutalisk = null; 
-					
-					for(Unit unit : myCombatUnitType4List){
-						if(unit.isIdle()){
-							commandUtil.attackMove(unit, mySecondChokePoint.getCenter());
-						}
-					}
-				}
-			}
-			// sc76.choi 타켓이 없으면, 본진귀환 TODO 정찰 해야 한다.
+			// sc76.choi 안전하지 않으면 본진으로 귀환
 			else{
+				
+				//System.out.println("enemyUnitForMutalisk null : ");
+				
+				enemyUnitForMutalisk = null; 
+				
 				for(Unit unit : myCombatUnitType4List){
 					if(unit.isIdle()){
 						commandUtil.attackMove(unit, mySecondChokePoint.getCenter());
 					}
 				}
 			}
-			
-		} // 공격일때
+		}
+		// sc76.choi 타켓이 없으면, 본진귀환 TODO 정찰 해야 한다.
+		else{
+			for(Unit unit : myCombatUnitType4List){
+				commandUtil.attackMove(unit, new Position(2000,2000));
+			}
+		}
+
 		hasCommanded = true;
 		
-		//}
-		
 		return hasCommanded;
-		
 	}
 	
 	// sc76.choi 울트라 유닛에 대해 컨트롤 명령을 내립니다
@@ -2305,8 +2280,16 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
-	/// 첫번째 특수 유닛 타입의 유닛에 대해 컨트롤 명령을 입력합니다
-	// sc76.choi 1 오버로드
+	//////////////////////////////////////////////////////////////////////////////////////////////////////// 
+	// sc76.choi 오버로드 유닛에 대해 컨트롤 명령을 입력합니다
+	
+	// sc76.choi closest 유닛의 살짝 뒤에 위치한다.
+	Position safePosition ;
+	Position safePosition1;
+	Position safePosition2;
+	Position safePosition3;
+	Position safePosition4;
+	
 	boolean controlSpecialUnitType1(Unit unit) {
 
 		boolean hasCommanded = false;		
@@ -2314,34 +2297,93 @@ public class StrategyManager {
 		// sc76.choi 기본적으로 myAllCombatUnitList에 담긴 오버로드만 대상이 된다. (즉 Idle인 오버로드)
 		// sc76.choi 오버로드는 hasCommanded는 항상 true
 		// sc76.choi TODO 공격시에 가장 적진과 가까운 히드라를 따라 다니게 된다. 개선 필요
-		if (unit.getType() == UnitType.Zerg_Overlord) {			
+		if (unit.getType() == UnitType.Zerg_Overlord) {
+			
 			if (!commandUtil.IsValidUnit(unit)) return true;
 			
 			Position targetPosition = null;
+			
+			// sc76.choi 공격모드
 			if(combatState == CombatState.attackStarted){
+				
+				if(enemyMainBaseLocation == null) return true;
 				
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
 				if(closesAttackUnitFromEnemyMainBase != null){
-					targetPosition = closesAttackUnitOfPositionFromEnemyMainBase;
-				}else{
-					//targetPosition = enemyMainBaseLocation.getPosition();
-					targetPosition = DEFENCE_POSITION;
 					
+					safePosition = closesAttackUnitFromEnemyMainBase.getPosition();
+					safePosition1 = closesAttackUnitFromEnemyMainBase.getPosition();
+					safePosition2 = closesAttackUnitFromEnemyMainBase.getPosition();
+					safePosition3 = closesAttackUnitFromEnemyMainBase.getPosition();
+					safePosition4 = closesAttackUnitFromEnemyMainBase.getPosition();
+					
+					// sc76.choi TARGET_POSITION 보다 항상 먼 포지션을 준다.
+					// 12 시
+					if(unit.getID() % 4 == 0){
+						safePosition1 = new Position(closesAttackUnitFromEnemyMainBase.getX(), closesAttackUnitFromEnemyMainBase.getY() - Config.TILE_SIZE*4);
+						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 12");
+					}
+					
+					//System.out.println("safePosition  : " + safePosition.toTilePosition());
+					//System.out.println("safePosition1 : " + safePosition1.toTilePosition());
+					
+					if(safePosition.getDistance(TARGET_POSITION) <= safePosition1.getDistance(TARGET_POSITION)){
+						safePosition = safePosition1;
+					}
+					
+					//System.out.println("safePosition  : " + safePosition.toTilePosition());
+					//System.out.println();
+					
+					// 3시
+					if(unit.getID() % 4 == 1){
+						safePosition2 = new Position(closesAttackUnitFromEnemyMainBase.getX() + Config.TILE_SIZE*4, closesAttackUnitFromEnemyMainBase.getY());
+						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 3");
+					}
+
+					if(safePosition.getDistance(TARGET_POSITION) <= safePosition2.getDistance(TARGET_POSITION)){
+						safePosition = safePosition2;
+					}
+					// 6시
+					if(unit.getID() % 4 == 2){
+						safePosition3 = new Position(closesAttackUnitFromEnemyMainBase.getX(), closesAttackUnitFromEnemyMainBase.getY()  + Config.TILE_SIZE*4);
+						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 6");
+					}
+					
+					if(safePosition.getDistance(TARGET_POSITION) <= safePosition3.getDistance(TARGET_POSITION)){
+						safePosition = safePosition3;
+					}
+					
+					// 9시
+					if(unit.getID() % 4 == 3) {
+						safePosition4 = new Position(closesAttackUnitFromEnemyMainBase.getX()  - Config.TILE_SIZE*4, closesAttackUnitFromEnemyMainBase.getY());
+						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 9");
+					}
+
+					if(safePosition.getDistance(TARGET_POSITION) <= safePosition4.getDistance(TARGET_POSITION)){
+						safePosition = safePosition4;
+					}
+					
+					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePosition, 5, Color.Teal, true);
+					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePosition, 6, Color.Red, false);
+					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePosition, 13, Color.Yellow, false);
+					
+					targetPosition = safePosition; //closesAttackUnitOfPositionFromEnemyMainBase;
+				}else{
+					targetPosition = DEFENCE_POSITION;
 				}
 				
-				OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);	
 				commandUtil.move(unit, targetPosition);
 				hasCommanded = true;
+			}
+			// sc76.choi 방어나, 초기 모드 일때
+			else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
 				
-				
-			}else if(combatState == CombatState.defenseMode || combatState == CombatState.initialMode){
-				
-				targetPosition = myMainBaseLocation.getPosition();
-				// TODO idle인것 중 멀리 있는것만 리턴 시켜야 한다.
+				// sc76.choi 멀리 나간 오버로드는 귀환시킨다.
 				for(Unit overload : OverloadManager.Instance().getOverloadData().getOverloads()){
-					if(OverloadManager.Instance().getOverloadData().getJobCode(overload) == 'A'){
+					if(OverloadManager.Instance().getOverloadData().getJobCode(overload) == 'A'
+						|| OverloadManager.Instance().getOverloadData().getJobCode(overload) == 'I'){
 						OverloadManager.Instance().getOverloadData().setOverloadJob(overload, OverloadData.OverloadJob.Idle, (Unit)null);				
-						commandUtil.move(overload, myFirstExpansionLocation.getPosition());
+						commandUtil.move(overload, DEFENCE_POSITION);
 						hasCommanded = true;
 					}
 				}
@@ -2349,10 +2391,7 @@ public class StrategyManager {
 			}else{
 				
 			}
-			
 		}
-		
-		//System.out.println("controlSpecialUnitType1(Unit) hasCommanded : " + hasCommanded);
 		return hasCommanded;
 	}
 	
@@ -2688,19 +2727,7 @@ public class StrategyManager {
 	        			}else if(unit.getType() == UnitType.Terran_Firebat){
 			        		target = unit;
 			        		break;
-	        			}else if(unit.getType() == UnitType.Terran_SCV){
-			        		target = unit;
-			        		break;
 	        			}else if(unit.getType() == UnitType.Terran_Medic){
-			        		target = unit;
-			        		break;
-	        			}else if(unit.getType() == UnitType.Terran_Command_Center){
-			        		target = unit;
-			        		break;
-	        			}else if(unit.getType() == UnitType.Terran_Barracks){
-			        		target = unit;
-			        		break;
-	        			}else if(unit.getType() == UnitType.Terran_Supply_Depot){
 			        		target = unit;
 			        		break;
 	        			}
@@ -3373,12 +3400,15 @@ public class StrategyManager {
 				myCombatUnitType1List.add(unit);
 				myAllCombatUnitList.add(unit);
 			}
-			// 히드라
-			else if (unit.getType() == myCombatUnitType2) {
-				// sc76.choi 적진과 가장 가까운 히드라를 찾는다.
-				if(commandUtil.IsValidUnit(unit) && distClosesAttackUnitFromEnemyMainBase > ui.getDistanceFromEnemyMainBase()){
+			
+			// 럴커
+			else if (unit.getType() == myCombatUnitType3) {
+				
+				// sc76.choi 적진과 가장 가까운 럴커를 찾는다.
+
+				if(distClosesAttackUnitFromEnemyMainBase > ui.getDistanceFromEnemyMainBase()){
 					closesAttackUnitFromEnemyMainBase = unit;
-					closesAttackUnitOfPositionFromEnemyMainBase = ui.getLastPosition();
+					closesAttackUnitOfPositionFromEnemyMainBase = ui.getUnit().getPosition();
 					distClosesAttackUnitFromEnemyMainBase = ui.getDistanceFromEnemyMainBase();
 					
 					// getDistanceFromEnemyMainBase가 마이너스 값을 가지는 경우가 있음
@@ -3386,14 +3416,34 @@ public class StrategyManager {
 						distClosesAttackUnitFromEnemyMainBase = 10000000;
 					}
 				}
-				myCombatUnitType2List.add(unit); 
-				myAllCombatUnitList.add(unit);
-			}
-			// 럴커
-			else if (unit.getType() == myCombatUnitType3) { 
+
+				
 				myCombatUnitType3List.add(unit); 
 				myAllCombatUnitList.add(unit);
 			}
+
+			// 히드라
+			else if (unit.getType() == myCombatUnitType2) {
+				
+				if(commandUtil.IsValidUnit(unit) == false) return;
+				
+				// sc76.choi 적진과 가장 가까운 히드라를 찾는다. 럴커가 없을때
+				if(closesAttackUnitFromEnemyMainBase == null){
+					if(distClosesAttackUnitFromEnemyMainBase > ui.getDistanceFromEnemyMainBase()){
+						closesAttackUnitFromEnemyMainBase = unit;
+						closesAttackUnitOfPositionFromEnemyMainBase = ui.getUnit().getPosition();
+						distClosesAttackUnitFromEnemyMainBase = ui.getDistanceFromEnemyMainBase();
+						
+						// getDistanceFromEnemyMainBase가 마이너스 값을 가지는 경우가 있음
+						if(distClosesAttackUnitFromEnemyMainBase < 0){
+							distClosesAttackUnitFromEnemyMainBase = 10000000;
+						}
+					}
+				}
+				myCombatUnitType2List.add(unit); 
+				myAllCombatUnitList.add(unit);
+			}
+			
 			
 			// 뮤탈
 			else if (unit.getType() == myCombatUnitType4) {
@@ -3418,16 +3468,20 @@ public class StrategyManager {
 				
 				// maxNumberOfSpecialUnitType1 숫자까지만 특수유닛 부대에 포함시킨다 (저그 종족의 경우 오버로드가 전부 전투참여했다가 위험해질 수 있으므로)
 				// sc76.choi defence 모드 시에 좀 애매 하다. 본진 으로 귀한하지 않는 유닛이 생길 수 있다.
-				if (mySpecialUnitType1List.size() <= maxNumberOfSpecialUnitType1) {
+				char jobCode = OverloadManager.Instance().getOverloadData().getJobCode(unit);
+				if (mySpecialUnitType1List.size() < maxNumberOfSpecialUnitType1) {
 
 					//  'A'를 채웠으나 모자라면 'I'에서 찾는다.
-					char jobCode = OverloadManager.Instance().getOverloadData().getJobCode(unit);
 					if(jobCode == 'A' || jobCode == 'I'){
+						OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.AttackMove, (Unit)null);
 						mySpecialUnitType1List.add(unit); 
 						myAllCombatUnitList.add(unit);
-						//System.out.println("add overload mySpecialUnitType1List (" + mySpecialUnitType1List.size()+") : " + unit.getID());
 					}
 					
+				}else{
+					if(jobCode == 'A'){
+						OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Idle, (Unit)null);
+					}
 				}
 			}
 			else if (unit.getType() == mySpecialUnitType2) { 
@@ -3738,8 +3792,25 @@ public class StrategyManager {
 								// sc76.choi 30마리 이상이면, 확장에서 일꾼을 생산한다.
 								if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 26){
 									if(enemyRace == Race.Terran){
-										if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-											|| myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
+										if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0){
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+										}else{
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+										}
+									}else{
+										if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+												&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6){
+												BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+											}else{
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+											}
+									}
+								}else if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 40
+										 && InformationManager.Instance().getTotalHatcheryCount() >= 5){
+									if(enemyRace == Race.Terran){
+										if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
 											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
 										}else{
@@ -4670,7 +4741,8 @@ public class StrategyManager {
 				
 				boolean isPossibleToTrain = false;
 				if (mySpecialUnitType3 == UnitType.Zerg_Scourge) {
-					if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0) {
+					if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+						 || myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0) {
 						isPossibleToTrain = true;
 					}							
 				}
@@ -4696,7 +4768,7 @@ public class StrategyManager {
 				int allCountOfSpecialUnitType3 = this.getCurrentTrainUnitCount(mySpecialUnitType3);
 				
 				if (allCountOfSpecialUnitType3 < maxNumberOfTrainSpecialUnitType3) {
-					// sc76.choi 뮤탈이 4마리 이상 있으면 생산시작한다.
+					// sc76.choi 뮤탈이 4마리 이상 있으면, 가디언이 1마리 이상 있으면 생산시작한다.
 					if(myCombatUnitType4List.size() >= 2
 						|| myCombatUnitType6List.size() >= 1){
 						isNecessaryToTrainMore = true;

@@ -79,7 +79,7 @@ public class Config {
 	public static int maxNumberOfCombatUnitType4AgainstProtoss = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstProtoss = 4;  // 울트라
 	
-	public static int maxNumberOfSpecialUnitType1AgainstProtoss = 1;  // 오버로드
+	public static int maxNumberOfSpecialUnitType1AgainstProtoss = 2;  // 오버로드
 	public static int maxNumberOfSpecialUnitType2AgainstProtoss = 2; // 디파일러
 	public static int maxNumberOfSpecialUnitType3AgainstProtoss = 6;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstProtoss = 2;  // 퀸
@@ -90,7 +90,7 @@ public class Config {
 	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstZerg = 4;  // 울트라
 	
-	public static int maxNumberOfSpecialUnitType1AgainstZerg = 1;  // 오버로드
+	public static int maxNumberOfSpecialUnitType1AgainstZerg = 2;  // 오버로드
 	public static int maxNumberOfSpecialUnitType2AgainstZerg = 2; // 디파일러
 	public static int maxNumberOfSpecialUnitType3AgainstZerg = 6;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstZerg = 2;  // 퀸

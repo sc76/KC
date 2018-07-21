@@ -310,7 +310,7 @@ public class KCTechTreeUp {
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2			
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 1			
 			&& myPlayer.allUnitCount(UnitType.Zerg_Hive) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hive) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hive, null) == 0) 
@@ -334,6 +334,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 10
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 4	
+			&& myPlayer.allUnitCount(UnitType.Zerg_Defiler_Mound) > 0
 			&& myPlayer.allUnitCount(UnitType.Zerg_Ultralisk_Cavern) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Ultralisk_Cavern, null) == 0) 

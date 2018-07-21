@@ -108,13 +108,23 @@ public class OverloadManager {
 		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
-		assignFirstScoutOverload(); // firstScoutOverload를 지정한다.
-		initialFirstScoutOverload(); // 지정된 오버로드를 정찰 시킨다.
+		// firstScoutOverload를 지정한다.
+		assignFirstScoutOverload(); 
+		
+		// 지정된 첫번째 오버로드를 정찰 시킨다.
+		initialFirstScoutOverload(); 
 		
         // 두번째 scoutUnit 을 지정하고, scoutUnit 의 이동을 컨트롤함.
         moveScoutUnit();
-		setMainBasePatrolOverload(); // 본진 patrol
-		setMainExpansionBasePatrolOverload(); // 앞마당 patrol
+        
+        // 본진 patrol
+		setMainBasePatrolOverload(); 
+		
+		// 앞마당 patrol
+		setMainExpansionBasePatrolOverload();
+		
+		// 정찰 중인 오버로드가 공격을 받으면 본진으로 귀환 시킨다.
+		handleScoutOverloads(); 
         
 	}
 	
@@ -219,7 +229,15 @@ public class OverloadManager {
 			for(Unit enemyUnit : firstScoutOverload.getUnitsInRadius(Config.TILE_SIZE*8)){
 				if(enemyUnit.getPlayer() == InformationManager.Instance().enemyPlayer){
 					if(enemyUnit.getType() == UnitType.Terran_Marine
-						|| enemyUnit.getType() == UnitType.Terran_Bunker){
+						|| enemyUnit.getType() == UnitType.Terran_Bunker
+						|| enemyUnit.getType() == UnitType.Protoss_Dragoon
+						|| enemyUnit.getType() == UnitType.Protoss_Photon_Cannon
+						|| enemyUnit.getType() == UnitType.Protoss_Corsair
+						|| enemyUnit.getType() == UnitType.Protoss_Scout
+						|| enemyUnit.getType() == UnitType.Zerg_Hydralisk
+						|| enemyUnit.getType() == UnitType.Zerg_Spore_Colony
+						|| enemyUnit.getType() == UnitType.Zerg_Mutalisk){
+						
 						isSafeAround = false;
 					}
 				}
@@ -261,6 +279,40 @@ public class OverloadManager {
 		}
 	}
 
+	// sc76.choi 정찰 중인 오버로드가 공격 중이면, 본진으로 귀환
+	public void handleScoutOverloads(){
+		for (Unit overload : overloadData.getOverloads()){
+			if (!commandUtil.IsValidSelfUnit(overload)) continue;
+
+			// sc76.choi 안전한지 체크
+			boolean isSafeAround = true;
+			for(Unit enemyUnit : overload.getUnitsInRadius(Config.TILE_SIZE*8)){
+				if(enemyUnit.getPlayer() == InformationManager.Instance().enemyPlayer){
+					
+					if(enemyUnit.getType() == UnitType.Terran_Marine
+						|| enemyUnit.getType() == UnitType.Terran_Bunker
+						|| enemyUnit.getType() == UnitType.Protoss_Dragoon
+						|| enemyUnit.getType() == UnitType.Protoss_Photon_Cannon
+						|| enemyUnit.getType() == UnitType.Protoss_Corsair
+						|| enemyUnit.getType() == UnitType.Protoss_Scout
+						|| enemyUnit.getType() == UnitType.Zerg_Hydralisk
+						|| enemyUnit.getType() == UnitType.Zerg_Spore_Colony
+						|| enemyUnit.getType() == UnitType.Zerg_Mutalisk){
+						isSafeAround = false;
+					}
+				}
+			}
+			
+			// sc76.choi 공격 받거나, 안전하지 않으면 본진으로 귀환
+			if (overloadData.getJobCode(overload) == 'S'
+				 || overloadData.getJobCode(overload) == 'I')	{
+				if(overload.isUnderAttack() || isSafeAround == false){
+					moveScoutUnitToMyBaseLocation(overload);
+				}
+			}
+		}
+	}
+	
 	public void handleMoveOverloads(){
 		// for each of our workers
 		for (Unit overload : overloadData.getOverloads())
