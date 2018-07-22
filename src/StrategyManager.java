@@ -3242,7 +3242,7 @@ public class StrategyManager {
 		y += 20;
 
 		// setInitialBuildOrder 에서 입력한 빌드오더가 다 끝나서 빌드오더큐가 empty 되었는지 여부
-		MyBotModule.Broodwar.drawTextScreen(190, y-10, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
+		MyBotModule.Broodwar.drawTextScreen(190, y, "isInitialBuildOrderFinished " + isInitialBuildOrderFinished);
 		y += 10;
 		
 	}
@@ -3730,9 +3730,8 @@ public class StrategyManager {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 해처리가 많고 확장이 되면, 미네럴당 일꾼 수 조절을 한다.
 		if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
-			Config.optimalWorkerCount = 1.5;
+			Config.optimalWorkerCount = 2.0;
 		}
-
 	}
 	
 	/// 일꾼을 계속 추가 생산합니다
@@ -3808,23 +3807,27 @@ public class StrategyManager {
 											}
 									}
 								}else if(WorkerManager.Instance().getWorkerData().getNumWorkers() < 40
-										 && InformationManager.Instance().getTotalHatcheryCount() >= 5){
+										 && InformationManager.Instance().getTotalHatcheryCount() >= 4){
 									if(enemyRace == Race.Terran){
 										if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
-											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
-											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), bestMultiLocation.getTilePosition(), false);										
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), bestMultiLocation.getTilePosition(), true);										
 										}else{
-											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), bestMultiLocation.getTilePosition(), false);
 										}
 									}else{
 										if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 												&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6){
-												BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
-												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+												BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), bestMultiLocation.getTilePosition(), false);										
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), bestMultiLocation.getTilePosition(), true);										
 											}else{
-												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), bestMultiLocation.getTilePosition(), false);
 											}
 									}
+								}else if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
+									
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), myFirstExpansionLocation.getTilePosition(), false);
+									
 								}else{
 									BuildManager.Instance().buildQueue.queueAsLowestPriority(InformationManager.Instance().getWorkerType(), BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified);
 								}
