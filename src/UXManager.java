@@ -1202,14 +1202,14 @@ public class UXManager {
 		BaseLocation enemyBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
 
 		if (enemyBaseLocation != null) {
-			MyBotModule.Broodwar.drawTextScreen(x-30, y-10, "Enemy MainBase : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") " + enemyBaseLocation.getPosition());
+			MyBotModule.Broodwar.drawTextScreen(x-30, y, "Enemy MainBase : (" + enemyBaseLocation.getTilePosition().getX() + ", " + enemyBaseLocation.getTilePosition().getY() + ") " + enemyBaseLocation.getPosition());
 		}
 		else {
-			MyBotModule.Broodwar.drawTextScreen(x-30, y-10, "Enemy MainBase : Unknown");
+			MyBotModule.Broodwar.drawTextScreen(x-30, y, "Enemy MainBase : Unknown");
 		}
 
 		if (currentScoutStatus == ScoutManager.ScoutStatus.NoScout.ordinal()) {
-			MyBotModule.Broodwar.drawTextScreen(x-30, y, "No Scout Unit");
+			MyBotModule.Broodwar.drawTextScreen(x-30, y+10, "No Scout Unit");
 		}
 		else {
 			

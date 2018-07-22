@@ -17,7 +17,6 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//7
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//8
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//9
-		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//10
 		
 		// 2 번째 해처리
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
@@ -25,6 +24,7 @@ public class KCInitialBuildOrder {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord); // 두번째 오버로드
 		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//10
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//11
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//12
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//12
@@ -39,6 +39,7 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//15
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//15
 		
+		// 1번째 크립	
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
@@ -46,8 +47,10 @@ public class KCInitialBuildOrder {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//17
 
-		
+		// 1번째 성큰
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony);
+		
+		// 2번째 크립
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, true);
 		
@@ -55,42 +58,42 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 				BuildOrderItem.SeedPositionStrategy.SecondChokePoint); //14 해처리
 		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor); //19
+		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//17
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//20
+		
+		// 2번째 성큰
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, 
+				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//18
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//20
 
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor); //19
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, 
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
-
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//18
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling);	//20
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone);	//21
 		
-		
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
-
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, 
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk_Den);	//21
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//22
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//22
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//23
-		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Zergling, false);	//24			
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//24			
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//24
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//25
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//26
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
 				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31

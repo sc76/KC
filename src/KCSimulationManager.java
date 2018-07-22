@@ -42,7 +42,6 @@ public class KCSimulationManager {
 	private int countBasicDefenceUnit = 0;
 	private int countAdvencedDefenceUnit = 0;
 	
-	
 	// static singleton 객체를 리턴합니다
 	private static KCSimulationManager instance = new KCSimulationManager();
 	public static KCSimulationManager Instance() {
@@ -73,7 +72,6 @@ public class KCSimulationManager {
 	UnitType.Protoss_Photon_Cannon;
 	UnitType.Terran_Missile_Turret;
 	UnitType.Zerg_Sunken_Colony;
-			
 	 */
 	
 	public boolean canAttackNow(List<Unit> Units){
@@ -129,9 +127,6 @@ public class KCSimulationManager {
 					myPoint += myDefenceCombatUnitTypePoint;
 				}
 			}else{
-				//System.out.println("unit.getPlayer          : " + unit.getPlayer().toString());
-				//System.out.println("unit.enemyRace          : " + enemyRace);
-				//System.out.println("unit.getType            : " + unit.getType());
 				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType(enemyRace)){
 					countBasicCombatUnit++;
 					enemyPoint += getBasicCombatUnitTypePoint(unit);
@@ -148,17 +143,8 @@ public class KCSimulationManager {
 					countAdvencedDefenceUnit++;
 					enemyPoint += getAdvencedDefenceBuildingTypePoint(unit);
 				}
-				//System.out.println("      enemyPoint By 1   : " + enemyPoint);
 			}
 		}
-//		System.out.println("-------------------------------------------------------------");
-//		System.out.println("countBasicCombatUnit     : " + countBasicCombatUnit);
-//		System.out.println("countAdvencedCombatUnit  : " + countBasicCombatUnit);
-//		System.out.println("countBasicDefenceUnit    : " + countBasicCombatUnit);
-//		System.out.println("countAdvencedDefenceUnit : " + countBasicCombatUnit);
-//		System.out.println();
-//		System.out.println("canAttackNow myPoint     : " + myPoint);
-//		System.out.println("canAttackNow enemyPoint  : " + enemyPoint);
 		
 		// TODO sc76.choi 각 false 값을 누적해서 계속 false가 나오면 CombatState를 defence모드로 변경한다.
 		// TODO sc76.choi 개별 전투에서 모두 패배를 기록하고 있다고 판단한다.
@@ -166,6 +152,93 @@ public class KCSimulationManager {
 			return true;
 		}
 		return false;
+	}
+	
+	public KCSimulationResult canAttackNow2(List<Unit> Units){
+		
+		selfPlayer = MyBotModule.Broodwar.self();
+		enemyPlayer = MyBotModule.Broodwar.enemy();
+		selfRace = selfPlayer.getRace();
+		enemyRace = enemyPlayer.getRace();
+		
+		selfMainBaseLocation = InformationManager.Instance().getMainBaseLocation(MyBotModule.Broodwar.self());
+		selfFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.self());
+		selfFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
+		selfSecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
+		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
+		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
+		
+		enemyBasicCombatUnitType = InformationManager.Instance().getBasicCombatUnitType(enemyRace);
+		enemyAdvancedCombatUnitType = InformationManager.Instance().getAdvancedCombatUnitType(enemyRace);
+		enemyAdvancedCombatUnitType2 = InformationManager.Instance().getAdvancedCombatUnitType2(enemyRace);
+		enemyBasicDefenceUnitType = InformationManager.Instance().getBasicDefenseBuildingType(enemyRace);
+		enemyAdvencedDefenceUnitType = InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace);
+		
+		myPoint = 0;
+		enemyPoint = 0;
+		
+		countBasicCombatUnit = 0;
+		countAdvencedCombatUnit = 0;
+		countAdvencedCombatUnit2 = 0;
+		countBasicDefenceUnit = 0;
+		countAdvencedDefenceUnit = 0;
+		
+		int myWorkerUnitTypePoint = 10;
+		int myBasicCombatUnitTypePoint = 10;
+		int myAdvencedCombatUnitTypePoint = 40;
+		int myAdvencedCombatUnitType2Point = 40; // 울트라리스크
+		int myBasicDefenceUnitTypePoint = 0;
+		int myDefenceCombatUnitTypePoint = 50;
+		
+		boolean existEnemyAdvancedDefenceBuilding = false;
+		
+		for(Unit unit : Units){
+			if(unit.getPlayer() == selfPlayer){
+				if(unit.getType() == InformationManager.Instance().getWorkerType()){
+					myPoint += myWorkerUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType()){
+					myPoint += myBasicCombatUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType()){
+					myPoint += myAdvencedCombatUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType2()){
+					myPoint += myAdvencedCombatUnitType2Point;					
+				}else if(unit.getType() == InformationManager.Instance().getBasicDefenseBuildingType()){
+					myPoint += myBasicDefenceUnitTypePoint;
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType()){
+					myPoint += myDefenceCombatUnitTypePoint;
+				}
+			}else{
+				if(unit.getType() == InformationManager.Instance().getBasicCombatUnitType(enemyRace)){
+					countBasicCombatUnit++;
+					enemyPoint += getBasicCombatUnitTypePoint(unit);
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType(enemyRace)){
+					countAdvencedCombatUnit++;
+					enemyPoint += getAdvencedCombatUnitTypePoint(unit);
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedCombatUnitType2(enemyRace)){
+					countAdvencedCombatUnit2++;
+					enemyPoint += getAdvencedCombatUnitType2Point(unit);
+				}else if(unit.getType() == InformationManager.Instance().getBasicDefenseBuildingType(enemyRace)){
+					countBasicDefenceUnit++;
+					enemyPoint += getBasicDefenceBuildingTypePoint(unit);
+				}else if(unit.getType() == InformationManager.Instance().getAdvancedDefenseBuildingType(enemyRace)){
+					existEnemyAdvancedDefenceBuilding = true;
+					countAdvencedDefenceUnit++;
+					enemyPoint += getAdvencedDefenceBuildingTypePoint(unit);
+				}
+			}
+		}
+		
+		// TODO sc76.choi 각 false 값을 누적해서 계속 false가 나오면 CombatState를 defence모드로 변경한다.
+		// TODO sc76.choi 개별 전투에서 모두 패배를 기록하고 있다고 판단한다.
+		KCSimulationResult result = new KCSimulationResult();
+		
+		result.setCanAttackNow(myPoint >= enemyPoint);
+		result.setMyPoint(myPoint);
+		result.setEnemyPoint(enemyPoint);
+		result.setExistEnemyAdvancedDefenceBuilding(existEnemyAdvancedDefenceBuilding);
+		
+		return result;
 	}
 	
 	/*
