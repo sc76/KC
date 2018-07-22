@@ -3825,7 +3825,11 @@ public class StrategyManager {
 											}
 									}
 								}else if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
+									// 태란이 아닐때
+									BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), myFirstExpansionLocation.getTilePosition(), false);
 									
+								}else if(InformationManager.Instance().getTotalHatcheryCount() >= 2){
+									// 태란 일때,
 									BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), myFirstExpansionLocation.getTilePosition(), false);
 									
 								}else{
