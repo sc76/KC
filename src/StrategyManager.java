@@ -980,36 +980,44 @@ public class StrategyManager {
 			while (it1.hasNext()) {
 				Region selfRegion = it1.next();
 				
-				// creep colony가 없으면
-				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
-						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
-						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
-						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
+				if(BuildManager.Instance().getAvailableMinerals() > 60){
+					//System.out.println("buildAirDefenceUnit selfRegion : " + selfRegion.getPoint().toTilePosition());
 					
-					if(enemyRace == Race.Zerg){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), false);
-					}else{
-						BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
+					// creep colony가 없으면
+					if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+							&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
+							&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
+							&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
+						
+						if(enemyRace == Race.Zerg){
+							//System.out.println("buildAirDefenceUnit selfRegion : Creep_Colony");
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getPoint().toTilePosition(), true);
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getPoint().toTilePosition(), false);
+						}else{
+							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfRegion.getCenter().toTilePosition(), true);
+						}
 					}
-				}
-
-				// creep colony가 있고, spore colony가 없으면
-				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
-					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == true
-					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spore_Colony) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spore_Colony, null) == 0){
-					
-					if(enemyRace == Race.Zerg){
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony, false);						
-						//BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony, false);						
-					}else{
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony, false);
+	
+					// creep colony가 있고, spore colony가 없으면
+					if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == true
+						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Spore_Colony) == false
+						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spore_Colony) == 0
+						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spore_Colony, null) == 0){
+						
+						if(enemyRace == Race.Zerg){
+							//System.out.println("buildAirDefenceUnit selfRegion : Spore_Colony");
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony, false);						
+							//BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony, false);						
+						}else{
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony, false);
+						}
 					}
 				}
 			}
+			
+			System.out.println();
 		}
 		
 //		for(Unit unit : myPlayer.getUnits()){
@@ -1108,40 +1116,39 @@ public class StrategyManager {
 				
 			}
 		
-		}
-		
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// sc76.choi TODO 각 본진별로 헤처리, 가스가 없으면 가스를 재건한다.
-		int countSelfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).size();
-		if(countSelfRegions >= 2){
-			
-			Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
-			Iterator<Region> it1 = selfRegions.iterator();
-			while (it1.hasNext()) {
-				Region selfRegion = it1.next();
-
-				if(selfRegion == BWTA.getRegion(myMainBaseLocation.getPosition())) continue;
-				if(selfRegion == BWTA.getRegion(myFirstExpansionLocation.getPosition())) continue;
-				
-				// 해처리만 있고, 가스가 없으면 가스를 건설
-				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
-						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Extractor) == false
-						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Extractor) == 0
-						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Extractor, null) == 0){
-					
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, selfRegion.getCenter().toTilePosition(), false);
-				}
-
-				// 가스만 있고, 해처리가 없으면 해처리를 건설
-				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Extractor) == true
-					&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == false
-					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0
-					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
-					
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, selfRegion.getCenter().toTilePosition(), false);
-					
-				}
-			}
+//			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//			// sc76.choi TODO 각 본진별로 헤처리, 가스가 없으면 가스를 재건한다.
+//			int countSelfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).size();
+//			if(countSelfRegions >= 3){
+//				
+//				Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
+//				Iterator<Region> it1 = selfRegions.iterator();
+//				while (it1.hasNext()) {
+//					Region selfRegion = it1.next();
+//	
+//					if(selfRegion == BWTA.getRegion(myMainBaseLocation.getPosition())) continue;
+//					if(selfRegion == BWTA.getRegion(myFirstExpansionLocation.getPosition())) continue;
+//					
+//					// 해처리만 있고, 가스가 없으면 가스를 건설
+//					if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
+//							&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Extractor) == false
+//							&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Extractor) == 0
+//							&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Extractor, null) == 0){
+//						
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, selfRegion.getCenter().toTilePosition(), false);
+//					}
+//	
+//					// 가스만 있고, 해처리가 없으면 해처리를 건설
+//					if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Extractor) == true
+//						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == false
+//						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
+//						
+//						BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, selfRegion.getCenter().toTilePosition(), false);
+//						
+//					}
+//				}
+//			}
 		}
 	}
 	
@@ -1761,7 +1768,10 @@ public class StrategyManager {
 						Unit enemyUnitForExpansionDefence = findAttackTargetForExpansionDefence();
 						// sc76.choi 확장에 적이 있으면, 본진 베이스 까지 후퇴한다.	
 						if (commandUtil.IsValidUnit(enemyUnitForExpansionDefence)){
-							commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
+							// sc76.choi 일꾼이 아니면
+							if(enemyUnitForExpansionDefence.getType().isWorker() == false){
+								commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
+							}
 						}else{
 							commandUtil.attackMove(unit, TARGET_POSITION);
 						}
@@ -1831,18 +1841,9 @@ public class StrategyManager {
 							commandUtil.attackMove(unit, enemyUnitForExpansionDefence.getPosition());
 						}else{
 							// sc76.choi 본진 가까이 있으면 그냥 싸운다.
-							//if(unit.getDistance(myMainBaseLocation.getPoint()) < Config.TILE_SIZE*5){
-								commandUtil.move(unit, myMainBaseLocation.getPoint());
-							//}
+							Position calPosition = getCalcuatePosition(unit);
+							commandUtil.move(unit, myMainBaseLocation.getPosition());
 //							
-//							// sc76.choi 확장 가까이 있으면 그냥 싸운다.
-//							else if(unit.getDistance(myFirstExpansionLocation.getPoint()) < Config.TILE_SIZE*5){
-//								commandUtil.attackMove(unit, myFirstExpansionLocation.getPoint());
-//							}
-//							// sc76.choi 본진 좀 거리가 있으면 move로 움직인다.
-//							else{
-//								commandUtil.attackMove(unit, DEFENCE_POSITION);
-//							}
 						}
 //					}
 					
@@ -2311,7 +2312,7 @@ public class StrategyManager {
 	// sc76.choi 오버로드 유닛에 대해 컨트롤 명령을 입력합니다
 	
 	// sc76.choi closest 유닛의 살짝 뒤에 위치한다.
-	Position safePosition ;
+	Position safePositionForOverload ;
 	Position safePosition1;
 	Position safePosition2;
 	Position safePosition3;
@@ -2322,8 +2323,8 @@ public class StrategyManager {
 		boolean hasCommanded = false;		
 		
 		// sc76.choi 기본적으로 myAllCombatUnitList에 담긴 오버로드만 대상이 된다. (즉 Idle인 오버로드)
+		// sc76.choi TODO 공격시에 가장 적진과 가까운 히드라(럴커)를 따라 다니게 된다. 개선 필요
 		// sc76.choi 오버로드는 hasCommanded는 항상 true
-		// sc76.choi TODO 공격시에 가장 적진과 가까운 히드라를 따라 다니게 된다. 개선 필요
 		if (unit.getType() == UnitType.Zerg_Overlord) {
 			
 			if (!commandUtil.IsValidUnit(unit)) return true;
@@ -2338,7 +2339,7 @@ public class StrategyManager {
 				// sc76.choi 가장 가까운 공격 유닛의 위치를 찾아 오버로드가 따라가게 한다.	
 				if(closesAttackUnitFromEnemyMainBase != null){
 					Position enemyMainLocationPosition = enemyMainBaseLocation.getPosition();
-					safePosition = closesAttackUnitFromEnemyMainBase.getPosition();
+					safePositionForOverload = closesAttackUnitFromEnemyMainBase.getPosition();
 					safePosition1 = closesAttackUnitFromEnemyMainBase.getPosition();
 					safePosition2 = closesAttackUnitFromEnemyMainBase.getPosition();
 					safePosition3 = closesAttackUnitFromEnemyMainBase.getPosition();
@@ -2354,8 +2355,8 @@ public class StrategyManager {
 					//System.out.println("safePosition  : " + safePosition.toTilePosition());
 					//System.out.println("safePosition1 : " + safePosition1.toTilePosition());
 					
-					if(safePosition.getDistance(enemyMainLocationPosition) <= safePosition1.getDistance(enemyMainLocationPosition)){
-						safePosition = safePosition1;
+					if(safePositionForOverload.getDistance(enemyMainLocationPosition) <= safePosition1.getDistance(enemyMainLocationPosition)){
+						safePositionForOverload = safePosition1;
 					}
 					
 					//System.out.println("safePosition  : " + safePosition.toTilePosition());
@@ -2367,8 +2368,8 @@ public class StrategyManager {
 						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 3");
 					}
 
-					if(safePosition.getDistance(enemyMainLocationPosition) <= safePosition2.getDistance(enemyMainLocationPosition)){
-						safePosition = safePosition2;
+					if(safePositionForOverload.getDistance(enemyMainLocationPosition) <= safePosition2.getDistance(enemyMainLocationPosition)){
+						safePositionForOverload = safePosition2;
 					}
 					// 6시
 					if(unit.getID() % 4 == 2){
@@ -2376,8 +2377,8 @@ public class StrategyManager {
 						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 6");
 					}
 					
-					if(safePosition.getDistance(enemyMainLocationPosition) <= safePosition3.getDistance(enemyMainLocationPosition)){
-						safePosition = safePosition3;
+					if(safePositionForOverload.getDistance(enemyMainLocationPosition) <= safePosition3.getDistance(enemyMainLocationPosition)){
+						safePositionForOverload = safePosition3;
 					}
 					
 					// 9시
@@ -2386,15 +2387,15 @@ public class StrategyManager {
 						//System.out.println("SpecialUnitType1 ["+unit.getID()+"] go -->> 9");
 					}
 
-					if(safePosition.getDistance(enemyMainLocationPosition) <= safePosition4.getDistance(enemyMainLocationPosition)){
-						safePosition = safePosition4;
+					if(safePositionForOverload.getDistance(enemyMainLocationPosition) <= safePosition4.getDistance(enemyMainLocationPosition)){
+						safePositionForOverload = safePosition4;
 					}
 					
-					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePosition, 5, Color.Teal, true);
-					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePosition, 6, Color.Red, false);
-					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePosition, 13, Color.Yellow, false);
+					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePositionForOverload, 5, Color.Teal, true);
+					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePositionForOverload, 6, Color.Red, false);
+					if(Config.IS_DRAW) MyBotModule.Broodwar.drawCircleMap(safePositionForOverload, 13, Color.Yellow, false);
 					
-					targetPosition = safePosition; //closesAttackUnitOfPositionFromEnemyMainBase;
+					targetPosition = safePositionForOverload; //closesAttackUnitOfPositionFromEnemyMainBase;
 				}else{
 					targetPosition = DEFENCE_POSITION;
 				}
@@ -3577,10 +3578,26 @@ public class StrategyManager {
 	 * @ sc76.choi
 	 */
 	int seqBuildOrderStep = 0;
-	void updatebuildOrderArray(){
+	public void updatebuildOrderArray(){
 		
 		// sc76.choi 공격 유닛 생산 순서 설정
 		// sc76.choi 단, 배열의 length는 동일하게 가야 한다. 에러 방지
+		
+		if (enemyRace == Race.Protoss) {
+			updatebuildOrderArrayForProtoss();
+		}
+		else if (enemyRace == Race.Terran) {
+			updatebuildOrderArrayForTerran();
+		}
+		else if (enemyRace == Race.Zerg) {
+			updatebuildOrderArrayForZerg();
+		}else{
+			updatebuildOrderArrayForTerran();
+		}
+	}
+	
+	public void updatebuildOrderArrayForProtoss(){
+		
 		// 1 : 저글링
 		// 2 : 히드라
 		// 3 : 러커
@@ -3682,6 +3699,212 @@ public class StrategyManager {
 		}
 	}
 	
+	public void updatebuildOrderArrayForTerran(){
+		
+		// 1 : 저글링
+		// 2 : 히드라
+		// 3 : 러커
+		// 4 : 뮤탈
+		// 5 : 울트라
+		// 6 : 가디언
+		
+		// sc76.choi 럴커 개발되고, 스파이어 없을 때,
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+			&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true
+			&& myCombatUnitType2List.size() >= 2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) <= 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) <= 0			
+		){
+			
+			if(selfGas < 200){
+				seqBuildOrderStep = 10;
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				seqBuildOrderStep = 20;
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}
+			
+		}
+		// sc76.choi 스파이어만 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
+			
+			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
+			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+				seqBuildOrderStep = 30;
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				// 테란일때, 럴커를 위주로
+				if(enemyRace == Race.Terran){
+					if(selfGas < 200){
+						seqBuildOrderStep = 40;
+						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 1, 1, 1, 2, 3, 1, 1}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					}else{
+						seqBuildOrderStep = 50;
+						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					}
+				}else{
+					seqBuildOrderStep = 60;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 2, 2, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+			}
+			
+		}
+		// sc76.choi 스파이어, 울트라 카벤 모두 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
+			
+				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2){
+					seqBuildOrderStep = 70;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					seqBuildOrderStep = 80;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 4, 2, 2, 5, 1, 1, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+				
+		}
+		// sc76.choi 그레이트 스파이어, 울트라 카벤 모두 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
+			
+				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
+					seqBuildOrderStep = 90;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					seqBuildOrderStep = 100;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 4, 1, 1, 2, 6, 3, 5, 6}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+				
+		}
+		// sc76.choi 그레이트 스파이어만, 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
+			
+				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
+					seqBuildOrderStep = 110;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					seqBuildOrderStep = 120;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 6, 1, 1, 4, 6, 3, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+				
+		}
+		else{
+			// 기본
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+				seqBuildOrderStep = 1;
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
+			}else{
+				seqBuildOrderStep = 2;
+				buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			}
+			
+		}
+	}
+
+	public void updatebuildOrderArrayForZerg(){
+		
+		// 1 : 저글링
+		// 2 : 히드라
+		// 3 : 러커
+		// 4 : 뮤탈
+		// 5 : 울트라
+		// 6 : 가디언
+		
+		// sc76.choi 럴커 개발되고, 스파이어 없을 때,
+		if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+			&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true
+			&& myCombatUnitType2List.size() >= 2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) <= 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) <= 0			
+		){
+			
+			if(selfGas < 200){
+				seqBuildOrderStep = 10;
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				seqBuildOrderStep = 20;
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}
+			
+		}
+		// sc76.choi 스파이어만 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
+			
+			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
+			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+				seqBuildOrderStep = 30;
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+			}else{
+				// 테란일때, 럴커를 위주로
+				if(enemyRace == Race.Terran){
+					if(selfGas < 200){
+						seqBuildOrderStep = 40;
+						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 1, 1, 1, 2, 3, 1, 1}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					}else{
+						seqBuildOrderStep = 50;
+						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					}
+				}else{
+					seqBuildOrderStep = 60;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 2, 2, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+			}
+			
+		}
+		// sc76.choi 스파이어, 울트라 카벤 모두 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
+			
+				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2){
+					seqBuildOrderStep = 70;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					seqBuildOrderStep = 80;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 4, 2, 2, 5, 1, 1, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+				
+		}
+		// sc76.choi 그레이트 스파이어, 울트라 카벤 모두 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
+			
+				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
+					seqBuildOrderStep = 90;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					seqBuildOrderStep = 100;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 4, 1, 1, 2, 6, 3, 5, 6}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+				
+		}
+		// sc76.choi 그레이트 스파이어만, 올라가 있을 때,
+		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
+				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
+			
+				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
+					seqBuildOrderStep = 110;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}else{
+					seqBuildOrderStep = 120;
+					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 6, 1, 1, 4, 6, 3, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				}
+				
+		}
+		else{
+			// 기본
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+				seqBuildOrderStep = 1;
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
+			}else{
+				seqBuildOrderStep = 2;
+				buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+			}
+			
+		}
+	}
+
 //	void updateVariablesForAttackUnit(){
 //		// 2초에 한번만 실행
 //		if (MyBotModule.Broodwar.getFrameCount() % (24 * 2) != 0) {
