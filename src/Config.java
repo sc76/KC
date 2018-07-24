@@ -62,8 +62,8 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 8; // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 8;  // 히드라
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 10; // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라

@@ -2526,7 +2526,7 @@ public class StrategyManager {
 			}
 			
 			// 한번 뿌리면 100이 깍인다.
-			else if (unit.getEnergy() >= 101) {
+			else if (unit.getEnergy() >= 100) {
 
 				// sc76.choi 공격중이고, 타켓으로 이동 중 적군을 많이 만나면.. Dark_Swarm을 뿌린다.
 				if (targetPosition != null) {
@@ -4280,28 +4280,55 @@ public class StrategyManager {
 		
 		boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()));
 		
+		// sc76.choi 기본 방어 타워
 		if(existHatcheryInMyFirstExpansion == true){
-			// 앞마당 방어 건물 증설을 우선적으로 실시한다
-			if (isPossibleToConstructDefenseBuildingType1 == true 
-				&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
-				if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
-					if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
-						
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
-								seedPositionStrategyOfMyDefenseBuildingType, false);
-						
-					}			
+			if(enemyRace == Race.Terran){
+				// 앞마당 방어 건물 증설을 우선적으로 실시한다
+				if (isPossibleToConstructDefenseBuildingType1 == true 
+					&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
+					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
+						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
+							
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
+									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
+							
+						}			
+					}
 				}
-			}
-			if (isPossibleToConstructDefenseBuildingType2 == true
-				&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
-				if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
-					if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
-						
-						BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-								seedPositionStrategyOfMyDefenseBuildingType, false);
-
-					}			
+				if (isPossibleToConstructDefenseBuildingType2 == true
+					&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
+					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
+						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
+							
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
+									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
+	
+						}			
+					}
+				}
+			}else{
+				// 앞마당 방어 건물 증설을 우선적으로 실시한다
+				if (isPossibleToConstructDefenseBuildingType1 == true 
+					&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
+					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
+						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
+							
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
+									seedPositionStrategyOfMyDefenseBuildingType, false);
+							
+						}			
+					}
+				}
+				if (isPossibleToConstructDefenseBuildingType2 == true
+					&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
+					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
+						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
+							
+							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
+									seedPositionStrategyOfMyDefenseBuildingType, false);
+	
+						}			
+					}
 				}
 			}
 		}	
