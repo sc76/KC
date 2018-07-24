@@ -85,7 +85,7 @@ public class Config {
 	public static int maxNumberOfSpecialUnitType4AgainstProtoss = 2;  // 퀸
 	
 	public static int maxNumberOfCombatUnitType1AgainstZerg = 12;  // 저글링
-	public static int maxNumberOfCombatUnitType2AgainstZerg = 12; // 히드라
+	public static int maxNumberOfCombatUnitType2AgainstZerg = 10; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstZerg = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstZerg = 4;  // 울트라
@@ -95,7 +95,7 @@ public class Config {
 	public static int maxNumberOfSpecialUnitType3AgainstZerg = 6;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstZerg = 2;  // 퀸
 	
-	public static int maxNumberOfCombatUnitType1AgainstTerran = 16;  // 저글링
+	public static int maxNumberOfCombatUnitType1AgainstTerran = 12;  // 저글링
 	public static int maxNumberOfCombatUnitType2AgainstTerran = 12; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstTerran = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstTerran = 8;  // 뮤탈
@@ -130,7 +130,7 @@ public class Config {
 	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 6;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
-	public static int maxNumberOfTrainUnitType1AgainstTerran = 20; // 저글링
+	public static int maxNumberOfTrainUnitType1AgainstTerran = 16; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 16; // 히드라
 	public static int maxNumberOfTrainUnitType3AgainstTerran = 5;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈

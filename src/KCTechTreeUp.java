@@ -18,9 +18,9 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 && myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
-		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 10
+		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 		    && myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 히드라 발업
-		    && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 사정업
+//		    && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 사정업
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0) 
@@ -128,7 +128,7 @@ public class KCTechTreeUp {
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 && myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
 		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
 		    && myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 히드라 발업
-		    && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 사정업		    
+//		    && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 사정업		    
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Lair) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Lair, null) == 0) 
