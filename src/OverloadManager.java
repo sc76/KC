@@ -304,9 +304,9 @@ public class OverloadManager {
 			}
 			
 			// sc76.choi 공격 받거나, 안전하지 않으면 본진으로 귀환
-			if (overloadData.getJobCode(overload) == 'S'
-				 || overloadData.getJobCode(overload) == 'I')	{
+			if (overloadData.getJobCode(overload) == 'S' || overloadData.getJobCode(overload) == 'I')	{
 				if(overload.isUnderAttack() || isSafeAround == false){
+					overloadData.setOverloadJob(overload, OverloadData.OverloadJob.Idle, (Unit)null);
 					moveScoutUnitToMyBaseLocation(overload);
 				}
 			}
