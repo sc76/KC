@@ -186,7 +186,12 @@ public class StrategyManager {
 		onlyHydralist,						// 히드라 모드, 히드라가 다수 필요할 때
 		onlyMutalisk,						// 뮤탈 모드, 중반 이후, only 질럿, 저글링만 보일 때		
 		fasterMutalisk,						// 빠른 뮤탈 모드, 태란 다수 탱크가 있을 때, 퀸도 빨리 올려 활용한다.
-		fasterUltralisk						// 빠른 울트라 모드, 태란 입구 막음 or 프로토스 앞마당 포토밭을 만들 때 상황
+		fasterUltralisk,						// 빠른 울트라 모드, 태란 입구 막음 or 프로토스 앞마당 포토밭을 만들 때 상황
+		blockTheFirstChokePoint_T,
+		blockTheSecondChokePoint_T,
+		vulture_Galia_Tank_T,
+		blockTheFirstChokePoint_P,
+		blockTheSecondChokePoint_P
 	};	
 	
 	BuildState buildState;     				// sc76.choi 상황에 맞는 빌드 모드 설정
@@ -856,7 +861,7 @@ public class StrategyManager {
 	
 	public void executeAdvancedDefenceBuildingCombat() {
 		
-		if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) return;
+		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
 		
 		for(Unit unit : myPlayer.getUnits()){
 			
@@ -2845,6 +2850,9 @@ public class StrategyManager {
         				if(unit.isConstructing()){
 		        			target = unit;
 		        			break;
+        				}else if(unit.isBeingConstructed()){
+		        			target = unit;
+		        			break;
         				}else{
         					target = unit;
 		        			break;
@@ -4155,6 +4163,8 @@ public class StrategyManager {
 	}
 	
 	public void excuteConfigration(){
+		
+		if (MyBotModule.Broodwar.getFrameCount() % 24*5 != 0) return;
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		// sc76.choi 초반 빌드 끝나기 전까지 저글링 러쉬를 위해

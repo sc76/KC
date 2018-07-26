@@ -102,6 +102,9 @@ public class KCInitialBuildOrder {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber, 
 				BuildOrderItem.SeedPositionStrategy.MainBaseLocation, false); //26
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Evolution_Chamber, 
+				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false); //26
 	}
 	
 	public void setInitialBuildOrderAgainstZerg(){
