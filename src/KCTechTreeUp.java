@@ -18,7 +18,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 && myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
-		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
+		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 		    && myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 히드라 발업
 //		    && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 사정업
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
@@ -42,7 +42,7 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 spire 테크 작성예정
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
@@ -264,8 +264,8 @@ public class KCTechTreeUp {
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 //				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1
 //				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType2
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 1
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 

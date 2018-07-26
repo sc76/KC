@@ -250,7 +250,8 @@ public class UXManager {
 		// build order array
 		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
 		int seqBuildOrderStep = StrategyManager.Instance().seqBuildOrderStep;
-		MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : " + seqBuildOrderStep + " " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		String strBuildOrderStep = StrategyManager.Instance().strBuildOrderStep;
+		MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : " + strBuildOrderStep + " " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
 
 		
 		

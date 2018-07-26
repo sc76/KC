@@ -35,16 +35,16 @@ public class KCUpgradeAndTech {
 	boolean			isTimeToStartResearchTech4 = false;	/// 리서치할 타이밍인가, 브루들링
 	
 	public void upGradeAndTechAgainstProtoss(){
-
+		// sc76.choi 프로토스 일때는 발업 먼저 업그레이드 후, 사정거리 업그레이드와 저글링 발업을 같이 진행한다.
 		// 히드라 사정 업그레이드
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6) {
+				&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
 		// 히드라 발업
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType2 = true;
 		}
@@ -145,9 +145,10 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
 		}
-		
 		
 		// 히드라 발업
 		// sc76.choi 챔버 공격 업그레이드		
@@ -158,6 +159,7 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+				
 			}
 		}
 
@@ -702,15 +704,16 @@ public class KCUpgradeAndTech {
 		// sc76.choi 히드라 사정 업그레이드, 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1) {
+				&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0				
+		) {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
 		// sc76.choi 히드라 발업, 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
-			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4) {
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+//			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1) {
 			isTimeToStartUpgradeType2 = true;
 		}
 		
@@ -742,7 +745,8 @@ public class KCUpgradeAndTech {
 		}
 		
 		// 러커는 최우선으로 리서치한다
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 1
 			  && (myPlayer.completedUnitCount(UnitType.Zerg_Lair) + 
 				  myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
 				  myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0) {
@@ -786,6 +790,8 @@ public class KCUpgradeAndTech {
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
 		}
 
