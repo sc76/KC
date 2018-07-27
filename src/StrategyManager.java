@@ -33,9 +33,6 @@ import bwapi.Color;
 /// 정찰, 빌드, 공격, 방어 등을 수행하는 코드가 들어가는 class
 public class StrategyManager {
 
-	private int countAttackMode;
-	private int countDefenceMode;
-	
 	// 아군
 	Player myPlayer;
 	Race myRace;
@@ -43,6 +40,9 @@ public class StrategyManager {
 	// 적군
 	Player enemyPlayer;
 	Race enemyRace;
+	
+	private int countAttackMode;
+	private int countDefenceMode;
 	
 	// 아군 공격 유닛 첫번째, 두번째, 세번째 타입                       프로토스     테란            저그
 	UnitType myCombatUnitType1;					/// 질럿         마린           저글링
@@ -1200,7 +1200,12 @@ public class StrategyManager {
 						if(selfBaseLocation.getGeysers().isEmpty() == false && selfBaseLocation.getGeysers().size() > 0){ 
 							
 							TilePosition refineryTilePosition = ConstructionPlaceFinder.Instance().getRefineryPositionNear(selfBaseLocation.getTilePosition());
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, refineryTilePosition, false);
+							if(selfBaseLocation.getGeysers().size() == 1){
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, refineryTilePosition, false);
+							}else{
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, refineryTilePosition, false);
+								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Extractor, refineryTilePosition, false);
+							}
 						}
 						
 					}
@@ -2624,14 +2629,14 @@ public class StrategyManager {
 					}
 					// 적군이 5마리 이상이면,  Swarm을 뿌린다.
 					if(enemyUnitCount >= 3){
-						System.out.println("Use Swarm enemyUnitCount total : " + enemyUnitCount);
+						if(Config.DEBUG) System.out.println("Use Swarm enemyUnitCount total : " + enemyUnitCount);
 						unit.useTech(TechType.Dark_Swarm, targetSwarmPosition);
 					}
 					
 					// sc76.choi choke에 가까이 있으면 뿌린다.
 					if(closesAttackUnitFromEnemyMainBase.getDistance(enemyFirstChokePoint.getCenter()) <= Config.TILE_SIZE*5
 						 && enemyUnitCount > 1){
-						System.out.println("Use Swarm enemyUnitCount total : " + enemyUnitCount);
+						if(Config.DEBUG) System.out.println("Use Swarm enemyUnitCount total : " + enemyUnitCount);
 						unit.useTech(TechType.Dark_Swarm, enemyFirstChokePoint.getCenter());
 					}
 					
@@ -4166,6 +4171,19 @@ public class StrategyManager {
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 24*5 != 0) return;
 		
+		// worker rebalancing
+		int myOccupiedBaseLocations = InformationManager.Instance().getOccupiedBaseLocations(myPlayer).size();
+		
+		if(myOccupiedBaseLocations >= 3){
+			WorkerManager.Instance().getWorkerData().mineralAndMineralWorkerRatio = 1.2;
+		}else{
+			WorkerManager.Instance().getWorkerData().mineralAndMineralWorkerRatio = 1.8;
+		}
+		
+//		if (MyBotModule.Broodwar.getFrameCount() % (24*60) != 0) {
+//			if(Config.DEBUG) System.out.println("WorkerData.java mineralAndMineralWorkerRatio (" + myOccupiedBaseLocations + ") : " + WorkerManager.Instance().getWorkerData().mineralAndMineralWorkerRatio);
+//		}
+		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		// sc76.choi 초반 빌드 끝나기 전까지 저글링 러쉬를 위해
 		if(isInitialBuildOrderFinished == false){
@@ -4176,9 +4194,9 @@ public class StrategyManager {
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 해처리가 많고 확장이 되면, 미네럴당 일꾼 수 조절을 한다.
-//		if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
-//			Config.optimalWorkerCount = 2.0;
-//		}
+		if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
+			Config.optimalWorkerCount = 2.0;
+		}
 		
 //		if(enemyRace == Race.Protoss){
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0){
@@ -4575,11 +4593,22 @@ public class StrategyManager {
 		boolean isPossibleToConstructCombatUnitTrainingBuildingType = false;
 		
 		// sc76.choi TODO 히드라의 갯수로 해처리를 더 지을지 말지 결정한다.
-		if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) > (necessaryNumberOfDefenceUnitType2 + 2)
-			|| myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > (necessaryNumberOfDefenceUnitType1 + 2)){
-			isPossibleToConstructCombatUnitTrainingBuildingType = true;
-		}else{
-			isPossibleToConstructCombatUnitTrainingBuildingType = false;
+		if(enemyRace != Race.Terran){
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) > (necessaryNumberOfDefenceUnitType2 + 2)
+				|| myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > (necessaryNumberOfDefenceUnitType1 + 2)){
+				isPossibleToConstructCombatUnitTrainingBuildingType = true;
+			}else{
+				isPossibleToConstructCombatUnitTrainingBuildingType = false;
+			}
+		}
+		// sc76.choi 테란일때, 확장 판단
+		else{
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > necessaryNumberOfDefenceUnitType3
+					|| myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > necessaryNumberOfDefenceUnitType1){
+					isPossibleToConstructCombatUnitTrainingBuildingType = true;
+				}else{
+					isPossibleToConstructCombatUnitTrainingBuildingType = false;
+				}
 		}
 	
 		// 현재 공격 유닛 생산 건물 갯수

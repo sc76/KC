@@ -4,11 +4,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import bwapi.Player;
+import bwapi.Race;
 import bwapi.Unit;
 import bwapi.UnitType;
 
 public class WorkerData {
 
+	Player myPlayer = MyBotModule.Broodwar.self();
+	Race myRace = MyBotModule.Broodwar.self().getRace();
+	
 	private Map<Integer, Integer> workersOnMineralPatch = new HashMap<Integer, Integer>();
 	
 	/// 일꾼 유닛에게 지정하는 임무의 종류
@@ -54,9 +59,9 @@ public class WorkerData {
 	{
 		// BasicBot 1.1 Patch Start ////////////////////////////////////////////////
 		// 멀티 기지간 일꾼 숫자 리밸런싱 조건값 수정 : 미네랄 갯수 * 2 배 초과일 경우 리밸런싱
-
-		mineralAndMineralWorkerRatio = 2;
 		
+		mineralAndMineralWorkerRatio = 2;
+
 		// BasicBot 1.1 Patch End //////////////////////////////////////////////////
 		
 	     for (Unit unit : MyBotModule.Broodwar.getAllUnits())
