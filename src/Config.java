@@ -31,7 +31,7 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 6; // 히드라
+	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 5; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
@@ -64,7 +64,7 @@ public class Config {
 	
 	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 4; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
-	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 1;  // 럴커
+	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
 	public static int necessaryNumberOfCombatUnitType6AgainstTerran = 2;  // 가디언

@@ -56,6 +56,7 @@ public class KCTechTreeUp {
 		if (StrategyManager.Instance().myKilledCombatUnitCount4 >= 5
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 				&& myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire) == 0
@@ -68,7 +69,7 @@ public class KCTechTreeUp {
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
@@ -151,7 +152,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType1
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
@@ -178,7 +179,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1			
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
@@ -193,7 +194,7 @@ public class KCTechTreeUp {
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType1				
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Hive) == 0 || myPlayer.incompleteUnitCount(UnitType.Zerg_Hive) == 0)
 			&& myPlayer.allUnitCount(UnitType.Zerg_Hive) == 0
@@ -264,7 +265,7 @@ public class KCTechTreeUp {
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 //				&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1
 //				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType2
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 1
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0

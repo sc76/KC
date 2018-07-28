@@ -105,7 +105,7 @@ public class UXManager {
 		
 		
 		if (Config.DrawEnemyUnitInfo) {
-			drawUnitStatisticsOnScreen(400, 20);
+			drawUnitStatisticsOnScreen(400, 100);
 		}
 
 		if (Config.DrawBWTAInfo) {
@@ -251,10 +251,18 @@ public class UXManager {
 		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
 		int seqBuildOrderStep = StrategyManager.Instance().seqBuildOrderStep;
 		String strBuildOrderStep = StrategyManager.Instance().strBuildOrderStep;
-		MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : " + strBuildOrderStep + " " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		if( StrategyManager.Instance().isInitialBuildOrderFinished == false){
+			MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : Processing InitialBuildOrder - " + BuildManager.Instance().getBuildQueue().size());
+		}else{
+			MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : " + strBuildOrderStep + " " + Arrays.toString(buildOrder) + " " + StrategyManager.Instance().getNextTargetIndexOfBuildOrderArray());
+		}
 
 		
-		
+		if(StrategyManager.Instance().getBestMultiLocation() != null){
+			MyBotModule.Broodwar.drawTextScreen(45, 300, "NextMulti Loc. : " + StrategyManager.Instance().getBestMultiLocation().getTilePosition());
+		}else{
+			MyBotModule.Broodwar.drawTextScreen(45, 300, "NextMulti Loc. : No Loc.");
+		}
 	}
 
 	// sc76.choi APM (Action Per Minute) 숫자를 Screen 에 표시합니다
@@ -1072,6 +1080,9 @@ public class UXManager {
 				MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + OverloadJobTyep + "(" + OverloadSmallJobTyep + ")");
 				if(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer) != null)
 					MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "dist F E : " + white + (int)unit.getDistance(InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer)));
+			}else if(unit.getType() == UnitType.Zerg_Lurker){
+				//MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "visible : " + white + unit.isVisible());
+				//MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 25, "Invincible : " + white + unit.isInvincible());
 			}else if(unit.getType() == UnitType.Zerg_Drone){
 				String WorkerJobTyep = WorkerManager.Instance().getWorkerData().getWorkerJob(unit).toString();
 				//MyBotModule.Broodwar.drawTextMap(unit.getPosition().getX(), unit.getPosition().getY() + 15, "" + white + WorkerJobTyep);
@@ -1107,7 +1118,7 @@ public class UXManager {
 		WorkerData  workerData = WorkerManager.Instance().getWorkerData();
 		int rowSpace = 10;
 		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<M W : " + workerData.getNumMineralWorkers() + ">");
-		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace, white + "<G W : " + workerData.getNumGasWorkers() + ">");
+		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace, white + "<G W : " + workerData.getNumGasWorkers() + "> " + Config.WorkersPerRefinery);
 		MyBotModule.Broodwar.drawTextScreen(x, y+rowSpace*2, white + "<C W : " + workerData.getNumCombatWorkers() + ">");
 
 		int yspace = 0;
