@@ -1401,7 +1401,7 @@ public class StrategyManager {
 			if(isInitialBuildOrderFinished == false){
 				
 				// sc76.choi defence저글링수만 초반 러쉬를 한번 간다.
-				// isNecessaryNumberOfCombatUnitType = myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1;
+				isNecessaryNumberOfCombatUnitType = myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1;
 						
 			}else{
 				isNecessaryNumberOfCombatUnitType = 
@@ -1526,6 +1526,10 @@ public class StrategyManager {
 	// sc76.choi 잘 판단해야 한다. 경기가 끝나지 않을 수도 있다.
 	boolean isTimeToStartElimination(){
 		
+		if(enemyMainBaseLocation == null){
+			return false;
+		}
+		
 		if (MyBotModule.Broodwar.getFrameCount() % 24*10 != 0) {
 			return false;
 		}
@@ -1550,6 +1554,18 @@ public class StrategyManager {
 			if (myUnitCountAroundEnemyMainBaseLocation > 10) {
 				return true;
 			}
+		}
+		
+		int myUnitCountAroundEnemyMainBaseLocation2 = 0;
+		int enemyUnitCountAroundEnemyMainBaseLocation2 = 0;
+		for(Unit unit : MyBotModule.Broodwar.getUnitsInRadius(enemyMainBaseLocation.getPosition(), Config.TILE_SIZE*10)) {
+			if (unit.getPlayer() == myPlayer) {
+				myUnitCountAroundEnemyMainBaseLocation2 ++;
+			}
+		}
+		
+		if (myUnitCountAroundEnemyMainBaseLocation2 > 20) {
+			return true;
 		}
 		
 		// sc76.choi 일꾼만 20마리 죽여도 elimination한다.
@@ -1618,13 +1634,11 @@ public class StrategyManager {
 		
 		// 저글링
 		for(Unit unit : myCombatUnitType1List){
-			if (MyBotModule.Broodwar.getFrameCount() % (6) != 0) return;
 			hasCommanded = controlCombatUnitType1(unit);
 		}
 		
 		// 히드라
 		for(Unit unit : myCombatUnitType2List){
-			if (MyBotModule.Broodwar.getFrameCount() % (6) != 0) return;
 			hasCommanded = controlCombatUnitType2(unit);
 		}
 		
@@ -1650,7 +1664,6 @@ public class StrategyManager {
 		// sc76.choi 따로 명령 받은 오버로드는 공격에서 제외 합니다.	
 		// System.out.println("commandMyCombatUnitToAttack() mySpecialUnitType1List : " + mySpecialUnitType1List.size());
 		for(Unit unit : mySpecialUnitType1List){
-			if (MyBotModule.Broodwar.getFrameCount() % (6) != 0) return;
 			hasCommanded = controlSpecialUnitType1(unit);
 		}
 		
@@ -1666,7 +1679,6 @@ public class StrategyManager {
 		
 		// 퀸
 		for(Unit unit : mySpecialUnitType4List){	
-			if (MyBotModule.Broodwar.getFrameCount() % (6) != 0) return;
 			hasCommanded = controlSpecialUnitType4(unit);
 		}
 		
@@ -1714,11 +1726,13 @@ public class StrategyManager {
 
 			// 저글링
 			if (unit.getType() == myCombatUnitType1) {
+				if (MyBotModule.Broodwar.getFrameCount() % (24*1) != 0) return;				
 				hasCommanded = controlCombatUnitType1(unit);
 			}
 
 			// 히드라
 			if (unit.getType() == myCombatUnitType2) {
+				if (MyBotModule.Broodwar.getFrameCount() % (24*1) != 0) return;				
 				hasCommanded = controlCombatUnitType2(unit);
 			}
 			
@@ -2043,8 +2057,14 @@ public class StrategyManager {
 			
 		}else if(combatState == CombatState.defenseMode){
 			
+//			// sc76.choi APM 관리
+//			if(existUnitTypeInRegion(enemyPlayer, null, myMainBaseLocation.getRegion()) == false
+//				&& existUnitTypeInRegion(enemyPlayer, null, myFirstExpansionLocation.getRegion()) == false){
+//				return true;
+//			}
+			
 			// sc76.choi APM 관리
-			if(MyBotModule.Broodwar.getAPM() > 1900){
+			if(MyBotModule.Broodwar.getAPM() > 1500){
 				return true;
 			}
 			
@@ -2081,9 +2101,7 @@ public class StrategyManager {
 				}
 				// sc76.choi 적이 없으면 모이는데, 확장이 시작되었으면 태어난 자리에 있게 한다.
 				else{
-					if(unit.isIdle()){
-						commandUtil.move(unit, DEFENCE_POSITION);
-					}
+					commandUtil.move(unit, DEFENCE_POSITION);
 				}
 			}
 			hasCommanded = true;
@@ -2099,8 +2117,14 @@ public class StrategyManager {
 			
 			if (combatState == CombatState.defenseMode) {
 				
+//				// sc76.choi APM 관리
+//				if(existUnitTypeInRegion(enemyPlayer, null, myMainBaseLocation.getRegion()) == false
+//						&& existUnitTypeInRegion(enemyPlayer, null, myFirstExpansionLocation.getRegion()) == false){
+//						return true;
+//				}
+				
 				// sc76.choi APM 관리
-				if(MyBotModule.Broodwar.getAPM() > 1900){
+				if(MyBotModule.Broodwar.getAPM() > 1500){
 					return true;
 				}
 				
@@ -2618,7 +2642,7 @@ public class StrategyManager {
 	    for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 	        if(commandUtil.IsValidUnit(unit)){
 	        	
-	        	if(unit.getType().isWorker()) continue;
+//	        	if(unit.getType().isWorker()) continue;
 	        	if(unit.getType().isBuilding()) continue;
 	        	
 	        	//if (unit.getType().canAttack()) {
@@ -3353,8 +3377,8 @@ public class StrategyManager {
 					
 					if((enemyPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 							|| enemyPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0
-							|| enemyPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-							|| enemyPlayer.incompleteUnitCount(UnitType.Zerg_Lair) > 0
+//							|| enemyPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+//							|| enemyPlayer.incompleteUnitCount(UnitType.Zerg_Lair) > 0
 							|| enemyPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 1)
 						&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
 							buildState = BuildState.fastMutalisk_Z;
