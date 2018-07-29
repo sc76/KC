@@ -288,6 +288,10 @@ public class OverloadManager {
 			boolean isSafeAround = true;
 			for(Unit enemyUnit : overload.getUnitsInRadius(Config.TILE_SIZE*8)){
 				if(enemyUnit.getPlayer() == InformationManager.Instance().enemyPlayer){
+					if(enemyUnit.getType() == UnitType.Zerg_Spire
+						|| enemyUnit.getType() == UnitType.Zerg_Mutalisk){
+							StrategyManager.Instance().bTimeToAirDefence = true;
+						}
 					
 					if(enemyUnit.getType() == UnitType.Terran_Marine
 						|| enemyUnit.getType() == UnitType.Terran_Bunker

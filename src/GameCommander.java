@@ -212,6 +212,12 @@ public class GameCommander {
 		}else if("off".equals(text) || "of".equals(text) || "f".equals(text)){
 			Config.IS_DRAW = false;
 		}
+		
+		if("b air".equals(text)){
+			StrategyManager.Instance().bTimeToAirDefence = true;
+		}
+		
+		
 	}
 
 	/// 다른 플레이어로부터 텍스트를 전달받았을 때 발생하는 이벤트를 처리합니다

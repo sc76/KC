@@ -125,9 +125,9 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 Lair 테크
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) >= 3
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 && myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
-		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
+		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 		    && myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 히드라 발업
 //		    && myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 사정업		    
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0

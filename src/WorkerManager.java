@@ -851,6 +851,11 @@ public class WorkerManager {
 		return workerData.getNumGasWorkers();
 	}
 
+	public int getNumWorkers() 
+	{
+		return workerData.getNumWorkers();	
+	}
+	
 	/// 일꾼 유닛들의 상태를 저장하는 workerData 객체를 리턴합니다
 	public WorkerData getWorkerData()
 	{

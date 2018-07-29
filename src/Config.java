@@ -84,7 +84,7 @@ public class Config {
 	public static int maxNumberOfSpecialUnitType3AgainstProtoss = 6;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstProtoss = 2;  // 퀸
 	
-	public static int maxNumberOfCombatUnitType1AgainstZerg = 12;  // 저글링
+	public static int maxNumberOfCombatUnitType1AgainstZerg = 10;  // 저글링
 	public static int maxNumberOfCombatUnitType2AgainstZerg = 10; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstZerg = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈

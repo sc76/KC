@@ -26,6 +26,7 @@ import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
+import javafx.concurrent.Worker;
 import bwapi.Color;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
@@ -36,7 +37,7 @@ public class StrategyManager {
 
 	private final Boolean DEBUG = Config.DEBUG;
 	
-	enum CombatState { 
+	public enum CombatState { 
 		initialMode,                        // 초반 빌드오더 타임
 		defenseMode,						// 아군 진지 방어
 		attackStarted,						// 아군 유닛으로 적 공격 시작
@@ -46,7 +47,7 @@ public class StrategyManager {
 	CombatState combatState;				/// 전투 상황
 	
 	// sc76.choi 상황에 맞는 빌드 모드 설정
-	enum BuildState { 
+	public enum BuildState { 
 		normalMode,                         // 기본
 		onlyZergling,						// 저글링 모드, 저글링이 다수 필요할 때
 		onlyHydralist,						// 히드라 모드, 히드라가 다수 필요할 때
@@ -54,6 +55,7 @@ public class StrategyManager {
 		fasterMutalisk,						// 빠른 뮤탈 모드, 태란 다수 탱크가 있을 때, 퀸도 빨리 올려 활용한다.
 		fasterUltralisk,						// 빠른 울트라 모드, 태란 입구 막음 or 프로토스 앞마당 포토밭을 만들 때 상황
 		fastZergling_Z,
+		fastMutalisk_Z,
 		blockTheFirstChokePoint_T,
 		blockTheSecondChokePoint_T,
 		vulture_Galia_Tank_T,
@@ -1079,28 +1081,36 @@ public class StrategyManager {
 		
 		if(bTimeToAirDefence){
 			
+			// sc76.choi 본진의 공중 공격 방어
+//			if(isInitialBuildOrderFinished == true
+//				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion()) == false					
+//				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Spore_Colony, myMainBaseLocation.getRegion()) == false){
+//				urgent_AirDefenceBuilding1 = false;
+//				urgent_AirDefenceBuilding2 = false;
+//			}
+//			else if(isInitialBuildOrderFinished == true
+//						&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion()) == true					
+//						&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Spore_Colony, myMainBaseLocation.getRegion()) == false
+//						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spore_Colony) == 0
+//						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spore_Colony, null) == 0){
+////				urgent_AirDefenceBuilding1 = false;
+//				urgent_AirDefenceBuilding2 = false;
+//			}
+			
+			// sc76.choi 본진에 먼저 긴급하게 스포어 클로니를 건설한다.
 			excuteUrgentAirDefenceConstructionInBaseLocation(myMainBaseLocation);
 			
-			Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(myPlayer);
+			// sc76.choi 각 지역에 공중 공격 방어를 위해 실행
 			List<BaseLocation> selfBaseLocations = InformationManager.Instance().getOccupiedBaseLocations(myPlayer);
 			
-			Iterator<Region> it1 = selfRegions.iterator();
 			Iterator<BaseLocation> it2 = selfBaseLocations.iterator();
 			
-//			while (it1.hasNext()) {
 			while (it2.hasNext()) {
-//				Region selfRegion = it1.next();
 				BaseLocation selfBaseLocation = it2.next();
 				
 				// sc76.choi 나의 본진
 				if(selfBaseLocation.equals(myMainBaseLocation)
 					|| (selfBaseLocation.getX() == myMainBaseLocation.getX() && selfBaseLocation.getY() == myMainBaseLocation.getY())) {
-					continue;
-				}
-				
-				// sc76.choi 나의 확장
-				if(selfBaseLocation.equals(myFirstExpansionLocation)
-					|| (selfBaseLocation.getX() == myFirstExpansionLocation.getX() && selfBaseLocation.getY() == myFirstExpansionLocation.getY())) {
 					continue;
 				}
 				
@@ -1116,7 +1126,6 @@ public class StrategyManager {
 						
 						if(enemyRace == Race.Zerg){
 							//System.out.println("buildAirDefenceUnit selfRegion : Creep_Colony");
-							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, selfBaseLocation.getTilePosition(), true);
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Creep_Colony, selfBaseLocation.getTilePosition(), false);
 						}else{
 							BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony, selfBaseLocation.getTilePosition(), true);
@@ -2072,7 +2081,9 @@ public class StrategyManager {
 				}
 				// sc76.choi 적이 없으면 모이는데, 확장이 시작되었으면 태어난 자리에 있게 한다.
 				else{
-					commandUtil.move(unit, DEFENCE_POSITION);
+					if(unit.isIdle()){
+						commandUtil.move(unit, DEFENCE_POSITION);
+					}
 				}
 			}
 			hasCommanded = true;
@@ -2135,15 +2146,32 @@ public class StrategyManager {
 					}
 					// sc76.choi 적이 없으면,
 					else{
+						
+//						Position fastMutalisk_Z_for_hydralisk = null;
+//						
+//						if(buildState == BuildState.fastMutalisk_Z){
+//							
+//						}
+						
 						if(canAttackNow && unit.getGroundWeaponCooldown() == 0){
 							if(targetWeakUnit != null){
 								//System.out.println("attack Unit  1 ");
 								commandUtil.attackUnit(unit, targetWeakUnit);
 							}else{
-								commandUtil.attackMove(unit, DEFENCE_POSITION);
+								// sc76.choi 적진에서 가까운 쪽으로 히드라를 모은다.
+								if(buildState == BuildState.fastMutalisk_Z){
+									commandUtil.attackMove(unit, myMainBaseLocation.getPosition());
+								}else{
+									commandUtil.attackMove(unit, DEFENCE_POSITION);
+								}
 							}
 						}else{
-							commandUtil.attackMove(unit, DEFENCE_POSITION);
+							// sc76.choi 적진에서 가까운 쪽으로 히드라를 모은다.							
+							if(buildState == BuildState.fastMutalisk_Z){
+								commandUtil.attackMove(unit, myMainBaseLocation.getPosition());
+							}else{
+								commandUtil.attackMove(unit, DEFENCE_POSITION);
+							}
 						}
 					}
 				}
@@ -3222,7 +3250,7 @@ public class StrategyManager {
         Unit target = null;
         
         for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
-        	if(commandUtil.IsValidUnit(unit)){
+        	if(unit != null){
         		if(Race.Terran == enemyRace){
         			if(unit.getType() == UnitType.Terran_Starport){
 	       				bTimeToAirDefence = true;
@@ -3301,7 +3329,7 @@ public class StrategyManager {
 
     public void isTimeToBuildState() {
     	
-    	if(DEBUG) System.out.println("isTimeToBuildState start");
+//    	if(DEBUG) System.out.println("isTimeToBuildState start");
     	
     	if(InformationManager.Instance().getUnitData(enemyPlayer) != null){
 			Iterator<Integer> it = InformationManager.Instance().getUnitData(enemyPlayer).getUnitAndUnitInfoMap().keySet().iterator();
@@ -3315,16 +3343,27 @@ public class StrategyManager {
 				}else if(enemyRace == Race.Terran){
 					
 				}else if(enemyRace == Race.Zerg){
-					if(existUnitTypeInRegion(enemyPlayer, UnitType.Zerg_Drone, myMainBaseLocation.getRegion())
+					if((existUnitTypeInRegion(enemyPlayer, UnitType.Zerg_Drone, myMainBaseLocation.getRegion())
+						|| existUnitTypeInRegion(enemyPlayer, UnitType.Zerg_Zergling, myMainBaseLocation.getRegion())
+						|| existUnitTypeInRegion(enemyPlayer, UnitType.Zerg_Zergling, myFirstExpansionLocation.getRegion())
+					)
 						 && MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 5)){
 						buildState = BuildState.fastZergling_Z;
 					}
-						
+					
+					if((enemyPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+							|| enemyPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0
+							|| enemyPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+							|| enemyPlayer.incompleteUnitCount(UnitType.Zerg_Lair) > 0
+							|| enemyPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 1)
+						&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
+							buildState = BuildState.fastMutalisk_Z;
+					}
 				}
 			}
 		}
     	
-    	if(DEBUG) System.out.println("buildState : " + buildState);
+//    	if(DEBUG) System.out.println("buildState : " + buildState);
     	
     	if(enemyRace == Race.Protoss){
 			if(buildState == BuildState.carrier_P){
@@ -3334,13 +3373,18 @@ public class StrategyManager {
 			
 		}else if(enemyRace == Race.Zerg){
 	    	if(buildState == BuildState.fastZergling_Z){
+	    		
+	    		// sc76.choi 저글링 두마리 추가	    		
+	    		excuteUrgenturgent_Add_Zergling1();
+	    		// sc76.choi 본진에 성큰하나 건설
 	    		excuteUrgentDefenceConstructionInBaseLocation(myMainBaseLocation);
+	    		
 	    	}
 		}
     	
     	
-    	if(DEBUG) System.out.println("isTimeToBuildState end");
-    	if(DEBUG) System.out.println();
+//    	if(DEBUG) System.out.println("isTimeToBuildState end");
+//    	if(DEBUG) System.out.println();
     }
     
 	// KTH. Drop 명령  수행합니다
@@ -3982,7 +4026,7 @@ public class StrategyManager {
 		}
 		else{
 			// 기본
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0){
 				seqBuildOrderStep = 1;
 				strBuildOrderStep = "P 1";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
@@ -4215,14 +4259,18 @@ public class StrategyManager {
 		}
 		else{
 			// 기본
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0){
 				seqBuildOrderStep = 1;
 				strBuildOrderStep = "Z 1";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
 			}else{
 				seqBuildOrderStep = 2;
 				strBuildOrderStep = "Z 2";
-				buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+				if(buildState == BuildState.fastMutalisk_Z){
+					buildOrderArrayOfMyCombatUnitType = new int[]{2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+				}else{
+					buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+				}
 			}
 			
 		}
@@ -4338,95 +4386,103 @@ public class StrategyManager {
 		if(InformationManager.Instance().getTotalHatcheryCount() >= 3){
 			Config.optimalWorkerCount = 2.0;
 		}
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// sc76.choi 가스 일꾼을 조절 한다.
+		int gasWorkers = WorkerManager.Instance().getNumWorkers();
 		
-		if(enemyRace == Race.Terran){
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
-				if(selfMinerals*3 <= selfGas){
-					Config.WorkersPerRefinery = 1;
-				}else{
-					Config.WorkersPerRefinery = 3;
-				}				
-			}else{
-				if(myOccupiedBaseLocations >= 3){
-					Config.WorkersPerRefinery = 3;
-				}else{
-//					if(myPlayer.hasResearched(TechType.Lurker_Aspect)){
-					if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-						Config.WorkersPerRefinery = 3;
-					}else{
-						Config.WorkersPerRefinery = 2;
-					}
-				}
-			}
-		}else if(enemyRace == Race.Zerg){
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
-				if(selfMinerals*3 <= selfGas){
-					Config.WorkersPerRefinery = 1;
-				}else{
-					Config.WorkersPerRefinery = 3;
-				}
-			}else{
-				if(myOccupiedBaseLocations >= 4){
-					Config.WorkersPerRefinery = 3;
-				}else{
-					if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-						if(selfMinerals*3 <= selfGas){
-							Config.WorkersPerRefinery = 2;
-						}else{
-							Config.WorkersPerRefinery = 3;
-						}
-					}else{
-						if(selfMinerals*3 <= selfGas){
-							Config.WorkersPerRefinery = 1;
-						}else{
-							Config.WorkersPerRefinery = 2;
-						}	
-					}
-				}
-			}
-		}else if(enemyRace == Race.Protoss){
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
-				if(selfMinerals*3 <= selfGas){
-					Config.WorkersPerRefinery = 1;
-				}else{
-					Config.WorkersPerRefinery = 3;
-				}				
-			}else{
-				if(myOccupiedBaseLocations >= 3){
+		if(gasWorkers <= 5){
+			Config.WorkersPerRefinery = 0;
+		}else{
+			if(enemyRace == Race.Terran){
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
 					if(selfMinerals*3 <= selfGas){
 						Config.WorkersPerRefinery = 1;
 					}else{
 						Config.WorkersPerRefinery = 3;
-					}	
+					}				
 				}else{
-//					if(myPlayer.hasResearched(TechType.Lurker_Aspect)){
-					if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+					if(myOccupiedBaseLocations >= 3){
 						Config.WorkersPerRefinery = 3;
 					}else{
+	//					if(myPlayer.hasResearched(TechType.Lurker_Aspect)){
+						if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+							Config.WorkersPerRefinery = 3;
+						}else{
+							Config.WorkersPerRefinery = 2;
+						}
+					}
+				}
+			}else if(enemyRace == Race.Zerg){
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
+					if(selfMinerals*3 <= selfGas){
+						Config.WorkersPerRefinery = 1;
+					}else{
+						Config.WorkersPerRefinery = 3;
+					}
+				}else{
+					if(myOccupiedBaseLocations >= 4){
+						Config.WorkersPerRefinery = 3;
+					}else{
+						if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+							if(selfMinerals*3 <= selfGas){
+								Config.WorkersPerRefinery = 2;
+							}else{
+								Config.WorkersPerRefinery = 3;
+							}
+						}else{
+							if(selfMinerals*3 <= selfGas){
+								Config.WorkersPerRefinery = 1;
+							}else{
+								Config.WorkersPerRefinery = 2;
+							}	
+						}
+					}
+				}
+			}else if(enemyRace == Race.Protoss){
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
+					if(selfMinerals*3 <= selfGas){
+						Config.WorkersPerRefinery = 1;
+					}else{
+						Config.WorkersPerRefinery = 3;
+					}				
+				}else{
+					if(myOccupiedBaseLocations >= 3){
 						if(selfMinerals*3 <= selfGas){
 							Config.WorkersPerRefinery = 1;
 						}else{
-							Config.WorkersPerRefinery = 2;
+							Config.WorkersPerRefinery = 3;
 						}	
+					}else{
+	//					if(myPlayer.hasResearched(TechType.Lurker_Aspect)){
+						if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+							Config.WorkersPerRefinery = 3;
+						}else{
+							if(selfMinerals*3 <= selfGas){
+								Config.WorkersPerRefinery = 1;
+							}else{
+								Config.WorkersPerRefinery = 2;
+							}	
+						}
 					}
 				}
-			}
-		}else{
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
-				if(selfMinerals*3 <= selfGas){
-					Config.WorkersPerRefinery = 1;
-				}else{
-					Config.WorkersPerRefinery = 3;
-				}				
 			}else{
-				if(myOccupiedBaseLocations >= 3){
-					Config.WorkersPerRefinery = 3;
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0){
+					if(selfMinerals*3 <= selfGas){
+						Config.WorkersPerRefinery = 1;
+					}else{
+						Config.WorkersPerRefinery = 3;
+					}				
 				}else{
-//					if(myPlayer.hasResearched(TechType.Lurker_Aspect)){
-					if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+					if(myOccupiedBaseLocations >= 3){
 						Config.WorkersPerRefinery = 3;
 					}else{
-						Config.WorkersPerRefinery = 2;
+	//					if(myPlayer.hasResearched(TechType.Lurker_Aspect)){
+						if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+							Config.WorkersPerRefinery = 3;
+						}else{
+							Config.WorkersPerRefinery = 2;
+						}
 					}
 				}
 			}
@@ -4666,6 +4722,10 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
 						base.getTilePosition(), true);
 				
+				// 확장에 low로 추가				
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(myDefenseBuildingType1, 
+						myFirstExpansionLocation.getTilePosition(), true);
+				
 				fastZergling_Z_DefenceBuilding1 = true;
 			}
 		}
@@ -4678,10 +4738,15 @@ public class StrategyManager {
 			){
 				
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-						base.getTilePosition(), true);
+						base.getTilePosition(), false);
+
+				// 확장에 low로 추가
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(myDefenseBuildingType2, 
+						myFirstExpansionLocation.getTilePosition(), false);
 				
 				// sc76.choi 클로니 대신 Drone 추가를 해준다.
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Drone, false);	//5
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//5
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Drone, false);	//5
 				
 				fastZergling_Z_DefenceBuilding2 = true;
 				
@@ -4694,31 +4759,42 @@ public class StrategyManager {
 	boolean urgent_AirDefenceBuilding2 = false;
 	void excuteUrgentAirDefenceConstructionInBaseLocation(BaseLocation base){
 		
-		if(BuildManager.Instance().getAvailableMinerals() >= 100){
+		//if(BuildManager.Instance().getAvailableMinerals() >= 100){
 			if(urgent_AirDefenceBuilding1 == false
-				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion()) == false
-				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Sunken_Colony, myMainBaseLocation.getRegion()) == false
+//				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion()) == false
+//				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Spore_Colony, myMainBaseLocation.getRegion()) == false
 			){
-				
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
-						base.getTilePosition(), true);
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
-						base.getTilePosition(), true);
-				
+				if(enemyRace == Race.Zerg){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
+							base.getTilePosition(), true);
+					
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
+							base.getTilePosition(), true);
+				}
+				else{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
+							base.getTilePosition(), true);
+				}
 				urgent_AirDefenceBuilding1 = true;
 			}
-		}
+		//}
 		
-		if(BuildManager.Instance().getAvailableMinerals() >= 100){
+		//if(BuildManager.Instance().getAvailableMinerals() >= 100){
 			if(urgent_AirDefenceBuilding2 == false
 				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion()) == true
+				&& getCountUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion()) > 0
 			){
 				
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-						base.getTilePosition(), true);
-				
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-						base.getTilePosition(), true);
+				if(enemyRace == Race.Zerg){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony,
+							base.getTilePosition(), false);
+					
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony,
+							base.getTilePosition(), false);
+				}else{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spore_Colony,
+							base.getTilePosition(), false);
+				}
 				
 				// sc76.choi 클로니 대신 Drone 추가를 해준다.
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Drone, false);	//5
@@ -4726,11 +4802,33 @@ public class StrategyManager {
 				urgent_AirDefenceBuilding2 = true;
 				
 			}
+		//}
+	}
+	
+	// sc76.choi initialBuildOrder 때문에 별도의 boolean을 두어 컨트롤 한다.
+	boolean urgent_Add_Zergling1 = false;
+	void excuteUrgenturgent_Add_Zergling1(){
+		
+		if(urgent_Add_Zergling1 == false){
+			if(enemyRace == Race.Zerg){
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Zergling, true);
+				
+				System.out.println("excuteUrgenturgent_Add_Zergling1");
+				System.out.println("excuteUrgenturgent_Add_Zergling1");
+				System.out.println("excuteUrgenturgent_Add_Zergling1");
+				System.out.println("excuteUrgenturgent_Add_Zergling1");
+			}
+			urgent_Add_Zergling1 = true;
 		}
+
 	}
 	
 	// sc76.choi 방어건물을 건설합니다
 	void executeDefenceConstruction(){
+		
+		// sc76.choi 공중 공격을 대비한, 스포어 클로니 
+		buildAirDefenceUnit();
 		
 		// 1초에 한번만 실행
 		if (MyBotModule.Broodwar.getFrameCount() % 24*5 != 0) {
@@ -4872,8 +4970,7 @@ public class StrategyManager {
 			}
 		}
 		
-		// sc76.choi 공중 공격을 대비한, 스포어 클로니 
-		buildAirDefenceUnit();
+
 	}
 	
 	/// 공격유닛 생산 건물을 건설합니다
@@ -4918,7 +5015,7 @@ public class StrategyManager {
 		}
 		// sc76.choi 테란일때, 확장 판단
 		else{
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 2){
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Lurker) > 1){
 					isPossibleToConstructCombatUnitTrainingBuildingType = true;
 				}else{
 					isPossibleToConstructCombatUnitTrainingBuildingType = false;
