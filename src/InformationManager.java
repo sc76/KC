@@ -477,6 +477,8 @@ public class InformationManager {
 				if (ui.getType().isBuilding()) {
 					
 					if(!commandUtil.IsValidUnit(ui.getUnit())) continue;
+					
+					// sc76.choi 커멘드 센터를 먹었을때 제외
 					if(ui.getType() == UnitType.Zerg_Infested_Command_Center) continue;
 					
 					TilePosition buildingPosition = ui.getLastPosition().toTilePosition();
@@ -584,6 +586,7 @@ public class InformationManager {
 		// for (const auto & kv : unitData.get(self).getUnits())
 		while (it.hasNext()) {
 			final UnitInfo ui = unitData.get(player).getUnitAndUnitInfoMap().get(it.next());
+			
 			if (ui.getType().canAttack()) {
 				
 				if(player == selfPlayer && ui.getType().isWorker()){

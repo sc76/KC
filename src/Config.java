@@ -62,7 +62,7 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 4; // 저글링
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 6; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
@@ -220,7 +220,7 @@ public class Config {
 	public static int BuildingSupplyDepotSpacing = 0;
 	
 	/// 건물과 건물간 띄울 최소한의 간격 - 방어 건물의 경우 (포톤캐논. 성큰콜로니. 스포어콜로니. 터렛. 벙커)
-	public static int BuildingDefenseTowerSpacing = 1; // sc76.choi 0 -> 3 조정
+	public static int BuildingDefenseTowerSpacing = 2; // sc76.choi 0 -> 3 조정
 	
 	/// 화면 표시 여부 - 게임 정보
 	public static boolean DrawGameInfo = true;
