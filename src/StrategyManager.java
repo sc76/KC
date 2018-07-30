@@ -3574,9 +3574,9 @@ public class StrategyManager {
 		
 		//MyBotModule.Broodwar.drawTextScreen(440, 70, "isDefence : " + isNecessaryNumberOfDefencedUnitType());
 		MyBotModule.Broodwar.drawTextScreen(410, 70, "Combat Num : " + 
-		"[" + myCombatUnitType1List.size() + "/" + necessaryNumberOfCombatUnitType1 +"/" +  necessaryNumberOfDefenceUnitType1 +"]" +
-		"[" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +"/" +  necessaryNumberOfDefenceUnitType2 +"]" +
-		"[" + myCombatUnitType3List.size() + "/" + necessaryNumberOfCombatUnitType3 +"/" +  necessaryNumberOfDefenceUnitType3 +"]" +
+		"[" + myCombatUnitType1List.size() + "/" + necessaryNumberOfCombatUnitType1 +" / " +  necessaryNumberOfDefenceUnitType1 +"]" +
+		"[" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +" / " +  necessaryNumberOfDefenceUnitType2 +"]" +
+		"[" + myCombatUnitType3List.size() + "/" + necessaryNumberOfCombatUnitType3 +" / " +  necessaryNumberOfDefenceUnitType3 +"]" +
 		"Air : " + bTimeToAirDefence);
 		//MyBotModule.Broodwar.drawTextScreen(440, 80, "Time Air Defence : " + bTimeToAirDefence);		
 
