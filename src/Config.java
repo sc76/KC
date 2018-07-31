@@ -17,7 +17,7 @@ public class Config {
 	public static int showConsoleLogDelayDisplayTime = 24; // 1초 24 Frame console에 보여주는 delay time
 	
 	// sc76.choi 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
-	public static int DISTANCE_WORKER_CANATTACK = 32 * 7; // TILE_SIZE
+	public static int DISTANCE_WORKER_AROUND = 32 * 5; // TILE_SIZE
 	
 	// sc76.choi 일꾼 공격 합세숫자
 	public static int COUNT_WORKERS_CANATTACK = 3; 
@@ -108,7 +108,7 @@ public class Config {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 아군 최대 생산 제한 유닛수
-	public static int maxNumberOfTrainUnitType1AgainstProtoss = 12; // 저글링
+	public static int maxNumberOfTrainUnitType1AgainstProtoss = 10; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstProtoss = 16; // 히드라
 	public static int maxNumberOfTrainUnitType3AgainstProtoss = 4;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstProtoss = 8;  // 뮤탈

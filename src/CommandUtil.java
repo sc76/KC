@@ -171,6 +171,38 @@ public class CommandUtil {
 	}
 
 	/**
+	 * 특정한 unit에게 우 클릭 명령을 내립니다. 보통 move 명령과 비슷합니다.
+	 * 
+	 * @param unit
+	 * @param target
+	 */
+	public void rightClick(Unit unit, Position target)
+	{
+		if (unit == null || target == null)
+		{
+			return;
+		}
+
+		// if we have issued a command to this unit already this frame, ignore this one
+		if (unit.getLastCommandFrame() >= MyBotModule.Broodwar.getFrameCount() || unit.isAttackFrame())
+		{
+			return;
+		}
+
+		// get the unit's current command
+		UnitCommand currentCommand = unit.getLastCommand();
+
+		// if we've already told this unit to move to this position, ignore this command
+		if ((currentCommand.getUnitCommandType() == UnitCommandType.Right_Click_Position) && (target.equals(currentCommand.getTargetPosition())))
+		{
+			return;
+		}
+
+		// if nothing prevents it, attack the target
+		unit.rightClick(target);
+	}
+	
+	/**
 	 * 특정 유닛을 수리합니다.
 	 * 
 	 * @param unit
