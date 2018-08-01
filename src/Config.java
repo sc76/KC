@@ -19,20 +19,20 @@ public class Config {
 	// sc76.choi 일꾼이 공격에 합세할때, 적군의 거리를 판단할 때 쓰입니다.
 	public static int DISTANCE_WORKER_AROUND = 32 * 5; // TILE_SIZE
 	
-	// sc76.choi 일꾼 공격 합세숫자
+	// sc76.choi 일꾼 공격 합세 기본 숫자
 	public static int COUNT_WORKERS_CANATTACK = 3; 
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 5; // 히드라
-	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 0; // 럴커
+	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 5; // 히드라
-	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 0; // 럴커
+	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
@@ -45,8 +45,8 @@ public class Config {
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 12; // 히드라
-	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 2;  // 럴커
+	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 10; // 히드라
+	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 3;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
 	public static int necessaryNumberOfCombatUnitType6AgainstProtoss = 2;  // 가디언
@@ -55,7 +55,7 @@ public class Config {
 	
 	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 8; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 12;  // 히드라
-	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 2;  // 럴커
+	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 3;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
 	public static int necessaryNumberOfCombatUnitType6AgainstZerg = 2;  // 가디언
@@ -142,10 +142,10 @@ public class Config {
 	public static int maxNumberOfTrainSpecialUnitType4AgainstTerran = 3;  // 퀸
 	
 	// 방어 건물 종류 및 건설 갯수 설정
-	public static int necessaryNumberOfDefenseBuilding1AgainstProtoss = 3;
-	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 3; 			
-	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 2;
-	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 2;
+	public static int necessaryNumberOfDefenseBuilding1AgainstProtoss = 1;
+	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 1; 			
+	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 1;
+	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 1;
 	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony

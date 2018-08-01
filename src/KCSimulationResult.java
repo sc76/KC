@@ -19,13 +19,19 @@ public class KCSimulationResult {
 	private int enemyPoint; // 적의 점수
 	private boolean existEnemyAdvancedDefenceBuilding; // Starting Position 유무
 	
+	private static KCSimulationResult instance = new KCSimulationResult();
+	public static KCSimulationResult Instance() {
+		return instance;
+	} 
+
+	
 	public KCSimulationResult()	{
 		canAttackNow = true;
 		myPoint = 1;
 		enemyPoint = 0;
 		existEnemyAdvancedDefenceBuilding = false;
 	}
-
+	
 	public boolean isCanAttackNow() {
 		return canAttackNow;
 	}
