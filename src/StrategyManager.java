@@ -2206,7 +2206,7 @@ public class StrategyManager {
 				if(unit.isUnderStorm()){
 					
 					// sc76.choi 주변은 같이 후퇴한다.
-					for(Unit aroundMyUnit : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
+					for(Unit aroundMyUnit : unit.getUnitsInRadius(Config.TILE_SIZE*8)){
 						if(aroundMyUnit.getType() == UnitType.Zerg_Zergling){
 							commandUtil.move(unit, myMainBaseLocation.getPosition());
 						}
@@ -2311,6 +2311,7 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
+	
 	boolean controlCombatUnitType2(Unit unit) { 
 		boolean hasCommanded = false; 
 		Position targetPosition = null;
@@ -2338,6 +2339,7 @@ public class StrategyManager {
 				boolean canAttackNow = KCSimulationManager.Instance().canAttackNow(units);
 				
 				if(unit.isUnderStorm()){
+					
 					commandUtil.move(unit, myMainBaseLocation.getPosition());
 				}
 				// sc76.choi 스톰을 맞고 있지 않으면
@@ -2416,7 +2418,7 @@ public class StrategyManager {
 				}
 				else if(unit.isUnderStorm()){
 					// sc76.choi 주변은 같이 후퇴한다.
-					for(Unit aroundMyUnit : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
+					for(Unit aroundMyUnit : unit.getUnitsInRadius(Config.TILE_SIZE*8)){
 						if(aroundMyUnit.getType() == UnitType.Zerg_Hydralisk){
 							commandUtil.move(unit, myMainBaseLocation.getPosition());
 						}
@@ -2641,7 +2643,7 @@ public class StrategyManager {
 			
 			if (MyBotModule.Broodwar.getFrameCount() % (24*10) != 0) return true;
 			for(Unit unit : myCombatUnitType4List){
-				commandUtil.attackMove(unit, DEFENCE_POSITION);
+				commandUtil.move(unit, DEFENCE_POSITION);
 			}
 			return true;
 		}
@@ -4954,6 +4956,7 @@ public class StrategyManager {
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi 방어 건물 spacing(BuildingDefenseTowerSpacing 기본 1)을 조절한다.
+		// sc76.choi Finder에 의해 성큰의 위치를 조정 할 수 없기때문에, spacing 값으로 조절 한다.
 		if(enemyRace == Race.Protoss){
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 2
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Sunken_Colony) <= 2){
@@ -4962,8 +4965,8 @@ public class StrategyManager {
 				Config.BuildingDefenseTowerSpacing = 2;
 			}
 		}else if(enemyRace == Race.Terran){
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 2
-					&& myPlayer.completedUnitCount(UnitType.Zerg_Sunken_Colony) <= 2){
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 0
+					&& myPlayer.completedUnitCount(UnitType.Zerg_Sunken_Colony) <= 0){
 					Config.BuildingDefenseTowerSpacing = 4;
 			}else{
 				Config.BuildingDefenseTowerSpacing = 3;
@@ -5485,10 +5488,11 @@ public class StrategyManager {
 		}
 		
 		boolean isPossibleToConstructCombatUnitTrainingBuildingType = false;
-		
+		int canMultiExpansionCount = 4;
 		// sc76.choi TODO 히드라의 갯수로 해처리를 더 지을지 말지 결정한다.
 		// sc76.choi 테란일때, 확장 판단
 		if(enemyRace == Race.Terran){
+			canMultiExpansionCount = 2;
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
 				isPossibleToConstructCombatUnitTrainingBuildingType = true;
@@ -5499,6 +5503,7 @@ public class StrategyManager {
 		}
 		// sc76.choi 테란 아닐 때.
 		else{
+			canMultiExpansionCount = 4;
 			if(myOccupiedBaseLocations >= 3){
 				if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) > (necessaryNumberOfDefenceUnitType2 - 2)
 						|| myPlayer.completedUnitCount(UnitType.Zerg_Zergling) > (necessaryNumberOfDefenceUnitType1 - 2)){
@@ -5528,13 +5533,12 @@ public class StrategyManager {
 			if (numberOfMyCombatUnitTrainingBuilding < Config.numberOfMyCombatUnitTrainingBuilding) { // 10
 				
 				// 3개 까지는 main location 주변에 나머지는 확장한다.
-				if (numberOfMyCombatUnitTrainingBuilding < 3
+				if (numberOfMyCombatUnitTrainingBuilding < canMultiExpansionCount
 					 && BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 ) 
 				{
 					// sc76.choi 해처리 갯수가 3개 이상이면 밖에 짓는다.
 					// sc76.choi 뛰울 최소한 공간 조정
-					
-					if(InformationManager.Instance().getTotalHatcheryCount() <= 3){
+					if(InformationManager.Instance().getTotalHatcheryCount() <= canMultiExpansionCount){
 						Config.BuildingResourceDepotSpacing = 0; // 뛰울 최소한 공간 조정
 						BuildManager.Instance().buildQueue.queueAsHighestPriority(InformationManager.Instance().getBasicCombatBuildingType(), false);
 					}else{
