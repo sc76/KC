@@ -183,7 +183,12 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
+				if(StrategyManager.Instance().buildState == StrategyManager.BuildState.darkTemplar_P){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, true);
+				}else{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
+				}
+
 			}
 		}
 		
@@ -524,7 +529,11 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
+				if(StrategyManager.Instance().buildState == StrategyManager.BuildState.lurker_Z ){
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, true);
+				}else{
+					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
+				}
 			}
 		}
 

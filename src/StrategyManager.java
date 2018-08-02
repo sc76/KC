@@ -60,13 +60,14 @@ public class StrategyManager {
 		blockTheFirstChokePoint_T,
 		blockTheSecondChokePoint_T,
 		vulture_Galia_Tank_T,
+		darkTemplar_P,
 		blockDefence2Dragon8_P,
 		blockTheFirstChokePoint_P,
 		blockTheSecondChokePoint_P,
 		carrier_P
 	};	
 	
-	BuildState buildState = BuildState.normalMode;     				// sc76.choi 상황에 맞는 빌드 모드 설정
+	public BuildState buildState = BuildState.normalMode;     				// sc76.choi 상황에 맞는 빌드 모드 설정
 	// 아군
 	Player myPlayer;
 	Race myRace;
@@ -1499,51 +1500,67 @@ public class StrategyManager {
 				}
 						
 			}else{
-				
-				// Greater_Spire : 가디언, 저글링만 판단
-				if(myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0){
-					
-					if(myCombatUnitType6List.size() >= necessaryNumberOfCombatUnitType6
-						&& myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				
-				// Ultralisk_Cavern : 울트라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0){
-						
-						if(myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5
-							&& myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-							isNecessaryNumberOfCombatUnitType = true; 
-						}
-				}
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-						&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-							&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-					
-				// Spire, : 뮤탈은 판단 하지 않고, 히드라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-							&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-							&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				// Zerg_Spawning_Pool : 저글링
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				}
+				isNecessaryNumberOfCombatUnitType = 
+						(
+								// 히드라
+								(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2)  
+
+								// 저글링, 럴커
+								|| (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1      
+								&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) 
+
+								// 히드라, 럴커
+								|| (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2      
+								&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
+
+								// 뮤탈
+								|| (myCombatUnitType4List.size() >= necessaryNumberOfCombatUnitType4)
+
+								// 울트라
+								|| (myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)
+
+								// 가디언
+								|| (myCombatUnitType6List.size() >= necessaryNumberOfCombatUnitType6)
+						); 
 			}
-		}else if(Race.Zerg == enemyRace){
+		}else if(Race.Zerg == enemyRace || Race.Protoss == enemyRace){
+			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
+			if(isInitialBuildOrderFinished == false && Race.Zerg == enemyRace){
+				
+				// sc76.choi defence저글링수만 초반 러쉬를 한번 간다.
+				if(myCombatUnitType1List.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size() 
+					>= necessaryNumberOfDefenceUnitType1){
+					isNecessaryNumberOfCombatUnitType = true;
+				}
+						
+			}else{
+				
+				// 럴커나, 다크템플러가 있으면 오버로드 속업 후, 공격에 가담
+				if(buildState == BuildState.lurker_Z || buildState == BuildState.darkTemplar_P){
+					if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) == 0){
+						return false;
+					}
+				}
+				
+				// 저글링 + 히드라
+				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
+					&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
+					isNecessaryNumberOfCombatUnitType = true;
+				}
+				// 히드라				
+				else if(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
+					isNecessaryNumberOfCombatUnitType = true;
+				}
+				// 저글링 + 럴커				
+				else if(myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1
+						&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3){
+					isNecessaryNumberOfCombatUnitType = true;
+				}
+				
+			}
+		}
+		// sc76.choi 랜덤 일 때...
+		else {
 			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
 			if(isInitialBuildOrderFinished == false){
 				
@@ -1555,118 +1572,17 @@ public class StrategyManager {
 						
 			}else{
 				
-				// Greater_Spire : 가디언, 저글링만 판단
-				if(myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0){
-					
-					if(myCombatUnitType6List.size() >= necessaryNumberOfCombatUnitType6
-						&& myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				
-				// Ultralisk_Cavern : 울트라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0){
-						
-						if(myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5
-							&& myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-							isNecessaryNumberOfCombatUnitType = true; 
-						}
-				}
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-						&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-							&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-					
-				// Spire, : 뮤탈은 판단 하지 않고, 히드라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-							&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-							&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				// Zerg_Spawning_Pool : 저글링
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0){
-					if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-				}
-			}
-				
-//				isNecessaryNumberOfCombatUnitType = 
-//					(
-//						// 저글링
-//						(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1)  
-//							
-//						// 히드라
-//						|| (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2)  
-//						
-//						// 저글링, 럴커
-//					    || (myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1      
-//					           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) 
-//					
-//					    // 히드라, 럴커
-//					    || (myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2      
-//					           && myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
-//					    
-//					    || (myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3)
-//					
-//					    // 뮤탈
-//					    || (myCombatUnitType4List.size() >= necessaryNumberOfCombatUnitType4)
-//					     
-//					    // 울트라
-//					    || (myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5)
-//					); 
-//			}
-		}
-		// sc76.choi 프로토스나 랜덤 일 때...
-		else {
-			// Greater_Spire : 가디언, 저글링만 판단
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0){
-				
-				if(myCombatUnitType6List.size() >= necessaryNumberOfCombatUnitType6
-					&& myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-					isNecessaryNumberOfCombatUnitType = true; 
-				}
-			
-			// Ultralisk_Cavern : 울트라, 저글링만 판단
-			}else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0){
-					
-					if(myCombatUnitType5List.size() >= necessaryNumberOfCombatUnitType5
-						&& myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-						isNecessaryNumberOfCombatUnitType = true; 
-					}
-			}
-			// Hydralisk_Den : 히드라, 저글링만 판단
-			else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-					&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
+//				// 저글링
+//				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
+//					isNecessaryNumberOfCombatUnitType = true; 
+//				}
+//				
+				// 히드라
 				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-						&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3){
-					isNecessaryNumberOfCombatUnitType = true; 
-				}
-				
-			// Spire, : 뮤탈은 판단 하지 않고, 히드라, 저글링만 판단
-			}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-						&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
-					isNecessaryNumberOfCombatUnitType = true; 
-				}
-			// Hydralisk_Den : 히드라, 저글링만 판단
-			}else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0){
-				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-						&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
-					isNecessaryNumberOfCombatUnitType = true; 
-				}
-			// Zerg_Spawning_Pool : 저글링
-			}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0){
-				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1){
-					isNecessaryNumberOfCombatUnitType = true; 
+					&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
+					isNecessaryNumberOfCombatUnitType = true;
+				}else if(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
+					isNecessaryNumberOfCombatUnitType = true;
 				}
 			}
 		}
@@ -1712,57 +1628,13 @@ public class StrategyManager {
 					returnDefenceMode = true;
 				}
 			}else{
-				// Greater_Spire : 가디언, 저글링만 판단
-				if(myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0){
-					
-					if(myCombatUnitType6List.size() < necessaryNumberOfDefenceUnitType6
-						&& myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1){
-						returnDefenceMode = true; 
-					}
-				
-				// Ultralisk_Cavern : 울트라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0){
-						
-					if(myCombatUnitType5List.size() < necessaryNumberOfDefenceUnitType5
-						&& myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1){
-						returnDefenceMode = true; 
-					}
-					
+				if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
+						&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
+						&& myCombatUnitType3List.size() < 1   // 럴커
+						){
+					countDefenceMode++;
+					returnDefenceMode = true;
 				}
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-						&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
-					if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
-							&& myCombatUnitType3List.size() < necessaryNumberOfDefenceUnitType3){
-						returnDefenceMode = true; 
-					}
-					
-				// Spire, : 뮤탈은 판단 하지 않고, 히드라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-					if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
-							&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
-						returnDefenceMode = true; 
-					}
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0){
-					if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
-							&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
-						returnDefenceMode = true; 
-					}
-				// Zerg_Spawning_Pool : 저글링
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0){
-					if(myCombatUnitType1List.size() < necessaryNumberOfCombatUnitType1){
-						returnDefenceMode = true; 
-					}
-				}
-				
-//				if (myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1 // 저글링
-//						&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2   // 히드라
-//						&& myCombatUnitType3List.size() < 1   // 럴커
-//						){
-//					countDefenceMode++;
-//					returnDefenceMode = true;
-//				}
 			}
 		}else{
 			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해			
@@ -1774,51 +1646,31 @@ public class StrategyManager {
 				}
 				
 			}else{
-//				// Greater_Spire : 가디언, 저글링만 판단
-//				if(myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0){
-//					
-//					if(myCombatUnitType6List.size() < necessaryNumberOfDefenceUnitType6
-//						&& myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1){
-//						returnDefenceMode = true; 
-//					}
-//				
-//				// Ultralisk_Cavern : 울트라, 저글링만 판단
-//				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0){
-//						
-//					if(myCombatUnitType5List.size() < necessaryNumberOfDefenceUnitType5
-//						&& myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1){
-//						returnDefenceMode = true; 
-//					}
-//					
-//				}
-//				// Hydralisk_Den : 히드라, 저글링만 판단
-//				else if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-//						&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true){
-//					if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
-//							&& myCombatUnitType3List.size() < necessaryNumberOfDefenceUnitType3){
-//						returnDefenceMode = true; 
-//					}
-//					
-//				// Spire, : 뮤탈은 판단 하지 않고, 히드라, 저글링만 판단
-//				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
-//					if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
-//							&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
-//						returnDefenceMode = true; 
-//					}
-//				}else 
-					
-				// Hydralisk_Den : 히드라, 저글링만 판단
-				if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0){
-					if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
-							&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
-						returnDefenceMode = true; 
-					}
-				// Zerg_Spawning_Pool : 저글링
-				}else if(myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0){
-					if(myCombatUnitType1List.size() < necessaryNumberOfCombatUnitType1){
-						returnDefenceMode = true; 
+				
+				// 럴커나, 다크템플러가 있으면 오버로드 속업 후, 공격에 가담
+				if(buildState == BuildState.lurker_Z || buildState == BuildState.darkTemplar_P){
+					if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) == 0){
+						return true;
 					}
 				}
+				
+				// 저글링 + 히드라
+				if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
+					&& myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
+					countDefenceMode++;
+					returnDefenceMode = true;
+				}
+//				// 히드라				
+//				else if(myCombatUnitType2List.size() < necessaryNumberOfDefenceUnitType2){
+//					countDefenceMode++;
+//					returnDefenceMode = true;
+//				}
+//				// 저글링 + 럴커
+//				else if(myCombatUnitType1List.size() < necessaryNumberOfDefenceUnitType1
+//						&& myCombatUnitType3List.size() < necessaryNumberOfDefenceUnitType3){
+//						countDefenceMode++;
+//						returnDefenceMode = true;
+//				}
 			}
 		}
 		
@@ -2540,7 +2392,7 @@ public class StrategyManager {
 								if(buildState == BuildState.fastMutalisk_Z){
 									commandUtil.attackMove(unit, myMainBaseLocation.getPosition());
 								}else{
-									commandUtil.move(unit, DEFENCE_POSITION);
+									commandUtil.attackMove(unit, DEFENCE_POSITION);
 								}
 							}
 						}else{
@@ -2549,7 +2401,7 @@ public class StrategyManager {
 								commandUtil.attackMove(unit, myMainBaseLocation.getPosition());
 							}else{
 								//commandUtil.move(unit, getCalcuatePosition(unit, 1));
-								commandUtil.move(unit, DEFENCE_POSITION);
+								commandUtil.attackMove(unit, DEFENCE_POSITION);
 							}
 						}
 					}
@@ -3745,6 +3597,7 @@ public class StrategyManager {
     	
     	int countEnemyAdvancedDefenceBuilding = 0;
     	int countEnemyAdvancedCombatUnitType = 0;
+    	int countClockingCombatUnitType = 0;
     	
 //    	if(DEBUG) System.out.println("isTimeToBuildState start");
     	
@@ -3760,6 +3613,11 @@ public class StrategyManager {
 					
 					if(ui.getType() == UnitType.Protoss_Dragoon){
 						countEnemyAdvancedCombatUnitType++;
+					}
+					
+					if(ui.getType() == UnitType.Protoss_Dark_Templar
+							&& myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) == 0){
+						buildState = BuildState.darkTemplar_P;
 					}
 					
 					if(ui.getType() == UnitType.Protoss_Fleet_Beacon || ui.getType() == UnitType.Protoss_Carrier || ui.getType() == UnitType.Protoss_Interceptor){
@@ -3789,8 +3647,10 @@ public class StrategyManager {
 					}
 					
 					// sc76.choi 럴커 출현 
-					if(enemyPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1){
-							buildState = BuildState.lurker_Z;
+					if(ui.getType() == UnitType.Zerg_Lurker
+							&& myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) == 0){
+						countClockingCombatUnitType++;
+						buildState = BuildState.lurker_Z;
 					}
 				}
 			}
@@ -3812,6 +3672,14 @@ public class StrategyManager {
 				Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 14;
 			}
     		
+    		// sc76.choi 다시 normalMmode로 변경해 준다. 
+    		// TODO 이전 모드로 변경해 주면 좋을까?
+    		if(buildState == BuildState.darkTemplar_P){
+	    		if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0){
+	    			buildState = BuildState.normalMode;
+				}
+	    	}
+    		
 			if(buildState == BuildState.carrier_P){
 				
 			}
@@ -3825,6 +3693,14 @@ public class StrategyManager {
 	    		// sc76.choi 본진에 성큰하나 건설
 	    		excuteUrgentDefenceConstructionInBaseLocation(myMainBaseLocation);
 	    		
+	    	}
+
+    		// sc76.choi 다시 normalMmode로 변경해 준다. 
+    		// TODO 이전 모드로 변경해 주면 좋을까?
+	    	if(buildState == BuildState.lurker_Z){
+	    		if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0){
+	    			buildState = BuildState.normalMode;
+				}
 	    	}
 		}
     	
@@ -4987,22 +4863,22 @@ public class StrategyManager {
 		// sc76.choi 최소 방어 수, 공격 가능 수를 조절한다.
 		if(enemyRace == Race.Protoss){
 			
-			if(myKilledCombatUnitCount1 >= 30 && isIncreasingUnitType1Number4 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
-				Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss + 1;
-				isIncreasingUnitType1Number4 = true;
-			}else if(myKilledCombatUnitCount1 >= 20 && isIncreasingUnitType1Number3 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
-				Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss + 1;
-				isIncreasingUnitType1Number3 = true;
-			}else if(myKilledCombatUnitCount1 >= 10 && isIncreasingUnitType1Number2 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
-				Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss + 1;
-				isIncreasingUnitType1Number2 = true;
-			}else if(myKilledCombatUnitCount1 >= 5 && isIncreasingUnitType1Number1 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
-				isIncreasingUnitType1Number1 = true;
-			}
+//			if(myKilledCombatUnitCount1 >= 30 && isIncreasingUnitType1Number4 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
+//				Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss + 1;
+//				isIncreasingUnitType1Number4 = true;
+//			}else if(myKilledCombatUnitCount1 >= 20 && isIncreasingUnitType1Number3 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
+//				Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss + 1;
+//				isIncreasingUnitType1Number3 = true;
+//			}else if(myKilledCombatUnitCount1 >= 10 && isIncreasingUnitType1Number2 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
+//				Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss + 1;
+//				isIncreasingUnitType1Number2 = true;
+//			}else if(myKilledCombatUnitCount1 >= 5 && isIncreasingUnitType1Number1 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstProtoss = Config.necessaryNumberOfCombatUnitType1AgainstProtoss + 1;
+//				isIncreasingUnitType1Number1 = true;
+//			}
 			
 			if(myKilledCombatUnitCount2 >= 30 && isIncreasingUnitType2Number4 == false){
 				Config.necessaryNumberOfCombatUnitType2AgainstProtoss = Config.necessaryNumberOfCombatUnitType2AgainstProtoss + 2;
@@ -5023,19 +4899,19 @@ public class StrategyManager {
 			}
 		}else if(enemyRace == Race.Zerg){
 			
-			if(myKilledCombatUnitCount1 >= 20 && isIncreasingUnitType1Number3 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstZerg = Config.necessaryNumberOfCombatUnitType1AgainstZerg + 1;
-				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = Config.necessaryNumberOfDefenceUnitType1AgainstZerg + 1;
-				isIncreasingUnitType1Number3 = true;
-			}else if(myKilledCombatUnitCount1 >= 10 && isIncreasingUnitType1Number2 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstZerg = Config.necessaryNumberOfCombatUnitType1AgainstZerg + 1;
-				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = Config.necessaryNumberOfDefenceUnitType1AgainstZerg + 1;
-				isIncreasingUnitType1Number2 = true;
-			}else if(myKilledCombatUnitCount1 >= 5 && isIncreasingUnitType1Number1 == false){
-				Config.necessaryNumberOfCombatUnitType1AgainstZerg = Config.necessaryNumberOfCombatUnitType1AgainstZerg + 1;
-				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = Config.necessaryNumberOfDefenceUnitType1AgainstZerg + 1;
-				isIncreasingUnitType1Number1 = true;
-			}
+//			if(myKilledCombatUnitCount1 >= 20 && isIncreasingUnitType1Number3 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstZerg = Config.necessaryNumberOfCombatUnitType1AgainstZerg + 1;
+//				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = Config.necessaryNumberOfDefenceUnitType1AgainstZerg + 1;
+//				isIncreasingUnitType1Number3 = true;
+//			}else if(myKilledCombatUnitCount1 >= 10 && isIncreasingUnitType1Number2 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstZerg = Config.necessaryNumberOfCombatUnitType1AgainstZerg + 1;
+//				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = Config.necessaryNumberOfDefenceUnitType1AgainstZerg + 1;
+//				isIncreasingUnitType1Number2 = true;
+//			}else if(myKilledCombatUnitCount1 >= 5 && isIncreasingUnitType1Number1 == false){
+//				Config.necessaryNumberOfCombatUnitType1AgainstZerg = Config.necessaryNumberOfCombatUnitType1AgainstZerg + 1;
+//				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = Config.necessaryNumberOfDefenceUnitType1AgainstZerg + 1;
+//				isIncreasingUnitType1Number1 = true;
+//			}
 			
 			if(myKilledCombatUnitCount2 >= 20 && isIncreasingUnitType2Number3 == false){
 				Config.necessaryNumberOfCombatUnitType2AgainstZerg = Config.necessaryNumberOfCombatUnitType2AgainstZerg + 1;
