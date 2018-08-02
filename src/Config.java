@@ -57,7 +57,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 12;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 3;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
-	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 3;  // 울트라
+	public static int necessaryNumberOfCombatUnitType5AgainstZerg = 1;  // 울트라
 	public static int necessaryNumberOfCombatUnitType6AgainstZerg = 2;  // 가디언
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
@@ -66,7 +66,7 @@ public class Config {
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
-	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 3;  // 웉트라
+	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 2;  // 웉트라
 	public static int necessaryNumberOfCombatUnitType6AgainstTerran = 2;  // 가디언
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstTerran = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstTerran = 3; // 디파일러	
@@ -99,7 +99,7 @@ public class Config {
 	public static int maxNumberOfCombatUnitType2AgainstTerran = 12; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstTerran = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstTerran = 8;  // 뮤탈
-	public static int maxNumberOfCombatUnitType5AgainstTerran = 4;  // 울트라
+	public static int maxNumberOfCombatUnitType5AgainstTerran = 2;  // 울트라
 	
 	public static int maxNumberOfSpecialUnitType1AgainstTerran = 2;  // 오버로드
 	public static int maxNumberOfSpecialUnitType2AgainstTerran = 2; // 디파일러
