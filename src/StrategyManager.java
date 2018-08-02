@@ -60,6 +60,7 @@ public class StrategyManager {
 		blockTheFirstChokePoint_T,
 		blockTheSecondChokePoint_T,
 		vulture_Galia_Tank_T,
+		blockDefence2Dragon8_P,
 		blockTheFirstChokePoint_P,
 		blockTheSecondChokePoint_P,
 		carrier_P
@@ -3551,6 +3552,9 @@ public class StrategyManager {
 
     public void isTimeToBuildState() {
     	
+    	int countEnemyAdvancedDefenceBuilding = 0;
+    	int countEnemyAdvancedCombatUnitType = 0;
+    	
 //    	if(DEBUG) System.out.println("isTimeToBuildState start");
     	
     	if(InformationManager.Instance().getUnitData(enemyPlayer) != null){
@@ -3559,6 +3563,14 @@ public class StrategyManager {
 				UnitInfo ui = InformationManager.Instance().getUnitData(enemyPlayer).getUnitAndUnitInfoMap().get(it.next());
 				
 				if(enemyRace == Race.Protoss){
+					if(ui.getType() == UnitType.Protoss_Photon_Cannon){
+						countEnemyAdvancedDefenceBuilding++;
+					}
+					
+					if(ui.getType() == UnitType.Protoss_Dragoon){
+						countEnemyAdvancedCombatUnitType++;
+					}
+					
 					if(ui.getType() == UnitType.Protoss_Fleet_Beacon || ui.getType() == UnitType.Protoss_Carrier || ui.getType() == UnitType.Protoss_Interceptor){
 						buildState = BuildState.carrier_P;
 					}
@@ -3596,6 +3608,19 @@ public class StrategyManager {
 //    	if(DEBUG) System.out.println("buildState : " + buildState);
     	
     	if(enemyRace == Race.Protoss){
+    		if(countEnemyAdvancedDefenceBuilding >= 2 && countEnemyAdvancedCombatUnitType >= 6){
+    			buildState = BuildState.blockDefence2Dragon8_P;
+    		}
+    		
+    		if(buildState == BuildState.blockDefence2Dragon8_P){
+    			// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
+				Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 5;
+				Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 5;
+				
+				Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 8;
+				Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 14;
+			}
+    		
 			if(buildState == BuildState.carrier_P){
 				
 			}
@@ -5312,7 +5337,7 @@ public class StrategyManager {
 						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
-									seedPositionStrategyOfMyDefenseBuildingType, false);
+									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 							
 						}			
 					}
@@ -5323,7 +5348,7 @@ public class StrategyManager {
 						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
-									seedPositionStrategyOfMyDefenseBuildingType, false);
+									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
 	
 						}			
 					}
