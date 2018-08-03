@@ -430,9 +430,9 @@ public class KCSimulationManager {
 		if (enemyRace == Race.Protoss) {
 			// sc76.choi 아직 지어지고 있으면 0로 리턴
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
-				return 20;
+				return 0;
 			}		
-			return 30;
+			return 20;
 		} else if (enemyRace == Race.Terran) {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 9;
@@ -442,7 +442,7 @@ public class KCSimulationManager {
 			if(selfPlayer.getUpgradeLevel(UpgradeType.Adrenal_Glands) > 0){
 				return 0;
 			}			
-			return 40;
+			return 20;
 		} else {
 			return 0;
 		}

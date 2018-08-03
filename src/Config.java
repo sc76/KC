@@ -108,8 +108,8 @@ public class Config {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 아군 최대 생산 제한 유닛수
-	public static int maxNumberOfTrainUnitType1AgainstProtoss = 10; // 저글링
-	public static int maxNumberOfTrainUnitType2AgainstProtoss = 16; // 히드라
+	public static int maxNumberOfTrainUnitType1AgainstProtoss = 14; // 저글링
+	public static int maxNumberOfTrainUnitType2AgainstProtoss = 30; // 히드라
 	public static int maxNumberOfTrainUnitType3AgainstProtoss = 4;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstProtoss = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstProtoss = 3;  // 울트라
@@ -119,8 +119,8 @@ public class Config {
 	public static int maxNumberOfTrainSpecialUnitType3AgainstProtoss = 6;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstProtoss = 0;  // 퀸
 	
-	public static int maxNumberOfTrainUnitType1AgainstZerg = 12; // 저글링
-	public static int maxNumberOfTrainUnitType2AgainstZerg = 16; // 히드라
+	public static int maxNumberOfTrainUnitType1AgainstZerg = 14; // 저글링
+	public static int maxNumberOfTrainUnitType2AgainstZerg = 30; // 히드라
 	public static int maxNumberOfTrainUnitType3AgainstZerg = 4;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstZerg = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstZerg = 3;  // 울트라
@@ -130,8 +130,8 @@ public class Config {
 	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 6;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
-	public static int maxNumberOfTrainUnitType1AgainstTerran = 16; // 저글링
-	public static int maxNumberOfTrainUnitType2AgainstTerran = 16; // 히드라
+	public static int maxNumberOfTrainUnitType1AgainstTerran = 14; // 저글링
+	public static int maxNumberOfTrainUnitType2AgainstTerran = 30; // 히드라
 	public static int maxNumberOfTrainUnitType3AgainstTerran = 5;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstTerran = 3;  // 울트라
@@ -202,7 +202,7 @@ public class Config {
 	public static int TILE_SIZE = 32;
 
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
-	public static int WorkersPerRefinery = 3;
+	public static int WorkersPerRefinery = 1;
 	
 	/// 건물과 건물간 띄울 최소한의 간격 - 일반적인 건물의 경우
 	public static int BuildingSpacing = 1;
