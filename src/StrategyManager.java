@@ -57,10 +57,11 @@ public class StrategyManager {
 		fastZergling_Z,
 		fastMutalisk_Z,
 		lurker_Z,
+		hardCodeMarine_T,
 		blockTheFirstChokePoint_T,
 		blockTheSecondChokePoint_T,
 		vulture_Galia_Tank_T,
-		hardCodeZealot_P,
+		hardCoreZealot_P,
 		darkTemplar_P,
 		blockDefence2Dragon8_P,
 		blockTheFirstChokePoint_P,
@@ -2071,7 +2072,7 @@ public class StrategyManager {
 						System.out.println("commandMyWorkerToAttack() 3");
 						countWorkersToCanAttak = 5; // 앞마당 공격이면 5 마리
 						distanceWorkerAround = Config.TILE_SIZE*30;
-					}else if(buildState == BuildState.hardCodeZealot_P){
+					}else if(buildState == BuildState.hardCoreZealot_P){
 						System.out.println("commandMyWorkerToAttack() 4");
 						countWorkersToCanAttak = WorkerManager.Instance().getNumWorkers(); // 앞마당 공격이면 5 마리
 						distanceWorkerAround = Config.TILE_SIZE*30;
@@ -3649,7 +3650,9 @@ public class StrategyManager {
 						buildState = BuildState.carrier_P;
 					}
 				}else if(enemyRace == Race.Terran){
-					
+					if(ui.getType() == UnitType.Terran_Marine){
+						countEnemyBasicCombatUnitType++;
+					}
 				}else if(enemyRace == Race.Zerg){
 					
 					// sc76.choi 빠른 저글링 러쉬
@@ -3687,14 +3690,14 @@ public class StrategyManager {
     		
     		if(countEnemyBasicCombatUnitType >= 5
     			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
-    			buildState = BuildState.hardCodeZealot_P;
+    			buildState = BuildState.hardCoreZealot_P;
     			
     			// sc76.choi 저글링 4 마리 추가	    		
 	    		excuteUrgenturgent_Add_Zergling1();
 	    		// sc76.choi 본진에 성큰하나 건설
 	    		excuteUrgentDefenceConstructionInBaseLocation(myFirstExpansionLocation);
     		}
-    		else if (buildState == BuildState.hardCodeZealot_P
+    		else if (buildState == BuildState.hardCoreZealot_P
     				&& MyBotModule.Broodwar.getFrameCount() > (24 * 60 * 10)){
     			buildState = BuildState.normalMode;
     		}
@@ -3721,7 +3724,10 @@ public class StrategyManager {
 				
 			}
 		}else if(enemyRace == Race.Terran){
-			
+	   		if(countEnemyBasicCombatUnitType >= 5
+	    			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
+	    			buildState = BuildState.hardCodeMarine_T;
+	   		}
 		}else if(enemyRace == Race.Zerg){
 	    	if(buildState == BuildState.fastZergling_Z){
 	    		// sc76.choi 저글링 4 마리 추가	    		
@@ -4788,11 +4794,17 @@ public class StrategyManager {
 		
 		/////////////////////////////////////////////////////////////////////////////////////////
 		// buildState에 따른 config 조정
-		if(buildState == BuildState.hardCodeZealot_P){
+		if(buildState == BuildState.hardCoreZealot_P){
 			Config.BuildingDefenseTowerSpacing = 1;
    			Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 3;
    			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 3;
 		}
+		
+		if(buildState == BuildState.hardCodeMarine_T){
+			Config.BuildingDefenseTowerSpacing = 2;
+   			Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
+   			Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 2;
+		}		
 		
 				
 		if(buildState == BuildState.blockDefence2Dragon8_P){
@@ -5626,7 +5638,7 @@ public class StrategyManager {
 							if(InformationManager.Instance().getTotalHatcheryCount() >= 3 && mineralsCount <= 13){
 								
 								BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
-										BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified,  true);
+										BuildOrderItem.SeedPositionStrategy.SeedPositionSpecified,  false);
 								
 							}else{
 								

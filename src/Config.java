@@ -146,8 +146,8 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding2AgainstProtoss = 1; 			
 	public static int necessaryNumberOfDefenseBuilding1AgainstZerg = 1;
 	public static int necessaryNumberOfDefenseBuilding2AgainstZerg = 1;
-	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 4;
-	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 4;	
+	public static int necessaryNumberOfDefenseBuilding1AgainstTerran = 1;
+	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 1;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
 	public static int numberOfMyCombatUnitTrainingBuilding = 10;
