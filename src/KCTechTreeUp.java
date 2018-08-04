@@ -364,7 +364,7 @@ public class KCTechTreeUp {
 		
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType1
+//			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfDefenceUnitType1
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 1			
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Queens_Nest) > 0

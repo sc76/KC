@@ -218,6 +218,8 @@ public class OverloadManager {
 				firstScoutTargetBaseLocation = closestBaseLocation;
 				commandUtil.move(firstScoutOverload, closestBaseLocation.getPosition());
 			}
+			
+//			System.out.println("currentScoutTargetBaseLocation 1 : " + firstScoutOverload.getID() + " " + currentScoutTargetBaseLocation.getPosition());
 		}
 		// 적진이 발견되었다면,
 		else{
@@ -586,6 +588,11 @@ public class OverloadManager {
 //                firstScoutTargetBaseLocation = getClosestBaseLocation();
 //                commandUtil.move(firstScoutOverload, firstScoutTargetBaseLocation.getPosition());
 //            }
+            
+//            if(secondScoutTargetBaseLocation != null){
+//            	System.out.println("secondScoutTargetBaseLocation 2 : " + secondScoutOverload.getID() + " " + secondScoutTargetBaseLocation.getPosition());
+//            }
+            
         } else {
         	
         	centerChokeOverload = secondScoutOverload;
@@ -627,8 +634,8 @@ public class OverloadManager {
 //            }
         }
     }
-    
-    private BaseLocation getClosestBaseLocation() {
+
+	private BaseLocation getClosestBaseLocation() {
         double closestDistance = 1000000000;
         double tempDistance;
         BaseLocation closestBaseLocation = null;
@@ -1091,11 +1098,37 @@ public class OverloadManager {
 		this.firstScoutOverload = firstScoutOverload;
 	}	
 	
+    
+    public Unit getSecondScoutOverload() {
+		return secondScoutOverload;
+	}
+
+	public void setSecondScoutOverload(Unit secondScoutOverload) {
+		this.secondScoutOverload = secondScoutOverload;
+	}
+	
 	public void setDropOverload(Unit dropOverload) {
 		this.dropOverload = dropOverload;
 	}	
 
 	public Unit getDropOverload() {
 		return dropOverload;
-	}	
+	}
+	
+	public BaseLocation getCurrentScoutTargetBaseLocation() {
+		return currentScoutTargetBaseLocation;
+	}
+
+	public void setCurrentScoutTargetBaseLocation(BaseLocation currentScoutTargetBaseLocation) {
+		this.currentScoutTargetBaseLocation = currentScoutTargetBaseLocation;
+	}
+
+	public BaseLocation getSecondScoutTargetBaseLocation() {
+		return secondScoutTargetBaseLocation;
+	}
+
+	public void setSecondScoutTargetBaseLocation(BaseLocation secondScoutTargetBaseLocation) {
+		this.secondScoutTargetBaseLocation = secondScoutTargetBaseLocation;
+	}
+
 }

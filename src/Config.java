@@ -36,7 +36,7 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
@@ -130,7 +130,7 @@ public class Config {
 	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 6;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
-	public static int maxNumberOfTrainUnitType1AgainstTerran = 14; // 저글링
+	public static int maxNumberOfTrainUnitType1AgainstTerran = 8; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 30; // 히드라
 	public static int maxNumberOfTrainUnitType3AgainstTerran = 5;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
@@ -138,7 +138,7 @@ public class Config {
 	
 	public static int maxNumberOfTrainSpecialUnitType1AgainstTerran = 2;  // 오버로드
 	public static int maxNumberOfTrainSpecialUnitType2AgainstTerran = 3;  // 디파일러
-	public static int maxNumberOfTrainSpecialUnitType3AgainstTerran = 6;  // 스커지
+	public static int maxNumberOfTrainSpecialUnitType3AgainstTerran = 8;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstTerran = 3;  // 퀸
 	
 	// 방어 건물 종류 및 건설 갯수 설정

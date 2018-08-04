@@ -798,7 +798,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType1) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType1, false);
 			}
 		}
 		
@@ -810,9 +810,9 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType2, false);
 				
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
+//				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
 		}
 
