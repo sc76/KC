@@ -25,7 +25,7 @@ public class Config {
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 5; // 히드라
+	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
@@ -36,7 +36,7 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
@@ -44,8 +44,8 @@ public class Config {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 공격 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
-	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 8;  // 저글링
-	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 10; // 히드라
+	public static int necessaryNumberOfCombatUnitType1AgainstProtoss = 6;  // 저글링
+	public static int necessaryNumberOfCombatUnitType2AgainstProtoss = 6; // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstProtoss = 3;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstProtoss = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstProtoss = 3;  // 울트라
@@ -110,7 +110,7 @@ public class Config {
 	// sc76.choi 아군 최대 생산 제한 유닛수
 	public static int maxNumberOfTrainUnitType1AgainstProtoss = 14; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstProtoss = 30; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstProtoss = 4;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstProtoss = 3;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstProtoss = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstProtoss = 3;  // 울트라
 	
@@ -132,13 +132,13 @@ public class Config {
 	
 	public static int maxNumberOfTrainUnitType1AgainstTerran = 8; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 30; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstTerran = 5;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstTerran = 2;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstTerran = 3;  // 울트라
 	
 	public static int maxNumberOfTrainSpecialUnitType1AgainstTerran = 2;  // 오버로드
 	public static int maxNumberOfTrainSpecialUnitType2AgainstTerran = 3;  // 디파일러
-	public static int maxNumberOfTrainSpecialUnitType3AgainstTerran = 8;  // 스커지
+	public static int maxNumberOfTrainSpecialUnitType3AgainstTerran = 6;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstTerran = 3;  // 퀸
 	
 	// 방어 건물 종류 및 건설 갯수 설정
@@ -150,7 +150,7 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 1;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
-	public static int numberOfMyCombatUnitTrainingBuilding = 10;
+	public static int numberOfMyCombatUnitTrainingBuilding = 8;
 	
 	public static double optimalWorkerCount = 1.5;
 			

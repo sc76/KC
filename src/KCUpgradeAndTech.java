@@ -146,7 +146,7 @@ public class KCUpgradeAndTech {
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType1, true);
 				
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
+				//BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
 		}
 		
@@ -158,7 +158,11 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+				if(StrategyManager.Instance().buildState == StrategyManager.BuildState.blockDefence2Dragon8_P){
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, true);
+				}else{
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(necessaryUpgradeType2, false);
+				}
 				
 			}
 		}
@@ -207,7 +211,7 @@ public class KCUpgradeAndTech {
 		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) == 0
 			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Carapace) == false
 			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Carapace) == 0
@@ -219,7 +223,7 @@ public class KCUpgradeAndTech {
 		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) > 0
 			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) == 0
 			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Attacks) == false
@@ -277,7 +281,9 @@ public class KCUpgradeAndTech {
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 //			&& (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 2
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
+			&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 
+			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -315,6 +321,9 @@ public class KCUpgradeAndTech {
 		// Zerg_Missile_Attacks 원거리 공격 업그레이드 1 단계 (히드라리스크, 러커)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0
+			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12				
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
@@ -816,6 +825,18 @@ public class KCUpgradeAndTech {
 			}
 		}
 
+//		// sc76.choi 히드라 발업
+//		if (isTimeToStartUpgradeType1 && isTimeToStartUpgradeType2) 
+//		{
+//			if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 0
+//				&& myPlayer.getUpgradeLevel(necessaryUpgradeType1) == 1 
+//				&& myPlayer.getUpgradeLevel(necessaryUpgradeType2) == 1
+//				&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Metabolic_Boost) == 0)
+//			{
+//				BuildManager.Instance().buildQueue.queueAsHighestPriority(UpgradeType.Metabolic_Boost, false);
+//			}
+//		}
+		
 		// KTH 오버로드 수송업
 		// System.out.println("isTimeToStartUpgradeType5 = " + isTimeToStartUpgradeType5 + " " + necessaryUpgradeType5);
 		if (isTimeToStartUpgradeType5) 

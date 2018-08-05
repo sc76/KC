@@ -228,7 +228,7 @@ public class OverloadManager {
 				
 			// sc76.choi 안전한지 체크
 			boolean isSafeAround = true;
-			for(Unit enemyUnit : firstScoutOverload.getUnitsInRadius(Config.TILE_SIZE*8)){
+			for(Unit enemyUnit : firstScoutOverload.getUnitsInRadius(Config.TILE_SIZE*7)){
 				if(enemyUnit.getPlayer() == InformationManager.Instance().enemyPlayer){
 					if(enemyUnit.getType() == UnitType.Terran_Marine
 						|| enemyUnit.getType() == UnitType.Terran_Bunker
@@ -288,7 +288,7 @@ public class OverloadManager {
 
 			// sc76.choi 안전한지 체크
 			boolean isSafeAround = true;
-			for(Unit enemyUnit : overload.getUnitsInRadius(Config.TILE_SIZE*8)){
+			for(Unit enemyUnit : overload.getUnitsInRadius(Config.TILE_SIZE*7)){
 				if(enemyUnit.getPlayer() == InformationManager.Instance().enemyPlayer){
 					if(enemyUnit.getType() == UnitType.Zerg_Spire
 						|| enemyUnit.getType() == UnitType.Zerg_Mutalisk){
@@ -521,8 +521,16 @@ public class OverloadManager {
 		// 센터 position
 		else if(centerChokeOverload == null){
 			centerChokeOverload = unit;
-			overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
-			commandUtil.move(centerChokeOverload, centerLocationPosition);
+			
+			if(centerChokeOverload.isUnderAttack() 
+				|| StrategyManager.Instance().buildState == StrategyManager.BuildState.blockDefence2Dragon8_P){
+				overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Idle , (Unit)null);
+				commandUtil.move(centerChokeOverload, StrategyManager.Instance().DEFENCE_POSITION);
+				
+			}else{
+				overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
+				commandUtil.move(centerChokeOverload, centerLocationPosition);
+			}
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		} 
 		// KTH. Drop 오버로드 Position
@@ -596,8 +604,7 @@ public class OverloadManager {
         } else {
         	
         	centerChokeOverload = secondScoutOverload;
-			overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
-			commandUtil.move(secondScoutOverload, new Position(2000, 2000));
+			
 			
 //            boolean isHydraliskDen = false;
 //            for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
@@ -620,11 +627,15 @@ public class OverloadManager {
 //
 			// sc76.choi 공격을 당하면, 본진귀환
 			if(commandUtil.IsValidUnit(centerChokeOverload)){
-	            if (centerChokeOverload.isUnderAttack()) {
+	            if (centerChokeOverload.isUnderAttack()
+	            	|| StrategyManager.Instance().buildState == StrategyManager.BuildState.blockDefence2Dragon8_P) {
 	            	if(commandUtil.IsValidUnit(centerChokeOverload)){
 		            	overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Idle , (Unit)null);
 		                moveScoutUnitToMyBaseLocation(centerChokeOverload);
 	            	}
+	            }else{
+	            	overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Center , (Unit)null);
+	    			commandUtil.move(secondScoutOverload, new Position(2000, 2000));
 	            }
 			}
 //

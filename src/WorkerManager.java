@@ -104,25 +104,45 @@ public class WorkerManager {
 	 * 
 	 * 가스량이 미네랄의 3배가 넘게 되면, 가스 일꾼을 보정하여, 미네랄을 채집할 수 있도록 한다.
 	 */
-	public void handleGasWorkers()
-	{
+	public void handleGasWorkers(){
+		
 		// for each unit we have
-		for (Unit unit : MyBotModule.Broodwar.self().getUnits())
-		{
+		for (Unit unit : MyBotModule.Broodwar.self().getUnits()){
+			
 			// refinery 가 건설 completed 되었으면,
-			if (unit.getType().isRefinery() && unit.isCompleted() )
-			{
-				// get the number of workers currently assigned to it
-				int numAssigned = workerData.getNumAssignedWorkers(unit);
-
-				// if it's less than we want it to be, fill 'er up
-				// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
-				for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i)
-				{
-					Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
-					if (gasWorker != null)
-					{
-						workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+			if (unit.getType().isRefinery() && unit.isCompleted() )	{
+				
+				// 보정
+				if(selfMinerals < 100 && selfMinerals*3 <= selfGas){
+					//System.out.println("                      trans mineral 1 " + Config.WorkersPerRefinery);
+					Config.WorkersPerRefinery = -1; // sc76.choi 필요가스 일꾼 조정 0, 가스 일꾼은 1마리만..
+					
+					for (Unit changeMineralWorker : workerData.getWorkers()){
+						if(workerData.getWorkerJob(changeMineralWorker) == WorkerData.WorkerJob.Gas){
+							//System.out.println("                      trans mineral2 " + Config.WorkersPerRefinery);
+							if (commandUtil.IsValidSelfUnit(changeMineralWorker)){
+								//System.out.println("                      trans mineral3 " + Config.WorkersPerRefinery);
+								setMineralWorker(changeMineralWorker);
+							}
+						}
+					}
+				}
+				// 미네랄3이 가스보다 많고 현재 미네랄이 200 이상이 있으면 가스를 계속 캔다. 
+				else if(selfMinerals > 200 || workerData.getNumWorkers() <= 7){
+					Config.WorkersPerRefinery = 3; // sc76.choi 필요가스 일꾼 조정 3
+					// get the number of workers currently assigned to it 
+					int numAssigned = workerData.getNumAssignedWorkers(unit);
+	
+					// if it's less than we want it to be, fill 'er up
+					// 단점 : 미네랄 일꾼은 적은데 가스 일꾼은 무조건 3~4명인 경우 발생.
+					//System.out.println("                      trans gas1 " + Config.WorkersPerRefinery);
+					for (int i = 0; i<(Config.WorkersPerRefinery - numAssigned); ++i){
+						Unit gasWorker = chooseGasWorkerFromMineralWorkers(unit);
+						//System.out.println("                      trans gas2 " + Config.WorkersPerRefinery);
+						if (commandUtil.IsValidSelfUnit(gasWorker)){
+							//System.out.println("                      trans gas3 " + Config.WorkersPerRefinery);
+							workerData.setWorkerJob(gasWorker, WorkerData.WorkerJob.Gas, unit);
+						}
 					}
 				}
 			}
@@ -420,9 +440,7 @@ public class WorkerManager {
 			{
 				double distance = unit.getDistance(refinery);
 				if (closestWorker == null || 
-						(distance < closestDistance 
-						&& unit.isCarryingMinerals() == false 
-						&& unit.isCarryingGas() == false ))
+						(distance < closestDistance && unit.isCarryingMinerals() == false))
 				{
 					closestWorker = unit;
 					closestDistance = distance;
@@ -472,7 +490,9 @@ public class WorkerManager {
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
-				if (closestMovingWorker == null || (distance < closestMovingWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
+				if (closestMovingWorker == null 
+						|| (distance < closestMovingWorkerDistance 
+								&& unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMovingWorker = unit;
@@ -491,7 +511,8 @@ public class WorkerManager {
 			{
 				// if it is a new closest distance, set the pointer
 				double distance = unit.getDistance(buildingPosition.toPosition());
-				if (closestMiningWorker == null || (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
+				if (closestMiningWorker == null 
+						|| (distance < closestMiningWorkerDistance && unit.isCarryingMinerals() == false && unit.isCarryingGas() == false ))
 				{
 					if (BWTA.isConnected(unit.getTilePosition(), buildingPosition)) {
 						closestMiningWorker = unit;
