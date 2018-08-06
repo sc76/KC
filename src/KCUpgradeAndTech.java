@@ -329,7 +329,7 @@ public class KCUpgradeAndTech {
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
 		{
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, false);
+			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Missile_Attacks, true);
 		}
 		
 		// Zerg_Missile_Attacks 원거리 공격 업그레이드 2 단계 (히드라리스크, 러커)

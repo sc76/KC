@@ -82,7 +82,7 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 spire 테크 작성예정
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 

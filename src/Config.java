@@ -150,7 +150,7 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 1;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
-	public static int numberOfMyCombatUnitTrainingBuilding = 8;
+	public static final int numberOfMyCombatUnitTrainingBuilding = 7;
 	
 	public static double optimalWorkerCount = 1.5;
 			

@@ -93,6 +93,8 @@ public class GameCommander {
 	/// 유닛(건물/지상유닛/공중유닛)이 Create 될 때 발생하는 이벤트를 처리합니다
 	public void onUnitCreate(Unit unit) { 
 		InformationManager.Instance().onUnitCreate(unit);
+		
+		StrategyManager.Instance().onUnitCreate(unit);
 	}
 
 	///  유닛(건물/지상유닛/공중유닛)이 Destroy 될 때 발생하는 이벤트를 처리합니다
@@ -135,6 +137,8 @@ public class GameCommander {
 	{
 		InformationManager.Instance().onUnitComplete(unit);
 
+		StrategyManager.Instance().onUnitComplete(unit);
+		
 		// ResourceDepot 및 Worker 에 대한 처리
 		WorkerManager.Instance().onUnitComplete(unit);
 		
@@ -162,6 +166,7 @@ public class GameCommander {
 	public void onUnitShow(Unit unit) { 
 		InformationManager.Instance().onUnitShow(unit); 
 		
+		StrategyManager.Instance().onUnitShow(unit);
 		// ResourceDepot 및 Worker 에 대한 처리
 		//WorkerManager.Instance().onUnitShow(unit);
 	}
