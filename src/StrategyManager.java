@@ -515,11 +515,11 @@ public class StrategyManager {
 			}
 			// sc76.choi TODO 앞마당에 없으면, 다시 성큰 위치를 찾는다 , 성큰이 있어야 한다.
 			else{
-				Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
-				if(myDefenseBuildingUnit != null){
-					DEFENCE_POSITION = myDefenseBuildingUnit.getPosition();
-					DEFENCE_TILEPOSITION = myDefenseBuildingUnit.getTilePosition();
-				}
+				//Unit myDefenseBuildingUnit = commandUtil.GetClosestSelfUnitTypeToTarget(UnitType.Zerg_Sunken_Colony, mySecondChokePoint.getCenter());
+				//if(myDefenseBuildingUnit != null){
+					DEFENCE_POSITION = myMainBaseLocation.getPosition();
+					DEFENCE_TILEPOSITION = myMainBaseLocation.getTilePosition();
+				//}
 			}
 		}
 	}
@@ -3185,7 +3185,8 @@ public class StrategyManager {
 			return enemyUnitForExpansionDefence;
 		}
 	}
-
+	
+	// sc76.choi DEFENCE_POSITION 근처에 적을 반환
 	private Unit findAttackTargetForDefence() {
 		
 		boolean existHatcheryInMyFirstExpansion = existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()), false, false);
@@ -4182,7 +4183,7 @@ public class StrategyManager {
        			buildState = BuildState.blockDefence2Dragon8_P;
    			}
 
-    		if (countEnemyAdvancedCombatUnitType >= 0
+    		if (countEnemyAdvancedCombatUnitType > 0
     				&& MyBotModule.Broodwar.getFrameCount() > (24 * 60 * 7)){
     			buildState = BuildState.blockDefence2Dragon8_P;
     		}
@@ -5324,34 +5325,61 @@ public class StrategyManager {
 //		}
 //	}
 
-	public void unitMoveToDefencePosition(Unit unit){
+	public void moveUnitToDefencePosition(Unit unit){
 		if(unit.getType() == UnitType.Zerg_Zergling
 			|| unit.getType() == UnitType.Zerg_Hydralisk
 			|| unit.getType() == UnitType.Zerg_Lurker
 			|| unit.getType() == UnitType.Zerg_Mutalisk){
 			
 			if(unit.isIdle() == true || unit.isMoving() == false){
-				if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*5){
 					
-					if( BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(myMainBaseLocation.getPosition())
-						|| BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(myFirstExpansionLocation.getPosition())){
+				// sc76.choi 본진이나, 앞마당에 태어난 유닛은 최초 설정한  DEFENCE_POSITION에 모인다.
+				if( BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(myMainBaseLocation.getPosition())
+					|| BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(myFirstExpansionLocation.getPosition())){
+					
+					if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*5){
 						commandUtil.move(unit, DEFENCE_POSITION);
 					}
+					
+				}else{
+					// 본진 근처에 적이 있고, 멀티에 공격 유닛이 5마리 이상있으면, 본진의 DEFENCE_POSITION으로 attackMove한다.
+					if(findAttackTargetForDefence() != null){
+						
+						int multiUnitCount = 0;
+						for(Unit multiUnit : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
+							if(multiUnit.getPlayer() == myPlayer && multiUnit.getType().isWorker() == false && multiUnit.getType().canAttack()){
+								multiUnitCount++;
+							}
+						}
+						
+						// 본진으로 출발
+						if(multiUnitCount >= 5){
+							for(Unit attackUnit : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
+								if(attackUnit.getPlayer() == myPlayer && attackUnit.getType().isWorker() == false && attackUnit.getType().canAttack()){
+									if(attackUnit.isIdle()){
+										commandUtil.attackMove(attackUnit, DEFENCE_POSITION);
+									}
+								}
+							}
+						}
+						
+					}
 				}
+				
 			}
 		}
 	}
 
 	public void onUnitComplete(Unit unit) {
-		unitMoveToDefencePosition(unit);
+		moveUnitToDefencePosition(unit);
 	}
 	
 	public void onUnitCreate(Unit unit) {
-		unitMoveToDefencePosition(unit);
+		moveUnitToDefencePosition(unit);
 	}
 	
 	public void onUnitShow(Unit unit) {
-		unitMoveToDefencePosition(unit);
+		moveUnitToDefencePosition(unit);
 	}	
 	
 	

@@ -233,6 +233,7 @@ public class OverloadManager {
 					if(enemyUnit.getType() == UnitType.Terran_Marine
 						|| enemyUnit.getType() == UnitType.Terran_Bunker
 						|| enemyUnit.getType() == UnitType.Protoss_Dragoon
+						|| enemyUnit.getType() == UnitType.Protoss_Cybernetics_Core
 						|| enemyUnit.getType() == UnitType.Protoss_Photon_Cannon
 						|| enemyUnit.getType() == UnitType.Protoss_Corsair
 						|| enemyUnit.getType() == UnitType.Protoss_Scout
