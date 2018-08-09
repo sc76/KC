@@ -27,6 +27,8 @@ public class UnitInfo {
 	private int distanceFromSelfMainBase;	
 	private UnitType type;
 	private boolean completed;
+//	private char bornRegion;
+//	private char job;
 
 	public UnitInfo()
 	{
@@ -39,7 +41,17 @@ public class UnitInfo {
 		distanceFromSelfMainBase = 0;
 		type = UnitType.None;
 		completed = false;
+//		bornRegion = 'M';
+//		job = 'N';
 	}
+
+//	public char getJob() {
+//		return job;
+//	}
+//
+//	public void setJob(char job) {
+//		this.job = job;
+//	}
 
 	public int getDistanceFromEnemyMainBase() {
 		return distanceFromEnemyMainBase;
@@ -120,6 +132,14 @@ public class UnitInfo {
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}
+//	
+//	public char getBornRegion() {
+//		return bornRegion;
+//	}
+//
+//	public void setBornRegion(char bornRegion) {
+//		this.bornRegion = bornRegion;
+//	}
 	
 	@Override
     public boolean equals(Object o) {

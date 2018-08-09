@@ -249,7 +249,6 @@ public class UXManager {
 		
 		// build order array
 		int[] buildOrder = StrategyManager.Instance().getBuildOrderArrayOfMyCombatUnitType();
-		int seqBuildOrderStep = StrategyManager.Instance().seqBuildOrderStep;
 		String strBuildOrderStep = StrategyManager.Instance().strBuildOrderStep;
 		if( StrategyManager.Instance().isInitialBuildOrderFinished == false){
 			MyBotModule.Broodwar.drawTextScreen(5, 50, "Train Order : Processing InitialBuildOrder - " + BuildManager.Instance().getBuildQueue().size());

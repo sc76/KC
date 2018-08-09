@@ -2,8 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,12 +19,10 @@ import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwapi.UpgradeType;
-import bwapi.WalkPosition;
 import bwta.BWTA;
 import bwta.BaseLocation;
 import bwta.Chokepoint;
 import bwta.Region;
-import javafx.concurrent.Worker;
 import bwapi.Color;
 
 /// 상황을 판단하여, 정찰, 빌드, 공격, 방어 등을 수행하도록 총괄 지휘를 하는 class <br>
@@ -159,9 +155,10 @@ public class StrategyManager {
 	ArrayList<Unit> myAllCombatUnitList = new ArrayList<Unit>();      
 	ArrayList<Unit> myCombatUnitType1List = new ArrayList<Unit>(); // 저글링      
 	ArrayList<Unit> myCombatUnitType2List = new ArrayList<Unit>(); // 히드라
-	ArrayList<Unit> myCombatUnitType2MultiDefenceList = new ArrayList<Unit>(); // 히드라 멀티 방어용
-	ArrayList<Unit> myCombatUnitType2MultiDefenceList2 = new ArrayList<Unit>(); // 히드라 멀티 방어용
 	ArrayList<Unit> myCombatUnitType3List = new ArrayList<Unit>(); // 럴커
+	ArrayList<Unit> myCombatUnitType1ListAway = new ArrayList<Unit>(); // 저글링      
+	ArrayList<Unit> myCombatUnitType2ListAway = new ArrayList<Unit>(); // 히드라
+	ArrayList<Unit> myCombatUnitType3ListAway = new ArrayList<Unit>(); // 럴커
 	ArrayList<Unit> myCombatUnitType4List = new ArrayList<Unit>(); // 뮤탈      
 	ArrayList<Unit> myCombatUnitType5List = new ArrayList<Unit>(); // 울트라      
 	ArrayList<Unit> myCombatUnitType6List = new ArrayList<Unit>(); // 가디언      
@@ -170,12 +167,15 @@ public class StrategyManager {
 	ArrayList<Unit> mySpecialUnitType3List = new ArrayList<Unit>(); // 스커지
 	ArrayList<Unit> mySpecialUnitType4List = new ArrayList<Unit>(); // 퀸
 	
+	ArrayList<Unit> myCombatUnitType2MultiDefenceList = new ArrayList<Unit>(); // 히드라 멀티 방어용
+	ArrayList<Unit> myCombatUnitType2MultiDefenceList2 = new ArrayList<Unit>(); // 히드라 멀티 방어용
 	ArrayList<Unit> myCombatUnitType1ScoutList = new ArrayList<Unit>(); // 저글링 정찰용
 	ArrayList<Unit> myCombatUnitType1ScoutList2 = new ArrayList<Unit>(); // 저글링 정찰용
 	
 	// 아군 방어 건물 첫번째, 두번째 타입
 	UnitType myDefenseBuildingType1;			/// 파일런 벙커 크립콜로니
 	UnitType myDefenseBuildingType2;			/// 포톤  터렛  성큰콜로니
+	UnitType myDefenseBuildingType3;			/// 포톤  터렛  성포어콜로니
 
 	// 아군 방어 건물 건설 숫자
 	int necessaryNumberOfDefenseBuilding1;		/// 방어 건물 건설 갯수
@@ -221,6 +221,10 @@ public class StrategyManager {
 	// 가스, 미네럴 양
 	int selfMinerals = 0;
 	int selfGas = 0;
+	
+	// 가용 가스, 미네럴 양
+	int selfAvailableMinerals = 0;
+	int selfAvailableGas = 0;
 
 	// 공격 포지션
 	Position TARGET_POSITION = null;
@@ -237,9 +241,6 @@ public class StrategyManager {
 	// Center 포지션
 	Position CENTER_POSITION = new Position(2000, 2000);
 	TilePosition CENTER_TILEPOSITION = CENTER_POSITION.toTilePosition();
-	
-	// target으로 부터 가장 가까운 공격 유닛을 찾기 위한 변수
-	ArrayList<UnitInfo> unitListByType = new ArrayList<UnitInfo>();
 	
 	public StrategyManager() {
 	}
@@ -310,31 +311,20 @@ public class StrategyManager {
 		mySpecialUnitType4 = UnitType.Zerg_Queen;
 
 		// 공격 유닛 생산 순서 설정
-		buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3}; 	// 저글링 저글링 히드라 히드라 히드라 러커 ...
+		// 1 저그링
+		// 2 히드라
+		// 3 럴커
+		// 4 뮤탈
+		// 5 울트라 리스크
+		// 7 가디언
+		buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3};
 		nextTargetIndexOfBuildOrderArray = 0; 			    	// 다음 생산 순서 index
 
-//		// 일반 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
-//		maxNumberOfCombatUnitType3 = 4; // 럴커
-//		
-//		// 특수 유닛을 최대 몇개까지 생산 / 전투참가 시킬것인가
-//		maxNumberOfSpecialUnitType1 = 2; // 오버로드  
-//		maxNumberOfSpecialUnitType2 = 2; // 디파일러
-//		maxNumberOfSpecialUnitType3 = 8; // 스커지
-//		maxNumberOfSpecialUnitType4 = 2; // 퀸
-
 		// 방어 건물 종류 및 건설 갯수 설정
-		if (enemyRace == Race.Terran) {
-			myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
-			necessaryNumberOfDefenseBuilding1 = 3; 					
-			myDefenseBuildingType2 = UnitType.Zerg_Sunken_Colony;
-			necessaryNumberOfDefenseBuilding2 = 3;
-		}else{
-			myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
-			necessaryNumberOfDefenseBuilding1 = 2; 					
-			myDefenseBuildingType2 = UnitType.Zerg_Sunken_Colony;
-			necessaryNumberOfDefenseBuilding2 = 2;
-		}
-	
+		myDefenseBuildingType1 = UnitType.Zerg_Creep_Colony;
+		myDefenseBuildingType2 = UnitType.Zerg_Sunken_Colony;
+		myDefenseBuildingType3 = UnitType.Zerg_Spore_Colony;
+		
 		// 방어 건물 건설 위치 설정 
 		seedPositionStrategyOfMyInitialBuildingType = BuildOrderItem.SeedPositionStrategy.MainBaseLocation;	// 본진
 		seedPositionStrategyOfMyDefenseBuildingType = BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation;	// 첫번째 choke point
@@ -939,43 +929,6 @@ public class StrategyManager {
    		return closestUnit;       	
 	}
 	
-	/**
-	 * myAllCombatUnitList 중에 target으로 부터 가장 가까운 공격 유닛을 찾는다.
-	 * 공격시 APM이 급격히 올라가는 버그가 있다. 
-	 * @param type
-	 * @param target
-	 * @return
-	 */
-	public Unit getClosestCanAttackUnitTypeToTarget(UnitType type, Position target){
-		
-		Unit closestUnitForAttack = null;
-
-		Iterator<Integer> it = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().keySet().iterator();
-		while (it.hasNext()) {
-			UnitInfo ui = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().get(it.next());
-			if(ui.getType() == type){
-				// sc76.choi BBE 죽은 유닛도 쌓이는 것 같다.
-				if(!commandUtil.IsValidSelfUnit(ui.getUnit())) {
-		        	continue;
-		        }
-				unitListByType.add(ui);
-			}
-		}
-		
-		if(unitListByType.isEmpty()){
-			return closestUnitForAttack;
-		}
-		
-		// 적진에 가까운 순으로 오름차순
-        Collections.sort(unitListByType,new CompareSeqAsc());
-
-        if(!commandUtil.IsValidSelfUnit(unitListByType.get(0).getUnit())) {
-        	return closestUnitForAttack;
-        }
-        closestUnitForAttack = unitListByType.get(0).getUnit();
-   		return closestUnitForAttack;       	
-	}
-	
 	/// target 으로부터 가장 가까운 IDLE인 Detector를 리턴합니다.
 	public Unit getClosestOverloadWithIDLE(Position target)
 	{
@@ -1322,7 +1275,7 @@ public class StrategyManager {
 		
 		for(Unit denfenceUnit : myCombatUnitType2MultiDefenceList2){
 			// sc76.choi 미리가는걸 방지
-			if(BuildManager.Instance().getAvailableMinerals() > 260){
+			if(selfAvailableMinerals > 260){
 				commandUtil.attackMove(denfenceUnit, dPosition);
 			}
 		}
@@ -1381,7 +1334,7 @@ public class StrategyManager {
 					continue;
 				}
 				
-				if(BuildManager.Instance().getAvailableMinerals() >= 50){
+				if(selfAvailableMinerals >= 50){
 					//System.out.println("buildAirDefenceUnit selfRegion : " + selfRegion.getPoint().toTilePosition());
 					
 					// creep colony가 없으면
@@ -1754,17 +1707,17 @@ public class StrategyManager {
 				}
 				
 				// 저글링 + 히드라
-				if(myCombatUnitType1List.size() >= necessaryNumberOfCombatUnitType1
-					&& myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
+				if((myCombatUnitType1List.size() + myCombatUnitType1ListAway.size()) >= necessaryNumberOfCombatUnitType1
+					&& (myCombatUnitType2List.size() + myCombatUnitType2ListAway.size()) >= necessaryNumberOfCombatUnitType2){
 					isNecessaryNumberOfCombatUnitType = true;
 				}
 				// 히드라				
-				else if(myCombatUnitType2List.size() >= necessaryNumberOfCombatUnitType2){
+				else if((myCombatUnitType2List.size() + myCombatUnitType2ListAway.size()) >= necessaryNumberOfCombatUnitType2){
 					isNecessaryNumberOfCombatUnitType = true;
 				}
 				// 저글링 + 럴커				
-				else if(myCombatUnitType1List.size() >= necessaryNumberOfDefenceUnitType1
-						&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3){
+				else if((myCombatUnitType1List.size() +  + myCombatUnitType1ListAway.size()) >= necessaryNumberOfDefenceUnitType1
+						&& (myCombatUnitType3List.size() + myCombatUnitType3ListAway.size()) >= necessaryNumberOfCombatUnitType3){
 					isNecessaryNumberOfCombatUnitType = true;
 				}
 				
@@ -2085,53 +2038,53 @@ public class StrategyManager {
 		// 아군 공격유닛을 아군 방어 건물 뒤쪽에 배치시켰다가 적들이 방어 건물을 공격하기 시작했을 때 다함께 싸우게하면 더 좋을 것입니다
 		
 		// sc76.choi 단, 정찰 오버로드는 자기 할일이 있다. myAllCombatUnitList에 오버로드 add 되는 기준을 확인 할 것
-		for (Unit unit : myAllCombatUnitList) {
+		//for (Unit unit : myAllCombatUnitList) {
 
-			if (!commandUtil.IsValidUnit(unit)) continue;
-			
-			boolean hasCommanded = false;
+//		if (!commandUtil.IsValidUnit(unit)) continue;
+		
+		boolean hasCommanded = false;
 
-			// 저글링
-			if (unit.getType() == myCombatUnitType1) {
-				hasCommanded = controlCombatUnitType1(unit);
-			}
+		// 저글링
+		for(Unit unit : myCombatUnitType1List){
+			hasCommanded = controlCombatUnitType1(unit);
+		}
 
-			// 히드라
-			if (unit.getType() == myCombatUnitType2) {
-				hasCommanded = controlCombatUnitType2(unit);
-			}
-			
-			// 럴커
-			if (unit.getType() == myCombatUnitType3) {
-				hasCommanded = controlCombatUnitType3(unit);
-			}
-			
-			// 뮤탈은 별도로 컨트롤 한다.
-			hasCommanded = controlCombatUnitType4((Unit)null);
-			
-			// 오버로드
-			if (unit.getType() == mySpecialUnitType1) {					
-				hasCommanded = controlSpecialUnitType1(unit);
-			}
-			
-			// 디파일러
-			if (unit.getType() == mySpecialUnitType2) {					
-				hasCommanded = controlSpecialUnitType2(unit);
-			}
-			
-			// 스커지
-			if (unit.getType() == mySpecialUnitType3) {					
-				hasCommanded = controlSpecialUnitType3(unit);
-			}
-			
-			// 퀸
-			if (unit.getType() == mySpecialUnitType4) {					
-				hasCommanded = controlSpecialUnitType4(unit);
-			}
-			
-			// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다. 단, 오버로드는 제외
-			if (hasCommanded == false) {
-				
+		// 히드라
+		for(Unit unit : myCombatUnitType2List){
+			hasCommanded = controlCombatUnitType2(unit);
+		}
+		
+		// 럴커
+		for(Unit unit : myCombatUnitType3List){
+			hasCommanded = controlCombatUnitType3(unit);
+		}
+		
+		// 뮤탈은 별도로 컨트롤 한다.
+		hasCommanded = controlCombatUnitType4((Unit)null);
+		
+		// 오버로드
+		for(Unit unit : mySpecialUnitType1List){					
+			hasCommanded = controlSpecialUnitType1(unit);
+		}
+		
+		// 디파일러
+		for(Unit unit : mySpecialUnitType2List){
+			hasCommanded = controlSpecialUnitType2(unit);
+		}
+		
+		// 스커지
+		for(Unit unit : mySpecialUnitType3List){			
+			hasCommanded = controlSpecialUnitType3(unit);
+		}
+		
+		// 퀸
+		for(Unit unit : mySpecialUnitType4List){				
+			hasCommanded = controlSpecialUnitType4(unit);
+		}
+		
+		// 따로 명령 내린 적이 없으면, 방어 건물 주위로 이동시킨다. 단, 오버로드는 제외
+		if (hasCommanded == false) {
+			for (Unit unit : myAllCombatUnitList) {	
 				// sc76.choi 무조건 후퇴 해야 한다. unit.isIdle() 체크 제거
 				// sc76.choi 먼저 명령을 받은 유닛은 그 명령이 끝날때까지 수행하기 때문
 				//if (unit.isIdle()) {
@@ -2143,7 +2096,8 @@ public class StrategyManager {
 					}
 				//}
 			}
-		}	
+		}
+		//}	
 	}
 	
 	/// 적군을 Eliminate 시키도록 아군 공격 유닛들에게 지시합니다
@@ -2480,7 +2434,7 @@ public class StrategyManager {
 				if(unit.isUnderStorm()){
 					
 					// sc76.choi 주변은 같이 후퇴한다.
-					for(Unit aroundMyUnit : unit.getUnitsInRadius(Config.TILE_SIZE*8)){
+					for(Unit aroundMyUnit : myCombatUnitType1List){
 						if(aroundMyUnit.getType() == UnitType.Zerg_Zergling){
 							commandUtil.move(unit, myMainBaseLocation.getPosition());
 						}
@@ -2585,7 +2539,7 @@ public class StrategyManager {
 				}
 				else{
 					//APM 관리
-					if (MyBotModule.Broodwar.getFrameCount() % 24*1 != 0) {
+					if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
 						return true;
 					}
 
@@ -2736,7 +2690,7 @@ public class StrategyManager {
 								commandUtil.attackMove(unit, myMainBaseLocation.getPosition());
 							}else{
 								// 2초에 한번 실행
-								if (MyBotModule.Broodwar.getFrameCount() % 24*2 != 0) {
+								if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
 									return true;
 								}
 								// 유닛이 멀리 있으면 강제로 소환
@@ -2759,7 +2713,7 @@ public class StrategyManager {
 				}
 				else if(unit.isUnderStorm()){
 					// sc76.choi 주변은 같이 후퇴한다.
-					for(Unit aroundMyUnit : unit.getUnitsInRadius(Config.TILE_SIZE*8)){
+					for(Unit aroundMyUnit : myCombatUnitType2List){
 						if(aroundMyUnit.getType() == UnitType.Zerg_Hydralisk){
 							commandUtil.move(unit, myMainBaseLocation.getPosition());
 						}
@@ -3022,8 +2976,8 @@ public class StrategyManager {
 			if (MyBotModule.Broodwar.getFrameCount() % (24*10) != 0) return true;
 			for(Unit unit : myCombatUnitType4List){
 				
-				if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*4){
-					commandUtil.move(unit, DEFENCE_POSITION);
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*4){
+					commandUtil.move(unit, myMainBaseLocation.getPosition());
 				}
 				
 			}
@@ -3036,8 +2990,8 @@ public class StrategyManager {
 			
 			if (MyBotModule.Broodwar.getFrameCount() % (24*10) != 0) return true;
 			for(Unit unit : myCombatUnitType4List){
-				if(unit.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*4){
-					commandUtil.move(unit, DEFENCE_POSITION);
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*4){
+					commandUtil.move(unit, myMainBaseLocation.getPosition());
 				}
 			}
 			return true;
@@ -3115,7 +3069,7 @@ public class StrategyManager {
 				for(Unit unit : myCombatUnitType4List){
 					//if(unit.isIdle()){
 						if (MyBotModule.Broodwar.getFrameCount() % (24*10) != 0) return true;
-						commandUtil.rightClick(unit, DEFENCE_POSITION);
+						commandUtil.rightClick(unit, myMainBaseLocation.getPosition());
 					//}
 				}
 			}
@@ -3127,7 +3081,7 @@ public class StrategyManager {
 			
 			for(Unit unit : myCombatUnitType4List){
 				if (MyBotModule.Broodwar.getFrameCount() % (24*10) != 0) return true;
-				commandUtil.rightClick(unit, DEFENCE_POSITION);
+				commandUtil.rightClick(unit, myMainBaseLocation.getPosition());
 			}
 		}
 
@@ -3648,7 +3602,7 @@ public class StrategyManager {
 						|| OverloadManager.Instance().getOverloadData().getJobCode(overload) == 'I'){
 						OverloadManager.Instance().getOverloadData().setOverloadJob(overload, OverloadData.OverloadJob.Idle, (Unit)null);
 						
-						if(overload.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*4){
+						if(overload.getDistance(DEFENCE_POSITION) > Config.TILE_SIZE*35){
 							commandUtil.move(overload, DEFENCE_POSITION);
 						}
 						
@@ -4213,9 +4167,11 @@ public class StrategyManager {
     			buildState = BuildState.normalMode;
     		}
     		
-			if(buildState == BuildState.carrier_P){
-				
-			}
+    		if((countEnemyAdvancedDefenceBuilding  >= 4 
+    			|| enemyPlayer.allUnitCount(UnitType.Protoss_Photon_Cannon) >= 4)
+    			&& MyBotModule.Broodwar.getFrameCount() > (24 * 60 * 7)){
+    			buildState = BuildState.carrier_P;
+    		}
 		}
     	// 테란의 경우
     	else if(enemyRace == Race.Terran){
@@ -4453,8 +4409,8 @@ public class StrategyManager {
 	private void drawStrategyManagerStatus() {
 
 		
-		MyBotModule.Broodwar.drawTextScreen(410, 20, red + "Avail Mi : " + BuildManager.Instance().getAvailableMinerals());
-		MyBotModule.Broodwar.drawTextScreen(510, 20, red + "Avail Ga : " + BuildManager.Instance().getAvailableGas());
+		MyBotModule.Broodwar.drawTextScreen(410, 20, red + "Avail Mi : " + selfAvailableMinerals);
+		MyBotModule.Broodwar.drawTextScreen(510, 20, red + "Avail Ga : " + selfAvailableGas);
 		// 전투 상황
 		MyBotModule.Broodwar.drawTextScreen(410, 30, red + "CombatState : " + combatState.toString());
 		MyBotModule.Broodwar.drawTextScreen(410, 40, red + "BuildState : " + buildState);
@@ -4463,9 +4419,9 @@ public class StrategyManager {
 		
 		//MyBotModule.Broodwar.drawTextScreen(440, 70, "isDefence : " + isNecessaryNumberOfDefencedUnitType());
 		MyBotModule.Broodwar.drawTextScreen(410, 70, "myUnit : " + 
-		"[" + myCombatUnitType1List.size() + "/" + necessaryNumberOfCombatUnitType1 +"/" +  necessaryNumberOfDefenceUnitType1 +"]" +
-		"[" + myCombatUnitType2List.size() + "/" + necessaryNumberOfCombatUnitType2 +"/" +  necessaryNumberOfDefenceUnitType2 +"]" +
-		"[" + myCombatUnitType3List.size() + "/" + necessaryNumberOfCombatUnitType3 +"/" +  necessaryNumberOfDefenceUnitType3 +"]" +
+		"[" + (myCombatUnitType1List.size() + myCombatUnitType1ListAway.size()) + "/" + necessaryNumberOfCombatUnitType1 +"/" +  necessaryNumberOfDefenceUnitType1 +"]" +
+		"[" + (myCombatUnitType2List.size() + myCombatUnitType2ListAway.size()) + "/" + necessaryNumberOfCombatUnitType2 +"/" +  necessaryNumberOfDefenceUnitType2 +"]" +
+		"[" + (myCombatUnitType3List.size() + myCombatUnitType3ListAway.size()) + "/" + necessaryNumberOfCombatUnitType3 +"/" +  necessaryNumberOfDefenceUnitType3 +"]" +
 		" Air : " + bTimeToAirDefence);
 		//MyBotModule.Broodwar.drawTextScreen(410, 80, "Time Air Defence : " + bTimeToAirDefence);		
 
@@ -4644,36 +4600,41 @@ public class StrategyManager {
 		// 아군 방어 건물 목록, 공격 유닛 목록
 		myDefenseBuildingType1List.clear();
 		myDefenseBuildingType2List.clear();
+		
 		myAllCombatUnitList.clear();
 		myCombatUnitType1List.clear(); // 저글링
 		myCombatUnitType2List.clear(); // 히드라
-		myCombatUnitType2MultiDefenceList.clear(); // 히드라
-		myCombatUnitType2MultiDefenceList2.clear(); // 히드라
 		myCombatUnitType3List.clear(); // 럴커
+		myCombatUnitType1ListAway.clear(); // 저글링
+		myCombatUnitType2ListAway.clear(); // 히드라
+		myCombatUnitType3ListAway.clear(); // 럴커
 		myCombatUnitType4List.clear(); // 뮤탈
 		myCombatUnitType5List.clear(); // 울트라
 		myCombatUnitType6List.clear(); // 가디언
-		myCombatUnitType1ScoutList.clear(); // 저글링 정찰용
-		myCombatUnitType1ScoutList2.clear(); // 저글링 정찰용
 		
 		mySpecialUnitType1List.clear(); // 오버로드
 		mySpecialUnitType2List.clear(); // 디파일러
 		mySpecialUnitType3List.clear(); // 스커지
 		mySpecialUnitType4List.clear(); // 퀸
 		
-		// target으로 부터 가장 가까운 공격 유닛을 찾기 위한 변수
-		unitListByType.clear();
+		myCombatUnitType2MultiDefenceList.clear(); // 히드라
+		myCombatUnitType2MultiDefenceList2.clear(); // 히드라
+		myCombatUnitType1ScoutList.clear(); // 저글링 정찰용
+		myCombatUnitType1ScoutList2.clear(); // 저글링 정찰용
 		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 		// sc76.choi 모든 공격 대상 유닛을 ArrayList에 담는다. 
 		// sc76.choi for(Unit unit : myPlayer.getUnits()) {
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		
 		int distClosesAttackUnitFromEnemyMainBase = 10000000;
 		closesAttackUnitFromEnemyMainBase = null;
 		closesAttackUnitOfPositionFromEnemyMainBase = null;
 		
 		Iterator<Integer> it = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().keySet().iterator();
+		
 		while (it.hasNext()) {
 			UnitInfo ui = InformationManager.Instance().getUnitData(myPlayer).getUnitAndUnitInfoMap().get(it.next());
 			
@@ -4779,7 +4740,20 @@ public class StrategyManager {
 					if(myCombatUnitType1ScoutList2.contains(unit)) continue;
 				}
 				
-				myCombatUnitType1List.add(unit);
+				// 멀리 떨어진 곳에서 생산된 유닛
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*50
+						&& combatState == CombatState.defenseMode){
+					
+					if(myCombatUnitType1ScoutList.contains(unit)) continue;
+					if(myCombatUnitType1ScoutList2.contains(unit)) continue;
+					if(myCombatUnitType1List.contains(unit)) continue;
+					
+					myCombatUnitType1ListAway.add(unit);
+				}else{
+					
+					if(myCombatUnitType1ListAway.contains(unit)) continue;
+					myCombatUnitType1List.add(unit);
+				}
 				myAllCombatUnitList.add(unit);
 			}
 			
@@ -4799,8 +4773,15 @@ public class StrategyManager {
 					}
 				}
 
-				
-				myCombatUnitType3List.add(unit); 
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*50
+						&& combatState == CombatState.defenseMode){
+					
+					if(myCombatUnitType3ListAway.contains(unit)) continue;
+					myCombatUnitType3ListAway.add(unit);
+				}else{
+					if(myCombatUnitType3ListAway.contains(unit)) continue;
+					myCombatUnitType3List.add(unit);
+				} 
 				myAllCombatUnitList.add(unit);
 			}
 
@@ -4812,19 +4793,30 @@ public class StrategyManager {
 				if(myCombatUnitType2MultiDefenceList2.contains(unit)) continue;
 					
 				// sc76.choi 적진과 가장 가까운 히드라를 찾는다. 럴커가 없을때
-				//if(closesAttackUnitFromEnemyMainBase == null){
-					if(distClosesAttackUnitFromEnemyMainBase > ui.getDistanceFromEnemyMainBase()){
-						closesAttackUnitFromEnemyMainBase = unit;
-						closesAttackUnitOfPositionFromEnemyMainBase = ui.getUnit().getPosition();
-						distClosesAttackUnitFromEnemyMainBase = ui.getDistanceFromEnemyMainBase();
-						
-						// getDistanceFromEnemyMainBase가 마이너스 값을 가지는 경우가 있음
-						if(distClosesAttackUnitFromEnemyMainBase < 0){
-							distClosesAttackUnitFromEnemyMainBase = 10000000;
-						}
+				if(distClosesAttackUnitFromEnemyMainBase > ui.getDistanceFromEnemyMainBase()){
+					closesAttackUnitFromEnemyMainBase = unit;
+					closesAttackUnitOfPositionFromEnemyMainBase = ui.getUnit().getPosition();
+					distClosesAttackUnitFromEnemyMainBase = ui.getDistanceFromEnemyMainBase();
+					
+					// getDistanceFromEnemyMainBase가 마이너스 값을 가지는 경우가 있음
+					if(distClosesAttackUnitFromEnemyMainBase < 0){
+						distClosesAttackUnitFromEnemyMainBase = 10000000;
 					}
-				//}
-				myCombatUnitType2List.add(unit); 
+				}
+					
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*35
+					&& combatState == CombatState.defenseMode){
+					
+					if(myCombatUnitType2MultiDefenceList.contains(unit)) continue;
+					if(myCombatUnitType2MultiDefenceList2.contains(unit)) continue;
+					if(myCombatUnitType2List.contains(unit)) continue;
+					
+					myCombatUnitType2ListAway.add(unit);
+				}else{
+					if(myCombatUnitType2ListAway.contains(unit)) continue;
+					myCombatUnitType2List.add(unit);
+				}	
+				 
 				myAllCombatUnitList.add(unit);
 			}
 			
@@ -4902,6 +4894,9 @@ public class StrategyManager {
 		selfMinerals = InformationManager.Instance().selfPlayer.minerals();
 		selfGas = InformationManager.Instance().selfPlayer.gas();
 		
+		selfAvailableMinerals = BuildManager.Instance().getAvailableMinerals();
+		selfAvailableGas = BuildManager.Instance().getAvailableGas();
+		
 		// sc76.choi 공격 포지션을 찾는다.
 		getTargetPositionForAttack();
 		
@@ -4910,6 +4905,10 @@ public class StrategyManager {
 		
 		myOccupiedBaseLocations = InformationManager.Instance().getOccupiedBaseLocations(myPlayer).size();
 		
+		System.out.println("Away Size 1 : " + myCombatUnitType1ListAway.size());
+		System.out.println("Away Size 2 : " + myCombatUnitType2ListAway.size());
+		System.out.println("Away Size 3 : " + myCombatUnitType3ListAway.size());
+		System.out.println();
 	}
 	
 	/**
@@ -4918,7 +4917,6 @@ public class StrategyManager {
 	 * buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 3, 1, 1, 2, 2, 2, 3};
 	 * @ sc76.choi
 	 */
-	int seqBuildOrderStep = 0;
 	String strBuildOrderStep = new String();
 	public void updatebuildOrderArray(){
 		
@@ -4956,11 +4954,9 @@ public class StrategyManager {
 		){
 			
 			if(selfGas < 200){
-				seqBuildOrderStep = 10;
 				strBuildOrderStep = "P 10";
 				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}else{
-				seqBuildOrderStep = 20;
 				strBuildOrderStep = "P 20";
 				if(buildState == BuildState.blockDefence2Dragon8_P){
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 1, 3, 1, 2, 2, 1, 2, 2, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈					
@@ -4976,16 +4972,10 @@ public class StrategyManager {
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
 			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
-			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
-				seqBuildOrderStep = 30;
+			if(selfGas < 200){
 				strBuildOrderStep = "P 30";
-				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 1, 1, 2, 2, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
-			}else if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) > 0){
-				seqBuildOrderStep = 60;
-				strBuildOrderStep = "P 60";
-				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 1, 3, 1, 1, 1, 2, 1, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 1, 1, 2, 2, 1, 2, 1, 1, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}else{
-				seqBuildOrderStep = 60;
 				strBuildOrderStep = "P 60";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 2, 2, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}
@@ -4996,12 +4986,10 @@ public class StrategyManager {
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
-					seqBuildOrderStep = 70;
+				if(selfGas < 200){
 					strBuildOrderStep = "P 70";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 80;
 					strBuildOrderStep = "P 80";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 4, 2, 2, 5, 1, 1, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
@@ -5012,12 +5000,10 @@ public class StrategyManager {
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) <= 0){
-					seqBuildOrderStep = 90;
+				if(selfGas < 200){
 					strBuildOrderStep = "P 90";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 1, 3, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 100;
 					strBuildOrderStep = "P 100";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 4, 1, 1, 2, 6, 3, 5, 6}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
@@ -5028,12 +5014,10 @@ public class StrategyManager {
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) <= 0){
-					seqBuildOrderStep = 110;
+				if(selfGas < 200){
 					strBuildOrderStep = "P 110";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 1, 2, 1, 3, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 120;
 					strBuildOrderStep = "P 120";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 4, 6, 1, 2, 4, 6, 3, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
@@ -5042,11 +5026,9 @@ public class StrategyManager {
 		else{
 			// 기본
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0){
-				seqBuildOrderStep = 1;
 				strBuildOrderStep = "P 1";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
 			}else{
-				seqBuildOrderStep = 2;
 				strBuildOrderStep = "P 2";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
 			}
@@ -5073,19 +5055,17 @@ public class StrategyManager {
 		){
 			
 			if(selfGas < 100){
-				seqBuildOrderStep = 10;
 				strBuildOrderStep = "T 10";
 				
 				if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 3, 1, 1, 2, 1, 1, 2}; 	
 				else buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2};
 			}else{
-				seqBuildOrderStep = 20;
 				strBuildOrderStep = "T 20";
 				
 				if(existHydralisk) {
 					// 빠른 럴커 변태를 위해
-					if((myPlayer.allUnitCount(UnitType.Zerg_Lurker_Egg) <= 0
-						|| myPlayer.incompleteUnitCount(UnitType.Zerg_Lurker) <= 0)
+					if(myPlayer.allUnitCount(UnitType.Zerg_Lurker_Egg) <= 0
+						&& myPlayer.incompleteUnitCount(UnitType.Zerg_Lurker) <= 0
 						&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) <= 0){
 						
 						strBuildOrderStep = "T 20-1";
@@ -5105,41 +5085,34 @@ public class StrategyManager {
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
 			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
-			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
-				seqBuildOrderStep = 30;
+			if(selfGas < 200){
 				strBuildOrderStep = "T 30";
 				
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4};
 				
 			}else if(selfGas < 200){
-					seqBuildOrderStep = 40;
-					strBuildOrderStep = "T 40";
-					
-					if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 1, 1, 3, 1, 1, 2, 3, 1, 1};
-					else buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 1};
+				strBuildOrderStep = "T 40";
+				
+				if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 1, 1, 3, 1, 1, 2, 3, 1, 1};
+				else buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 1};
 					
 			}else{
-					seqBuildOrderStep = 50;
-					strBuildOrderStep = "T 50";
-					
-					if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 2, 3, 2, 1, 2, 1, 3, 2, 4};
-					else buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 2, 2, 4, 2, 2, 2, 2, 2, 4};
+				strBuildOrderStep = "T 50";
+				
+				if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 2, 2, 3, 2, 1, 2, 1, 3, 2, 4};
+				else buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 2, 2, 4, 2, 2, 2, 2, 2, 4};
 			}
-			
-			
 		}
 		// sc76.choi 스파이어, 울트라 카벤 모두 올라가 있을 때,
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2){
-					seqBuildOrderStep = 70;
+				if(selfGas < 200){
 					strBuildOrderStep = "T 70";
 					
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					
 				}else{
-					seqBuildOrderStep = 80;
 					strBuildOrderStep = "T 80";
 					
 					if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 5, 1, 1, 2, 3, 5, 4};
@@ -5151,13 +5124,11 @@ public class StrategyManager {
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
-					seqBuildOrderStep = 90;
+				if(selfGas < 200){
 					strBuildOrderStep = "T 90";
 					if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 1, 1, 2, 3, 2, 1, 4};
 					else buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 4};
 				}else{
-					seqBuildOrderStep = 100;
 					strBuildOrderStep = "T 100";
 					
 					if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 4, 1, 1, 2, 6, 3, 5, 6};
@@ -5169,12 +5140,10 @@ public class StrategyManager {
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
-					seqBuildOrderStep = 110;
+				if(selfGas < 200){
 					strBuildOrderStep = "T 110";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 120;
 					strBuildOrderStep = "T 120";
 					
 					if(existHydralisk) buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 6, 1, 1, 4, 6, 3, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
@@ -5185,11 +5154,9 @@ public class StrategyManager {
 		else{
 			// 기본
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0){
-				seqBuildOrderStep = 1;
 				strBuildOrderStep = "T 1";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
 			}else{
-				seqBuildOrderStep = 2;
 				strBuildOrderStep = "T 2";
 				buildOrderArrayOfMyCombatUnitType = new int[]{2, 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
 			}
@@ -5215,11 +5182,9 @@ public class StrategyManager {
 		){
 			
 			if(selfGas < 200){
-				seqBuildOrderStep = 10;
 				strBuildOrderStep = "Z 10";
 				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}else{
-				seqBuildOrderStep = 20;
 				strBuildOrderStep = "Z 20";
 				buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 3}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}
@@ -5230,29 +5195,24 @@ public class StrategyManager {
 			  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
 			
 			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
-			if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) <= 0){
-				seqBuildOrderStep = 30;
+			if(selfGas < 200){
 				strBuildOrderStep = "Z 30";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 			}else{
 				// 테란일때, 럴커를 위주로
 				if(enemyRace == Race.Terran){
 					if(selfGas < 200){
-						seqBuildOrderStep = 40;
 						strBuildOrderStep = "Z 40";
 						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 1, 1, 1, 2, 3, 1, 1}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					}else{
-						seqBuildOrderStep = 50;
 						strBuildOrderStep = "Z 50";
 						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 1, 1, 2, 3, 4, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					}
 				}else{
 					if(selfGas < 200){
-						seqBuildOrderStep = 61;
 						strBuildOrderStep = "Z 61";
 						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 1, 3, 1, 1, 2, 1, 1, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					}else{
-						seqBuildOrderStep = 60;
 						strBuildOrderStep = "Z 60";
 						buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 2, 3, 4, 2, 2, 2, 3, 2, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					}
@@ -5264,12 +5224,10 @@ public class StrategyManager {
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0 // 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2){
-					seqBuildOrderStep = 70;
+				if(selfGas < 200){
 					strBuildOrderStep = "Z 70";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 80;
 					strBuildOrderStep = "Z 80";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 4, 2, 2, 5, 1, 1, 2, 3, 5, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
@@ -5279,12 +5237,10 @@ public class StrategyManager {
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0) { // 울트라리스크 가벤
 			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
-					seqBuildOrderStep = 90;
+				if(selfGas < 200){
 					strBuildOrderStep = "Z 90";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 100;
 					strBuildOrderStep = "Z 100";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 4, 1, 1, 2, 6, 3, 5, 6}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
@@ -5293,26 +5249,20 @@ public class StrategyManager {
 		// sc76.choi 그레이트 스파이어만, 올라가 있을 때,
 		else if (myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0 // 그레이트 스파이어 
 				  && myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) <= 0) { // 울트라리스크 가벤
-			
-				if(selfGas < 200 && myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2){
-					seqBuildOrderStep = 110;
+				if(selfGas < 200){
 					strBuildOrderStep = "Z 110";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}else{
-					seqBuildOrderStep = 120;
 					strBuildOrderStep = "Z 120";
 					buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 2, 4, 6, 1, 1, 4, 6, 3, 1, 2}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 				}
-				
 		}
 		else{
 			// 기본
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) <= 0){
-				seqBuildOrderStep = 1;
 				strBuildOrderStep = "Z 1";
 				buildOrderArrayOfMyCombatUnitType = new int[]{1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2, 2}; 	// 저글링 저글링 히드라 히드라 히드라 러커				
 			}else{
-				seqBuildOrderStep = 2;
 				strBuildOrderStep = "Z 2";
 				if(buildState == BuildState.fastMutalisk_Z){
 					buildOrderArrayOfMyCombatUnitType = new int[]{2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
@@ -5339,7 +5289,10 @@ public class StrategyManager {
 //		}
 //	}
 
+	// sc76.choi 초기에 태어났을 때, DEFENCE_POSITION으로 이동시킨다.
+	// sc76.choi APM을 줄이는데, 큰 기여를 했음
 	public void moveUnitToDefencePosition(Unit unit){
+		
 		if(unit.getType() == UnitType.Zerg_Zergling
 			|| unit.getType() == UnitType.Zerg_Hydralisk
 			|| unit.getType() == UnitType.Zerg_Lurker
@@ -5355,33 +5308,44 @@ public class StrategyManager {
 						commandUtil.move(unit, DEFENCE_POSITION);
 					}
 					
-				}else{
-					// 본진 근처에 적이 있고, 멀티에 공격 유닛이 5마리 이상있으면, 본진의 DEFENCE_POSITION으로 attackMove한다.
-					if(findAttackTargetForDefence() != null){
-						
-						int multiUnitCount = 0;
-						for(Unit multiUnit : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
-							if(multiUnit.getPlayer() == myPlayer && multiUnit.getType().isWorker() == false && multiUnit.getType().canAttack()){
-								multiUnitCount++;
-							}
-						}
-						
-						// 본진으로 출발
-						if(multiUnitCount >= 5){
-							for(Unit attackUnit : unit.getUnitsInRadius(Config.TILE_SIZE*6)){
-								if(attackUnit.getPlayer() == myPlayer && attackUnit.getType().isWorker() == false && attackUnit.getType().canAttack()){
-									if(attackUnit.isIdle()){
-										commandUtil.attackMove(attackUnit, DEFENCE_POSITION);
-									}
-								}
-							}
-						}
-						
-					}
 				}
 				
 			}
 		}
+		
+		// 본진 근처에 적이 있고, 멀티에 공격 유닛이 5마리 이상있으면, 본진의 DEFENCE_POSITION으로 attackMove한다.
+		// 10초에 한번 실행
+		if (MyBotModule.Broodwar.getFrameCount() % 24*10 != 0) {
+			return;
+		}
+		
+		Position MOVE_POSITION = DEFENCE_POSITION;
+		if(combatState == CombatState.defenseMode){
+			MOVE_POSITION = DEFENCE_POSITION;
+		}else{
+			MOVE_POSITION = TARGET_POSITION;
+		}
+		
+		if((myCombatUnitType1ListAway.size() + myCombatUnitType2ListAway.size() + myCombatUnitType3ListAway.size()) >= 10){
+			for(Unit awayUnit : myCombatUnitType1ListAway){
+				if(awayUnit.isIdle()){
+					commandUtil.attackMove(awayUnit, MOVE_POSITION);
+				}
+			}
+			
+			for(Unit awayUnit : myCombatUnitType2ListAway){
+				if(awayUnit.isIdle()){
+					commandUtil.attackMove(awayUnit, MOVE_POSITION);
+				}
+			}
+			
+			for(Unit awayUnit : myCombatUnitType3ListAway){
+				if(awayUnit.isIdle()){
+					commandUtil.attackMove(awayUnit, MOVE_POSITION);
+				}
+			}
+		}
+		
 	}
 
 	public void onUnitComplete(Unit unit) {
@@ -5518,27 +5482,45 @@ public class StrategyManager {
 		if(buildState == BuildState.blockDefence2Dragon8_P){
    			// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
 			// 저글링
-   			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 12;
-   			Config.necessaryNumberOfCombatUnitType1AgainstProtoss = 22;
+   			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 8;
+   			Config.necessaryNumberOfCombatUnitType1AgainstProtoss = 14;
    			
    			// 히드라
-   			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 12;
-   			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 22;
+   			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 10;
+   			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 20;
    			
    			// 럴커
    			Config.necessaryNumberOfDefenceUnitType3AgainstProtoss = 2;
    			Config.necessaryNumberOfCombatUnitType3AgainstProtoss = 5;
    			
    			// 저글링, 히드라 생산제한
-   			Config.maxNumberOfTrainUnitType1AgainstProtoss = 30;
+   			Config.maxNumberOfTrainUnitType1AgainstProtoss = 20;
    			Config.maxNumberOfTrainUnitType2AgainstProtoss = 50;
    			
    			Config.BuildingDefenseTowerSpacing = 3;
-   			Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 4;
-   			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 4;
+   			if(myKilledCombatUnitCount2 >= 30){
+   				Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 6;
+	   			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 6;
+   			}else{
+	   			Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 4;
+	   			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 4;
+   			}
    			
    			// 즉각 해처리 증설
    			excuteUrgentCombatConstructionInBaseLocation(mySecondChokePoint.getCenter().toTilePosition());
+		}
+		
+		if(buildState == BuildState.carrier_P){
+   			// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
+   			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 4;
+   			
+   			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 15;
+   			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 35;
+   			
+   			Config.maxNumberOfTrainUnitType1AgainstProtoss = 4;
+   			Config.maxNumberOfTrainUnitType2AgainstProtoss = 40;
+   			
+			excuteUrgentCombatConstructionInBaseLocation(mySecondChokePoint.getCenter().toTilePosition());
 		}
 		
 		if(buildState == BuildState.vulture_Galia_Tank_T){
@@ -6080,7 +6062,7 @@ public class StrategyManager {
 		
 		if(blockDefence2Dragon8_P_CombatBuilding == false){
 			
-			if( BuildManager.Instance().getAvailableMinerals() > 350){
+			if( selfAvailableMinerals > 350){
 			
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, 
 						tp, true);
@@ -6114,7 +6096,6 @@ public class StrategyManager {
 				urgent_AirDefenceBuilding1 = true;
 			}
 		
-		//if(BuildManager.Instance().getAvailableMinerals() >= 100){
 			if(urgent_AirDefenceBuilding2 == false
 				&& existUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion(), false, false) == true
 				&& getCountUnitTypeInRegion(myPlayer, UnitType.Zerg_Creep_Colony, myMainBaseLocation.getRegion(), false, false) > 0
@@ -6230,7 +6211,7 @@ public class StrategyManager {
 				if (isPossibleToConstructDefenseBuildingType1 == true 
 					&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
 					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
-						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
+						if (selfAvailableMinerals >= myDefenseBuildingType1.mineralPrice()) {
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
 									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
@@ -6241,7 +6222,7 @@ public class StrategyManager {
 				if (isPossibleToConstructDefenseBuildingType2 == true
 					&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
 					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
-						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
+						if (selfAvailableMinerals >= myDefenseBuildingType2.mineralPrice()) {
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
 									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
@@ -6254,7 +6235,7 @@ public class StrategyManager {
 				if (isPossibleToConstructDefenseBuildingType1 == true 
 					&& numberOfMyDefenseBuildingType1 < necessaryNumberOfDefenseBuilding1) {
 					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType1) == 0 ) {
-						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType1.mineralPrice()) {
+						if (selfAvailableMinerals >= myDefenseBuildingType1.mineralPrice()) {
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType1, 
 									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
@@ -6265,7 +6246,7 @@ public class StrategyManager {
 				if (isPossibleToConstructDefenseBuildingType2 == true
 					&& numberOfMyDefenseBuildingType2 < necessaryNumberOfDefenseBuilding2) {
 					if (BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2) == 0 ) {
-						if (BuildManager.Instance().getAvailableMinerals() >= myDefenseBuildingType2.mineralPrice()) {
+						if (selfAvailableMinerals >= myDefenseBuildingType2.mineralPrice()) {
 							
 							BuildManager.Instance().buildQueue.queueAsHighestPriority(myDefenseBuildingType2, 
 									BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);
@@ -6387,7 +6368,7 @@ public class StrategyManager {
 		
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 8개 까지만
 		if (isPossibleToConstructCombatUnitTrainingBuildingType == true
-			&& BuildManager.Instance().getAvailableMinerals() > canAvailableCombatBuildingMinerals){
+			&& selfAvailableMinerals > canAvailableCombatBuildingMinerals){
 			
 			System.out.println("canAvailableCombatBuildingMinerals : " + canAvailableCombatBuildingMinerals);
 			System.out.println("Config.numberOfMyCombatUnitTrainingBuilding : " + Config.numberOfMyCombatUnitTrainingBuilding);
