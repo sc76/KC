@@ -26,17 +26,17 @@ public class Config {
 	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstProtoss = 4; // 히드라
-	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 1; // 럴커
+	public static int necessaryNumberOfDefenceUnitType3AgainstProtoss = 0; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 4; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 7; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 5; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
@@ -53,7 +53,7 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstProtoss = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstProtoss = 1; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 8; // 저글링
+	public static int necessaryNumberOfCombatUnitType1AgainstZerg = 14; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstZerg = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstZerg = 3;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstZerg = 6;  // 뮤탈
@@ -62,7 +62,7 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 6; // 저글링
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 4; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
@@ -202,7 +202,7 @@ public class Config {
 	public static int TILE_SIZE = 32;
 
 	/// 각각의 Refinery 마다 투입할 일꾼 최대 숫자
-	public static int WorkersPerRefinery = 1;
+	public static int WorkersPerRefinery = 2;
 	
 	/// 건물과 건물간 띄울 최소한의 간격 - 일반적인 건물의 경우
 	public static int BuildingSpacing = 1;

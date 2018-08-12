@@ -87,7 +87,7 @@ public class KCTechTreeUp {
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
 		{
-			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire, true);
+			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Spire, false);
 		}
 		
 		// sc76.choi 빠른 spire 테크 작성예정					
@@ -327,7 +327,7 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 spire 테크 작성예정
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 3
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
@@ -396,7 +396,7 @@ public class KCTechTreeUp {
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Defiler) >= 1
+//				&& myPlayer.completedUnitCount(UnitType.Zerg_Defiler) >= 1
 				&& myPlayer.allUnitCount(UnitType.Zerg_Greater_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Greater_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Greater_Spire, null) == 0) 
@@ -408,7 +408,7 @@ public class KCTechTreeUp {
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 4기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 10
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 4	
+//			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 4	
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Defiler_Mound) > 0
 			&& myPlayer.allUnitCount(UnitType.Zerg_Ultralisk_Cavern) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Ultralisk_Cavern) == 0

@@ -58,7 +58,8 @@ public class KCUpgradeAndTech {
 		
 		if ((myPlayer.completedUnitCount(UnitType.Zerg_Lair) +
 				myPlayer.completedUnitCount(UnitType.Zerg_Hive) +
-				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0 
+				myPlayer.incompleteUnitCount(UnitType.Zerg_Hive)) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 14
 //				&& myPlayer.isResearching(necessaryTechType1) == true
 			) {
 			isTimeToStartUpgradeType3 = true;
@@ -509,6 +510,14 @@ public class KCUpgradeAndTech {
 			}
 		}		
 		
+		if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 0 
+				 && myPlayer.isUpgrading(UpgradeType.Metabolic_Boost) == false
+				 && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Metabolic_Boost) == 0
+				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 8)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
+			}
+		
 		// 업그레이드는 낮은 우선순위로 실행
 		// sc76.choi 히드라 사정 업그레이드
 		if (isTimeToStartUpgradeType1) 
@@ -737,7 +746,8 @@ public class KCUpgradeAndTech {
 		// sc76.choi 히드라 사정 업그레이드, 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0				
+				&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 3
 		) {
 			isTimeToStartUpgradeType1 = true;
 		}
@@ -746,7 +756,7 @@ public class KCUpgradeAndTech {
 		if (isTimeToStartResearchTech1
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 //			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1) {
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 3) {
 			isTimeToStartUpgradeType2 = true;
 		}
 		
@@ -802,6 +812,13 @@ public class KCUpgradeAndTech {
 			isTimeToStartResearchTech4 = true;
 		}	
 
+		if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 0 
+				 && myPlayer.isUpgrading(UpgradeType.Metabolic_Boost) == false
+				 && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Metabolic_Boost) == 0
+				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 8)
+			{
+				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
+			}
 		
 		// sc76.choi 히드라 사정 업그레이드
 		if (isTimeToStartUpgradeType1) 
@@ -810,7 +827,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType1) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType1) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType1, false);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType1, true);
 			}
 		}
 		
@@ -822,7 +839,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType2) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType2) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType2, false);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType2, true);
 				
 //				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
@@ -864,7 +881,7 @@ public class KCUpgradeAndTech {
 				// sc76.choi 테란일 경우 럴커 테크 연구를 먼저 진행한다.
 //				System.out.println("myPlayer.hasResearched(TechType.Lurker_Aspect) : " + myPlayer.hasResearched(TechType.Lurker_Aspect));
 				if(myPlayer.hasResearched(TechType.Lurker_Aspect) == true
-					 && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1){
+					 && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2){
 					
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
 					
@@ -924,9 +941,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.hasResearched(necessaryTechType4) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType4) == 0)
 			{
-				if(myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 4){
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType4, true);
-				}
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType4, true);
 			}
 		}
 		
@@ -994,7 +1009,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Carapace 지상 갑피 업그레이드 1 단계 (드론, 저글링, 히드라리스크, 러커, 디파일러, 울트라리스크, 라바, 브루들링, 인페스티드 테란,코쿤)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lurker)) >= 2				
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lurker)) >= 3				
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -1033,6 +1048,7 @@ public class KCUpgradeAndTech {
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lurker)) >= 3
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Missile_Attacks) == 0)
@@ -1070,6 +1086,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Melee_Attacks 근접 공격 업그레이드 1 단계 (저글링, 울트라리스크, 브루들링)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lurker)) >= 3
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false

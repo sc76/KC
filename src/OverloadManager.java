@@ -79,6 +79,7 @@ public class OverloadManager {
 	Chokepoint selfFirstChokePoint = null;
 	Chokepoint selfSecondChokePoint = null;	
 	BaseLocation enemyMainBaseLocation = null;
+	BaseLocation enemyFirstExpansionBaseLocation = null;
 	Chokepoint enemyFirstChokePoint = null;
 	Chokepoint enemySecondChokePoint = null;
 	
@@ -105,6 +106,7 @@ public class OverloadManager {
 		selfFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().selfPlayer);
 		selfSecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().selfPlayer);
 		enemyMainBaseLocation = InformationManager.Instance().getMainBaseLocation(InformationManager.Instance().enemyPlayer);
+		enemyFirstExpansionBaseLocation = InformationManager.Instance().getFirstExpansionLocation(InformationManager.Instance().enemyPlayer);
 		enemyFirstChokePoint = InformationManager.Instance().getFirstChokePoint(InformationManager.Instance().enemyPlayer);
 		enemySecondChokePoint = InformationManager.Instance().getSecondChokePoint(InformationManager.Instance().enemyPlayer);
 		
@@ -248,8 +250,9 @@ public class OverloadManager {
 			
 			//System.out.println("initialFirstScoutOverload() isSafeAround : " + firstScoutOverload.getID() + " " + isSafeAround);
 			
-			// sc76.choi 발견된 적진의 거리를 구해, patrol 할수 있도록 한다.
-			double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
+			// sc76.choi 발견된 적진의 거리를 구해, 앞마당까지 patrol 할수 있도록 한다.
+			//double distanceFromEnemyMainBaseLocation = enemyMainBaseLocation.getDistance(firstScoutOverload.getPosition());
+			double distanceFromEnemyMainBaseLocation = enemyFirstExpansionBaseLocation.getDistance(firstScoutOverload.getPosition());
 			if(distanceFromEnemyMainBaseLocation <= (double)TilePosition.SIZE_IN_PIXELS*3){
 				
 				// sc76.choi 공격을 당하면, 본진귀환
@@ -259,7 +262,8 @@ public class OverloadManager {
 		                moveScoutUnitToMyBaseLocation(firstScoutOverload);
 	            	}
 	            }else{
-	            	commandUtil.patrol(firstScoutOverload, enemySecondChokePoint.getCenter());
+	            	//commandUtil.patrol(firstScoutOverload, enemySecondChokePoint.getCenter());
+	            	commandUtil.patrol(firstScoutOverload, enemyMainBaseLocation.getPosition());
 	            }
 	            
 			}else{
@@ -273,7 +277,8 @@ public class OverloadManager {
 				}else{
 					if(isFinishedInitialScout) return; // 정찰이 끝났으면 수행하지 않음,
 					
-					commandUtil.move(firstScoutOverload, enemyMainBaseLocation.getPosition());
+					//commandUtil.move(firstScoutOverload, enemyMainBaseLocation.getPosition());
+					commandUtil.move(firstScoutOverload, enemyFirstExpansionBaseLocation.getPosition());
 					currentOverloadScoutStatus = ScoutStatus.NoScout.ordinal();
 					isFinishedInitialScout = true; // 초반 정찰 끝
 					overloadData.setOverloadJob(firstScoutOverload, OverloadData.OverloadJob.EnemyBase, (Unit)null);
@@ -524,7 +529,8 @@ public class OverloadManager {
 			centerChokeOverload = unit;
 			
 			if(centerChokeOverload.isUnderAttack() 
-				|| StrategyManager.Instance().buildState == StrategyManager.BuildState.blockDefence2Dragon8_P){
+				|| StrategyManager.Instance().buildState == StrategyManager.BuildState.blockDefence2Dragon8_P
+				|| StrategyManager.Instance().buildState == StrategyManager.BuildState.hardCoreMarine_T){
 				overloadData.setOverloadJob(centerChokeOverload, OverloadData.OverloadJob.Idle , (Unit)null);
 				commandUtil.move(centerChokeOverload, StrategyManager.Instance().DEFENCE_POSITION);
 				
