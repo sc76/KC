@@ -378,7 +378,7 @@ public class StrategyManager {
 		// 2초에 1번만 실행합니다
 		if (MyBotModule.Broodwar.getFrameCount() % 24 * 2 != 0) return;
 
-		if(enemyRace == Race.Terran && myKilledCombatUnitCount3 <= 3){
+		if(enemyRace == Race.Terran && myKilledCombatUnitCount1 <= 3){
 			
 			// sc76.choi 아직 발견 전이면, 앞마당을 지정
 			if(enemyMainBaseLocation == null){
@@ -859,17 +859,16 @@ public class StrategyManager {
 	void excuteTemp(){
 		if(DEBUG) {
 			
-			// 1초에 1번만 실행합니다
-//			if (MyBotModule.Broodwar.getFrameCount() % 24*60 != 0) return;
-//			
-//			System.out.println("canGreateAttackNow : " + KCSimulationManager.Instance().canGreateAttackNow().getMyPoint());
-//			System.out.println("canGreateAttackNow : " + KCSimulationManager.Instance().canGreateAttackNow().getEnemyPoint());
-//			System.out.println("canGreateAttackNow : " + KCSimulationManager.Instance().canGreateAttackNow().isCanAttackNow());
-//			System.out.println();
-////			
-//			Position center = new Position(2000, 2000);
-			//Position cp = myMainBaseLocation.getPosition() + center;
-//			System.out.println("cp : " + cp);
+			getLurkerDefencePosition();
+			
+			MyBotModule.Broodwar.drawCircleMap(lurkerDefenceBuildingPos1.toPosition(), 20, Color.Black, true);
+			MyBotModule.Broodwar.drawTextMap(lurkerDefenceBuildingPos1.toPosition(), "1");
+			MyBotModule.Broodwar.drawCircleMap(lurkerDefenceBuildingPos2.toPosition(), 20, Color.Black, true);
+			MyBotModule.Broodwar.drawTextMap(lurkerDefenceBuildingPos2.toPosition(), "2");
+			MyBotModule.Broodwar.drawCircleMap(lurkerDefenceBuildingPos3.toPosition(), 20, Color.Black, true);
+			MyBotModule.Broodwar.drawTextMap(lurkerDefenceBuildingPos3.toPosition(), "3");
+			MyBotModule.Broodwar.drawCircleMap(lurkerDefenceBuildingPos4.toPosition(), 20, Color.Black, true);
+			MyBotModule.Broodwar.drawTextMap(lurkerDefenceBuildingPos4.toPosition(), "4");
 		}
 	}
 	
@@ -2517,14 +2516,26 @@ public class StrategyManager {
 //					}
 //					// 앞마당 도착 했다면, burrow 한다.
 //					else{
-						if(unit.getID() % 2 == 0){
+						if(unit.getID() % 4 == 0){
 							if(unit.canBurrow() == true && unit.getDistance(enemyFirstExpansionLocation.getPosition()) < Config.TILE_SIZE-15){
 								unit.burrow();
 							}else{
 								commandUtil.attackMove(unit, enemyFirstExpansionLocation.getPosition());
 							}
-						}else if(unit.getID() % 2 == 1){
+						}else if(unit.getID() % 4 == 1){
+							if(unit.canBurrow() == true && unit.getDistance(enemyFirstExpansionLocation.getPosition()) < Config.TILE_SIZE-25){
+								unit.burrow();
+							}else{
+								commandUtil.attackMove(unit, enemyFirstExpansionLocation.getPosition());
+							}
+						}else if(unit.getID() % 4 == 2){
 							if(unit.canBurrow() == true && unit.getDistance(enemySecondChokePoint.getCenter()) < Config.TILE_SIZE-15){
+								unit.burrow();
+							}else{
+								commandUtil.attackMove(unit, enemySecondChokePoint.getCenter());
+							}
+						}else if(unit.getID() % 4 == 3){
+							if(unit.canBurrow() == true && unit.getDistance(enemySecondChokePoint.getCenter()) < Config.TILE_SIZE-25){
 								unit.burrow();
 							}else{
 								commandUtil.attackMove(unit, enemySecondChokePoint.getCenter());
@@ -2975,6 +2986,8 @@ public class StrategyManager {
 			for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
 				
 				if (enemyUnit.isFlying()) continue;
+				if (enemyUnit.getType().isFlyingBuilding()) continue;
+				
 				tempDistance = unit.getDistance(enemyUnit.getPosition());
 				if (tempDistance < 6 * Config.TILE_SIZE) {
 					nearEnemyUnitPosition = enemyUnit.getPosition();
@@ -3024,8 +3037,8 @@ public class StrategyManager {
 								// 
 								// sc76.choi 공격가능하지만, 건물은 아닌 유닛만 카운트한다.
 								
-								if(who.getType() == UnitType.Zerg_Lurker) continue; 
 								if(who.getType().isWorker()) continue;
+								if(who.getType() == UnitType.Zerg_Lurker) continue; 
 								if(who.getType() == UnitType.Zerg_Overlord) continue;
 								
 								if(who.getType().canAttack() && !who.getType().isBuilding()){
@@ -3073,6 +3086,8 @@ public class StrategyManager {
 				for(Unit enemyUnit : MyBotModule.Broodwar.enemy().getUnits()) {
 					
 					//if(unit.getPlayer() == enemyPlayer){
+						if (enemyUnit.getType().isFlyer()) continue;
+						if (enemyUnit.getType().isFlyingBuilding()) continue;
 						if (enemyUnit.getType().isFlyer() && enemyUnit.getType() == UnitType.Terran_Engineering_Bay) continue;
 						if (enemyUnit.getType().isFlyer() && enemyUnit.getType() == UnitType.Terran_Barracks) continue;
 						if (enemyUnit.getType().isWorker()) continue;
@@ -3399,7 +3414,10 @@ public class StrategyManager {
 //		if(enemyUnitForMainDefence == null){
 		    for (Unit unit : MyBotModule.Broodwar.enemy().getUnits()) {
 		    	if(unit.getDistance(myMainBaseLocation.getPoint()) <= Config.TILE_SIZE*15){
-		    		if(unit.getType().canAttack() && unit.getType().isWorker() == false) {
+		    		if(unit.getType().canAttack() || unit.getType().isFlyer()) {
+		    			
+		    			if(unit.getType().isWorker()) continue;
+		    			
 		    			target = unit;
 		    			break;
 		    		}
@@ -4401,7 +4419,7 @@ public class StrategyManager {
     	// 테란의 경우
     	else if(enemyRace == Race.Terran){
 			
-	   		if((countEnemyBasicCombatUnitType >= 6 || countEnemyBasicCombatBuildingType >= 2)
+	   		if((countEnemyBasicCombatUnitType >= 7 || countEnemyBasicCombatBuildingType >= 2)
 	    			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 8)){
 	    			buildState = BuildState.hardCoreMarine_T;
 	    			
@@ -4414,7 +4432,7 @@ public class StrategyManager {
 	   		}
 	   		
 	   		if(buildState != BuildState.hardCoreMarine_T
-	   			&& (countEnemyBasicCombatUnitType >= 2 || countEnemyAdvancedCombatUnitType >= 1)
+	   			&& (countEnemyBasicCombatUnitType >= 3 || countEnemyAdvancedCombatUnitType >= 1)
 	    			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 8)){
 	    			buildState = BuildState.hardCoreMarine_T;
 	    			
@@ -5329,7 +5347,7 @@ public class StrategyManager {
 					}
 					else{
 						strBuildOrderStep = "T 20";
-						buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 3};
+						buildOrderArrayOfMyCombatUnitType = new int[]{3, 1, 2, 1, 3, 2, 1, 1, 3, 2, 1, 3};
 					}
 				}
 				else {
@@ -6634,19 +6652,19 @@ public class StrategyManager {
 		
 		if(enemyRace == Race.Terran){
 			if(numberOfMyCombatUnitTrainingBuilding >= 5){
-				canAvailableCombatBuildingMinerals = 700;
+				canAvailableCombatBuildingMinerals = 550;
 			}else if(numberOfMyCombatUnitTrainingBuilding >= 4){
 				canAvailableCombatBuildingMinerals = 500;
 			}else if(numberOfMyCombatUnitTrainingBuilding >= 3){
-				canAvailableCombatBuildingMinerals = 350;
+				canAvailableCombatBuildingMinerals = 400;
 			}
 		}else{
 			if(numberOfMyCombatUnitTrainingBuilding >= 5){
-				canAvailableCombatBuildingMinerals = 700;
+				canAvailableCombatBuildingMinerals = 550;
 			}else if(numberOfMyCombatUnitTrainingBuilding >= 4){
-				canAvailableCombatBuildingMinerals = 600;
+				canAvailableCombatBuildingMinerals = 550;
 			}else if(numberOfMyCombatUnitTrainingBuilding >= 3){
-				canAvailableCombatBuildingMinerals = 500;
+				canAvailableCombatBuildingMinerals = 450;
 			}
 		}
 		// 공격 유닛 생산 건물 증설 : 돈이 남아돌면 실시. 최대 8개 까지만
@@ -7739,8 +7757,6 @@ public class StrategyManager {
 		
 		if(enemyRace != Race.None && enemyRace == Race.Protoss){
 			
-			Config.WorkersPerRefinery = 2;
-			
 			// sc76.choi 각 종족별 방어, 공격에 필요한 유닛 수 설정
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstProtoss;
 			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstProtoss;
@@ -7781,8 +7797,6 @@ public class StrategyManager {
 			 
 		}else if(enemyRace != Race.None && enemyRace == Race.Zerg){
 			
-			Config.WorkersPerRefinery = 2;
-			
 			// sc76.choi 각 종족별 방어, 공격에 필요한 유닛 수 설정
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstZerg;
 			necessaryNumberOfDefenceUnitType2 = Config.necessaryNumberOfDefenceUnitType2AgainstZerg;
@@ -7820,8 +7834,6 @@ public class StrategyManager {
 			necessaryNumberOfDefenseBuilding1 = Config.necessaryNumberOfDefenseBuilding1AgainstZerg;
 			necessaryNumberOfDefenseBuilding2 = Config.necessaryNumberOfDefenseBuilding2AgainstZerg;			
 		}else if(enemyRace != Race.None && enemyRace == Race.Terran){
-			
-			Config.WorkersPerRefinery = 2;
 			
 			// sc76.choi 각 종족별 방어, 공격에 필요한 유닛 수 설정
 			necessaryNumberOfDefenceUnitType1 = Config.necessaryNumberOfDefenceUnitType1AgainstTerran;
