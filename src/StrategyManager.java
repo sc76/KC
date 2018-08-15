@@ -792,12 +792,11 @@ public class StrategyManager {
 		// sc76.choi 베이스 정보를 업데이트 합니다.
 		//updateKCBaseInfo();
 		
+		// 각종 기본 Config를 조정합니다.
+		excuteConfigration();
 
 		// sc76.choi 적의 유닛을 보고, 빌드를 판단한다.
 		isTimeToBuildState();
-		
-		// 각종 기본 Config를 조정합니다.
-		excuteConfigration();
 		
 		/// 변수 값을 업데이트 합니다
 		updateVariables();
@@ -4481,8 +4480,7 @@ public class StrategyManager {
 		// 프로토스    	
     	if(enemyRace == Race.Protoss){
     		
-    		if(buildState == BuildState.hardCoreZealot_P
-    			&& countEnemyBasicCombatUnitType >= 4
+    		if(countEnemyBasicCombatUnitType >= 4
     			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
     			
     			buildState = BuildState.hardCoreZealot_P;
@@ -4494,10 +4492,10 @@ public class StrategyManager {
        			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 4;
        			
        			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 8;
-       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 12;
+       			Config.necessaryNumberOfCombatUnitType1AgainstProtoss = 12;
        			
        			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 8;
-       			Config.necessaryNumberOfCombatUnitType2AgainstTerran = 12;
+       			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 12;
        			
     			// sc76.choi 저글링 4 마리 추가	    		
 	    		excuteUrgenturgent_Add_Zergling1();
@@ -4505,9 +4503,10 @@ public class StrategyManager {
 	    		// sc76.choi 본진에 성큰하나 건설
 	    		excuteUrgentDefenceConstructionInBaseLocation(myFirstExpansionLocation);
     		}
-    		else if(countEnemyBasicCombatUnitType >= 1
-    				&& existUnitTypeInRegion(enemyPlayer, UnitType.Protoss_Zealot, myFirstExpansionLocation.getRegion(), false, false) == true
-        			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
+    		
+    		if(countEnemyBasicCombatUnitType >= 1
+    			&& existUnitTypeInRegion(enemyPlayer, UnitType.Protoss_Zealot, myFirstExpansionLocation.getRegion(), false, false) == true
+        		&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
     			
     			buildState = BuildState.hardCoreZealot_P;
     			
@@ -4518,10 +4517,10 @@ public class StrategyManager {
        			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 4;
        			
        			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 8;
-       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 12;
+       			Config.necessaryNumberOfCombatUnitType1AgainstProtoss = 12;
        			
        			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 8;
-       			Config.necessaryNumberOfCombatUnitType2AgainstTerran = 12;
+       			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 12;
        			
     			// sc76.choi 저글링 4 마리 추가	    		
 	    		excuteUrgenturgent_Add_Zergling1();
@@ -4675,12 +4674,13 @@ public class StrategyManager {
     			buildState = BuildState.darkTemplar_P;
     			
     			
-    		}else if (buildState == BuildState.darkTemplar_P
-        			&& (myPlayer.isUpgrading(UpgradeType.Pneumatized_Carapace) == true
-        			     || myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0)){
-    			
-    			buildState = BuildState.normalMode;
     		}
+//    		else if (buildState == BuildState.darkTemplar_P
+//        			&& (myPlayer.isUpgrading(UpgradeType.Pneumatized_Carapace) == true
+//        			     || myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0)){
+//    			
+//    			buildState = BuildState.normalMode;
+//    		}
     		
     		if((countEnemyAdvancedDefenceBuilding  >= 4 
     			|| enemyPlayer.allUnitCount(UnitType.Protoss_Photon_Cannon) >= 4)
@@ -4853,7 +4853,6 @@ public class StrategyManager {
 	   			// 즉각 해처리 증설
 	   			excuteUrgentCombatConstructionInBaseLocation(myMainBaseLocation.getTilePosition());
 	   		}
-	   		
 	   		
 		}else if(enemyRace == Race.Zerg){
 			
