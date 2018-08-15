@@ -7,27 +7,6 @@ public class KCTechTreeUp {
 
 	Player myPlayer = MyBotModule.Broodwar.self();
 	Race myRace = MyBotModule.Broodwar.self().getRace();
-
-	// sc76.choi 상황에 맞는 빌드 모드 설정
-	public enum BuildState { 
-		normalMode,                         // 기본
-		onlyZergling,						// 저글링 모드, 저글링이 다수 필요할 때
-		onlyHydralist,						// 히드라 모드, 히드라가 다수 필요할 때
-		onlyMutalisk,						// 뮤탈 모드, 중반 이후, only 질럿, 저글링만 보일 때		
-		fasterMutalisk,						// 빠른 뮤탈 모드, 태란 다수 탱크가 있을 때, 퀸도 빨리 올려 활용한다.
-		fasterUltralisk,						// 빠른 울트라 모드, 태란 입구 막음 or 프로토스 앞마당 포토밭을 만들 때 상황
-		fastZergling_Z,
-		fastMutalisk_Z,
-		lurker_Z,
-		blockTheFirstChokePoint_T,
-		blockTheSecondChokePoint_T,
-		vulture_Galia_Tank_T,
-		darkTemplar_P,
-		blockDefence2Dragon8_P,
-		blockTheFirstChokePoint_P,
-		blockTheSecondChokePoint_P,
-		carrier_P
-	};	
 	
 	public void techTreeupAgainstProtoss(){
 		
@@ -39,7 +18,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hatchery) > 0
 			&& (myPlayer.completedUnitCount(UnitType.Zerg_Lair) == 0 && myPlayer.incompleteUnitCount(UnitType.Zerg_Lair) == 0)
-		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
+		    && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 4
 //			&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 // 히드라 발업
 			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 히드라 사정업
 			&& myPlayer.allUnitCount(UnitType.Zerg_Lair) == 0
@@ -82,7 +61,8 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 spire 테크 작성예정
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
@@ -110,7 +90,7 @@ public class KCTechTreeUp {
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (StrategyManager.Instance().buildState != StrategyManager.BuildState.carrier_P
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+//			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 10
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
@@ -241,7 +221,7 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+//			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= StrategyManager.Instance().necessaryNumberOfCombatUnitType1			
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
@@ -328,7 +308,7 @@ public class KCTechTreeUp {
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 3
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
+//				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
 				&& myPlayer.allUnitCount(UnitType.Zerg_Spire) == 0
 				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Spire) == 0
 				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Spire, null) == 0) 
@@ -343,9 +323,10 @@ public class KCTechTreeUp {
 		// sc76.choi 기본 Queens_Nest
 		// 고급 건물 생산을 너무 성급하게 하다가 위험에 빠질 수 있으므로, 최소 히드라리스크 12기 생산 후 건설한다
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
+//			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 2
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+			&& StrategyManager.Instance().myOccupiedBaseLocations >= 3
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0

@@ -283,6 +283,8 @@ public class UXManager {
 	// sc76.choi 오버로드의 시야를 원을 Map 에 표시합니다
 	public void drawSightToSpecialUnits() {
 		
+		
+		
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 20, Color.White);
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 35, Color.White);
 		MyBotModule.Broodwar.drawCircleMap(selfMainBaseLocation.getPosition(), Config.TILE_SIZE * 80, Color.White);

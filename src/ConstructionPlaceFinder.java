@@ -175,9 +175,9 @@ public class ConstructionPlaceFinder {
 				break;
 			case SeedPositionSpecified:
 				// sc76.choi 멀티를 위해 새로운 Base를 찾는다.
-				if(StrategyManager.Instance().isInitialBuildOrderFinished == true){
+				//if(StrategyManager.Instance().isInitialBuildOrderFinished == true){
 					desiredPosition = StrategyManager.Instance().getBestMultiLocation().getTilePosition();
-				}
+				//}
 				break;
 			}
 		}

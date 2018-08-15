@@ -37,7 +37,7 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType5AgainstZerg = 0; // 울트라
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
-	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 4; // 히드라
+	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 3; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstTerran = 0; // 울트라
@@ -62,7 +62,7 @@ public class Config {
 	public static int necessaryNumberOfSpecialCombatUnitType1AgainstZerg = 1; // 오버로드
 	public static int necessaryNumberOfSpecialCombatUnitType2AgainstZerg = 3; // 디파일러
 	
-	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 4; // 저글링
+	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 6; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
 	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
@@ -75,7 +75,7 @@ public class Config {
 	// 아군의 일반 유닛 최대 전투참가 제한 수
 	public static int maxNumberOfCombatUnitType1AgainstProtoss = 12;  // 저글링
 	public static int maxNumberOfCombatUnitType2AgainstProtoss = 16; // 히드라
-	public static int maxNumberOfCombatUnitType3AgainstProtoss = 4;  // 럴커
+	public static int maxNumberOfCombatUnitType3AgainstProtoss = 7;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstProtoss = 8;  // 뮤탈
 	public static int maxNumberOfCombatUnitType5AgainstProtoss = 4;  // 울트라
 	
@@ -84,7 +84,7 @@ public class Config {
 	public static int maxNumberOfSpecialUnitType3AgainstProtoss = 6;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstProtoss = 2;  // 퀸
 	
-	public static int maxNumberOfCombatUnitType1AgainstZerg = 10;  // 저글링
+	public static int maxNumberOfCombatUnitType1AgainstZerg = 8;  // 저글링
 	public static int maxNumberOfCombatUnitType2AgainstZerg = 10; // 히드라
 	public static int maxNumberOfCombatUnitType3AgainstZerg = 4;  // 럴커
 	public static int maxNumberOfCombatUnitType4AgainstZerg = 8;  // 뮤탈
@@ -132,7 +132,7 @@ public class Config {
 	
 	public static int maxNumberOfTrainUnitType1AgainstTerran = 8; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 30; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstTerran = 2;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstTerran = 7;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstTerran = 3;  // 울트라
 	
@@ -150,7 +150,7 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding2AgainstTerran = 1;	
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
-	public static final int numberOfMyCombatUnitTrainingBuilding = 7;
+	public static final int numberOfMyCombatUnitTrainingBuilding = 9;
 	
 	public static double optimalWorkerCount = 1.5;
 			

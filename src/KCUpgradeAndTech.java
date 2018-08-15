@@ -37,7 +37,7 @@ public class KCUpgradeAndTech {
 	public void upGradeAndTechAgainstProtoss(){
 		// sc76.choi 프로토스 히드라 사정 업그레이드 제일 먼저
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6) {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
@@ -45,7 +45,7 @@ public class KCUpgradeAndTech {
 		if (isTimeToStartResearchTech1 == true // 럴커
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 사정업
-				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6) {
 			isTimeToStartUpgradeType2 = true;
 		}
 		
@@ -117,7 +117,7 @@ public class KCUpgradeAndTech {
 				&& myPlayer.hasResearched(necessaryTechType1) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryTechType1) == 0)
 			{
-				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType1, true);
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType1, false);
 			}
 		}
 		
@@ -191,7 +191,8 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isUpgrading(necessaryUpgradeType3) == false
 				&& BuildManager.Instance().buildQueue.getItemCount(necessaryUpgradeType3) == 0)
 			{
-				if(StrategyManager.Instance().buildState == StrategyManager.BuildState.darkTemplar_P){
+				if(StrategyManager.Instance().buildState == StrategyManager.BuildState.darkTemplar_P
+					|| StrategyManager.Instance().buildState == StrategyManager.BuildState.blockDefence2Dragon8_P){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, true);
 				}else{
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
@@ -211,30 +212,30 @@ public class KCUpgradeAndTech {
 			}
 		}		
 
-		// 뮤탈 방어 1 업
-		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
-			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) == 0
-			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Carapace) == false
-			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Carapace) == 0
-		) {
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Carapace, false);
-		}	
-		
-		// 뮤탈 공격 1 업
-		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
-			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
-			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) > 0
-			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) == 0
-			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Attacks) == false
-			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Attacks) == 0
-		) {
-			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Attacks, false);
-		}
+//		// 뮤탈 방어 1 업
+//		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
+//			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) == 0
+//			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Carapace) == false
+//			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Carapace) == 0
+//		) {
+//			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Carapace, false);
+//		}	
+//		
+//		// 뮤탈 공격 1 업
+//		if (StrategyManager.Instance().myKilledCombatUnitCount3 < 10
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
+//			  && myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8
+//			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Carapace) > 0
+//			  && myPlayer.getUpgradeLevel(UpgradeType.Zerg_Flyer_Attacks) == 0
+//			  && myPlayer.isUpgrading(UpgradeType.Zerg_Flyer_Attacks) == false
+//			  && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Flyer_Attacks) == 0
+//		) {
+//			BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Zerg_Flyer_Attacks, false);
+//		}
 		
 		// 울트라 벙어 1업
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Ultralisk_Cavern) > 0
@@ -287,7 +288,7 @@ public class KCUpgradeAndTech {
 //			&& (myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 2
 			&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0 
 			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Carapace) == false
 			&& BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Zerg_Carapace) == 0)
@@ -327,7 +328,7 @@ public class KCUpgradeAndTech {
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 12				
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2				
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Carapace) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Missile_Attacks) == false
@@ -366,6 +367,7 @@ public class KCUpgradeAndTech {
 		// Zerg_Melee_Attacks 근접 공격 업그레이드 1 단계 (저글링, 울트라리스크, 브루들링)
 		if(myPlayer.completedUnitCount(UnitType.Zerg_Evolution_Chamber) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Missile_Attacks) > 0
 			&& myPlayer.getUpgradeLevel(UpgradeType.Zerg_Melee_Attacks) == 0
 			&& myPlayer.isUpgrading(UpgradeType.Zerg_Melee_Attacks) == false
@@ -402,14 +404,14 @@ public class KCUpgradeAndTech {
 
 	public void upGradeAndTechAgainstZerg(){
 
-		// 히드라 사정 업그레이드
+		// 히드라 사정(Grooved Spines) 업그레이드
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
-		// 히드라 발업
+		// 히드라 발업(Muscular Augments)
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8) {
 			isTimeToStartUpgradeType2 = true;
@@ -553,7 +555,7 @@ public class KCUpgradeAndTech {
 			{
 				if(StrategyManager.Instance().buildState == StrategyManager.BuildState.lurker_Z ){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, true);
-				}else{
+				}else if (myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 8	){
 					BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryUpgradeType3, false);
 				}
 			}
@@ -743,7 +745,7 @@ public class KCUpgradeAndTech {
 	
 	public void upGradeAndTechAgainstTerran(){
 
-		// sc76.choi 히드라 사정 업그레이드, 테란은 럴커를 먼저 업그레이드 한다.
+		// sc76.choi 히드라 사정(Grooved Spines) 업그레이드, 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.getUpgradeLevel(UpgradeType.Muscular_Augments) > 0
@@ -752,11 +754,11 @@ public class KCUpgradeAndTech {
 			isTimeToStartUpgradeType1 = true;
 		}
 		
-		// sc76.choi 히드라 발업, 테란은 럴커를 먼저 업그레이드 한다.
+		// sc76.choi 히드라 발업 (Muscular Augments), 테란은 럴커를 먼저 업그레이드 한다.
 		if (isTimeToStartResearchTech1
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 //			&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 3) {
+			&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true) {
 			isTimeToStartUpgradeType2 = true;
 		}
 		
@@ -815,7 +817,7 @@ public class KCUpgradeAndTech {
 		if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 0 
 				 && myPlayer.isUpgrading(UpgradeType.Metabolic_Boost) == false
 				 && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Metabolic_Boost) == 0
-				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 8)
+				 && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
