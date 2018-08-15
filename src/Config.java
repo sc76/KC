@@ -30,7 +30,7 @@ public class Config {
 	public static int necessaryNumberOfDefenceUnitType4AgainstProtoss = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstProtoss = 0; // 울트라
 	
-	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 7; // 저글링
+	public static int necessaryNumberOfDefenceUnitType1AgainstZerg = 8; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstZerg = 5; // 히드라
 	public static int necessaryNumberOfDefenceUnitType3AgainstZerg = 1; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstZerg = 0; // 뮤탈

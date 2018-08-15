@@ -1181,6 +1181,7 @@ public class StrategyManager {
 	public void controlAdvancedDefenceBuildingCombat() {
 		
 		if (MyBotModule.Broodwar.getFrameCount() % 24 != 0) return;
+		if (isInitialBuildOrderFinished == false) return;
 		
 		for(Unit unit : myPlayer.getUnits()){
 			
@@ -1202,7 +1203,9 @@ public class StrategyManager {
 				
 				// sc76.choi 본진에 성큰이 있으면, 짓는 것을 취소한다.
 				if(creepRegion == BWTA.getRegion(myMainBaseLocation.getPosition())){
-					if(existUnitTypeInRegion(myPlayer, UnitType.Zerg_Sunken_Colony, BWTA.getRegion(myMainBaseLocation.getPosition()), false, false)){
+					
+					//if(existUnitTypeInRegion(myPlayer, UnitType.Zerg_Sunken_Colony, BWTA.getRegion(myMainBaseLocation.getPosition()), false, false)){
+					if(getCountUnitTypeInPosition(myPlayer, UnitType.Zerg_Sunken_Colony, myMainBaseLocation.getPosition(), Config.TILE_SIZE* 15) >= 2){
 						if(unit.canCancelMorph()){
 							unit.cancelMorph();
 							if(DEBUG) System.out.println("cancel Zerg_Sunken_Colony!!! " + unit.getID());
@@ -1564,7 +1567,7 @@ public class StrategyManager {
 					&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0
 					&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
 					
-					BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery,
+					BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hatchery,
 							BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation, false);
 				}
 			}
@@ -3528,6 +3531,7 @@ public class StrategyManager {
 		    		if(unit.getType().canAttack() || unit.getType().isFlyer()) {
 		    			
 		    			if(unit.getType().isWorker()) continue;
+		    			if(unit.getType() == UnitType.Zerg_Overlord) continue;
 		    			
 		    			target = unit;
 		    			break;
@@ -4859,18 +4863,22 @@ public class StrategyManager {
 			// 본진에 성큰이 두개 이상.
 			if(buildState == BuildState.blockTheFirstChokePoint_Z){
 				
-	   			Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 9;
+	   			Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 11;
 	   			Config.necessaryNumberOfCombatUnitType1AgainstZerg = 18;
 	   			
 	   			Config.necessaryNumberOfDefenceUnitType2AgainstZerg = 7;
 	   			Config.necessaryNumberOfCombatUnitType2AgainstZerg = 14;
 			}
 			
-			if((countEnemyBasicCombatUnitType >= 10)
+			if(urgent_Add_Zergling1 == false && fastZergling_Z_DefenceBuilding1 == false && fastZergling_Z_DefenceBuilding2 == false
+					&& (countEnemyBasicCombatUnitType >= 10)
 	    			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
 				
 				buildState = BuildState.fastZergling_Z;
 				
+	   			Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 11;
+	   			Config.necessaryNumberOfCombatUnitType1AgainstZerg = 17;
+	   			
 				// sc76.choi 저글링 4 마리 추가	    		
 				excuteUrgenturgent_Add_Zergling1();
 				// sc76.choi 본진에 성큰하나 건설
@@ -5930,7 +5938,11 @@ public class StrategyManager {
 					if(selfGas < 100){
 						buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
 					}else{
-						buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 1, 1, 1, 2, 1, 1, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+						if(buildState == BuildState.fastZergling_Z){
+							buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+						}else{
+							buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 1, 1, 1, 2, 1, 1, 2, 2, 1}; 	// 저글링 저글링 히드라 히드라 히드라 러커
+						}
 					}
 				}
 			}
@@ -6291,9 +6303,9 @@ public class StrategyManager {
 		if(enemyRace == Race.Protoss){
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 2
 					&& myPlayer.completedUnitCount(UnitType.Zerg_Sunken_Colony) <= 2){
-				Config.BuildingDefenseTowerSpacing = 4;
-			}else{
 				Config.BuildingDefenseTowerSpacing = 2;
+			}else{
+				Config.BuildingDefenseTowerSpacing = 1;
 			}
 		}else if(enemyRace == Race.Terran){
 			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 0
@@ -6368,7 +6380,7 @@ public class StrategyManager {
 									if(enemyRace == Race.Terran){
 										if(myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0){
 											BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
-											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
 										}else{
 											BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 										}
@@ -6376,7 +6388,7 @@ public class StrategyManager {
 										if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 												&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6){
 												BuildManager.Instance().buildQueue.queueAsHighestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
-												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), true);										
+												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);										
 											}else{
 												BuildManager.Instance().buildQueue.queueAsLowestPriority(new MetaType(InformationManager.Instance().getWorkerType()), false);
 											}
@@ -6698,9 +6710,16 @@ public class StrategyManager {
 		// TODO 앞마당에 적군만 있으면 방어 타워를 본진에 짓는다.
 		int enemyUnitsInMyFirstExpansion = InformationManager.Instance().getCombatUnitCountInRegion(BWTA.getRegion(myFirstExpansionLocation.getPosition()), enemyPlayer);
 		int myUnitsInMyFirstExpansion = InformationManager.Instance().getCombatUnitCountInRegion(BWTA.getRegion(myFirstExpansionLocation.getPosition()), myPlayer);
+		int countHatcheryInMyFirstExpansion = getCountUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(myFirstExpansionLocation.getPosition()), false, false);
+		
+		if(countHatcheryInMyFirstExpansion <= 0){
+			System.out.println("executeDefenceConstruction 1 cancle!!");
+			System.out.println();
+			return;
+		}
 		
 		if(enemyUnitsInMyFirstExpansion > 0 && myUnitsInMyFirstExpansion <= 0){
-			System.out.println("executeDefenceConstruction cancle!!");
+			System.out.println("executeDefenceConstruction 2 cancle!!");
 			System.out.println();
 			return;
 		}
@@ -6949,7 +6968,7 @@ public class StrategyManager {
 				}
 				// 확장지역에 건설한다.
 				else{
-					if(combatState == CombatState.attackStarted || combatState == CombatState.defenseMode){
+					if(combatState == CombatState.attackStarted || combatState == CombatState.defenseMode || combatState == CombatState.eliminateEnemy){
 						if(BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0){
 //							&& ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0){
 							
@@ -7055,34 +7074,22 @@ public class StrategyManager {
 		}
 		
 		if(numberOfMyCombatUnitTrainingBuilding >= 2 && numberOfMyCombatUnitTrainingBuilding <= 3){
-//			System.out.println("expansion1 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion1 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion1 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion1 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println();
-//			System.out.println();
 			bestMultiLocation = bestMultiLocation;
 			bestMultiLocation1 = bestMultiLocation;
 		}else if(numberOfMyCombatUnitTrainingBuilding >= 3 && numberOfMyCombatUnitTrainingBuilding <= 5){
-//			System.out.println("expansion2 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion2 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion2 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion2 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println();
-//			System.out.println();
-			bestMultiLocation = getBestMultiLocation2();
+			if(existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(bestMultiLocation1.getPosition()), false, false) == false){
+				bestMultiLocation = bestMultiLocation1;
+			}else{
+				bestMultiLocation = getBestMultiLocation2();
+			}
 			//bestMultiLocation2 = getBestMultiLocation2();
 		}else if(numberOfMyCombatUnitTrainingBuilding >= 5 && numberOfMyCombatUnitTrainingBuilding <= 7){
-
-//			System.out.println("expansion3 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion3 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion3 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println("expansion3 : " + numberOfMyCombatUnitTrainingBuilding);
-//			System.out.println();
-//			System.out.println();
 			
-			bestMultiLocation = getBestMultiLocation3();
-			//bestMultiLocation3 = getBestMultiLocation3();
+			if(existUnitTypeInRegion(myPlayer, UnitType.Zerg_Hatchery, BWTA.getRegion(bestMultiLocation2.getPosition()), false, false) == false){
+				bestMultiLocation = bestMultiLocation2;
+			}else{
+				bestMultiLocation = getBestMultiLocation3();
+			}
 		}else if(numberOfMyCombatUnitTrainingBuilding >= 7){
 			
 			bestMultiLocation = getBestMultiLocation4();
