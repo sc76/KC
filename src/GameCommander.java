@@ -213,9 +213,9 @@ public class GameCommander {
 		}
 		
 		if("on".equals(text) || "n".equals(text)){
-			Config.IS_DRAW = true;
+			Config.DRAW = true;
 		}else if("off".equals(text) || "of".equals(text) || "f".equals(text)){
-			Config.IS_DRAW = false;
+			Config.DRAW = false;
 		}
 		
 		if("b air".equals(text)){

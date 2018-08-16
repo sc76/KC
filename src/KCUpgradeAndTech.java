@@ -510,12 +510,14 @@ public class KCUpgradeAndTech {
 			{
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(necessaryTechType3, true);
 			}
-		}		
+		}
+		
+		//UpgradeType.Metabolic_Boost.mineralPrice()
 		
 		if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 0 
 				 && myPlayer.isUpgrading(UpgradeType.Metabolic_Boost) == false
 				 && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Metabolic_Boost) == 0
-				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 8)
+				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 14)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}

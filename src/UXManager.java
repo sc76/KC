@@ -93,7 +93,7 @@ public class UXManager {
 		// Resions
 		drawResionStateOnScreen(5, 160);
 		
-		if(!Config.IS_DRAW){
+		if(!Config.DRAW){
 			return;
 		}
 		
