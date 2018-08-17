@@ -210,14 +210,14 @@ public class KCInitialBuildOrder {
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(TechType.Lurker_Aspect);
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
-				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);	//20
+//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Creep_Colony,
+//				BuildOrderItem.SeedPositionStrategy.SecondChokePoint, false);	//20
 		
 		// sc76.choi 확장 가스
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
-				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
+//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Extractor,
+//				BuildOrderItem.SeedPositionStrategy.FirstExpansionLocation); //31
 		
-		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, false);
+//		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Sunken_Colony, false);
 		
 		//BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//26

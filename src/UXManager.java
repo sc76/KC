@@ -203,8 +203,11 @@ public class UXManager {
 		
 		
 		Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
+		Set<Region> enemyRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer);
+		List<BaseLocation> selfBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().selfPlayer);
+		List<BaseLocation> enemyBases = InformationManager.Instance().getOccupiedBaseLocations(InformationManager.Instance().enemyPlayer);
 		
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<my Regions>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<my Regions> " + selfBases.size());
 		y += 10;
 		
 		Iterator<Region> it1 = selfRegions.iterator();
@@ -214,10 +217,9 @@ public class UXManager {
 			y += 10;
 		}
 
-		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<enemy Regions>");
+		MyBotModule.Broodwar.drawTextScreen(x, y, white + "<enemy Regions> " + enemyBases.size());
 		y += 10;
 
-		Set<Region> enemyRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().enemyPlayer);
 		
 		Iterator<Region> it2 = enemyRegions.iterator();
 		while (it2.hasNext()) {

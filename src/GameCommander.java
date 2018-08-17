@@ -222,6 +222,10 @@ public class GameCommander {
 			StrategyManager.Instance().bTimeToAirDefence = true;
 		}
 		
+		if("vul".equals(text)){
+			StrategyManager.Instance().buildState = StrategyManager.BuildState.fastVulture_T;
+		}
+		
 		
 	}
 

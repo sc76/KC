@@ -132,7 +132,7 @@ public class Config {
 	
 	public static int maxNumberOfTrainUnitType1AgainstTerran = 8; // 저글링
 	public static int maxNumberOfTrainUnitType2AgainstTerran = 30; // 히드라
-	public static int maxNumberOfTrainUnitType3AgainstTerran = 7;  // 럴커
+	public static int maxNumberOfTrainUnitType3AgainstTerran = 3;  // 럴커
 	public static int maxNumberOfTrainUnitType4AgainstTerran = 8;  // 뮤탈
 	public static int maxNumberOfTrainUnitType5AgainstTerran = 3;  // 울트라
 	
@@ -151,6 +151,8 @@ public class Config {
 	public static int necessaryNumberOfDefenseBuilding3AgainstTerran = 1; // spore clony
 
 	public static final int numberOfMyCombatUnitTrainingBuilding = 9;
+	
+	public static final int numberOfMyWorkerUnitTrainingBuilding = 45;
 	
 	public static double optimalWorkerCount = 1.5;
 			
