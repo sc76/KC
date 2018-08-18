@@ -171,8 +171,7 @@ public class KCUpgradeAndTech {
 			}
 		}
 
-		// 오버로드 수송업 
-		// KTH necessaryUpgradeType5 : Ventral_Sacs
+		// KTH 오버로드 수송업 necessaryUpgradeType5 : Ventral_Sacs 
 		if (isTimeToStartUpgradeType5) 
 		{
 			if (myPlayer.getUpgradeLevel(necessaryUpgradeType5) == 0 
@@ -517,7 +516,7 @@ public class KCUpgradeAndTech {
 		if (myPlayer.getUpgradeLevel(UpgradeType.Metabolic_Boost) == 0 
 				 && myPlayer.isUpgrading(UpgradeType.Metabolic_Boost) == false
 				 && BuildManager.Instance().buildQueue.getItemCount(UpgradeType.Metabolic_Boost) == 0
-				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 14)
+				 && myPlayer.completedUnitCount(UnitType.Zerg_Zergling) >= 12)
 			{
 				BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Metabolic_Boost, false); // 저글링 속도업(Faster Zergling movement)
 			}
