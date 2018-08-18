@@ -45,6 +45,7 @@ public class KCUpgradeAndTech {
 		if (isTimeToStartResearchTech1 == true // 럴커
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 				&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) > 0 // 사정업
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 1
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6) {
 			isTimeToStartUpgradeType2 = true;
 		}

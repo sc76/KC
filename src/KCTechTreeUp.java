@@ -91,8 +91,8 @@ public class KCTechTreeUp {
 		if (StrategyManager.Instance().buildState != StrategyManager.BuildState.carrier_P
 			&& myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //			&& myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 10
-			&& myPlayer.completedUnitCount(UnitType.Zerg_Mutalisk) >= 2
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 14
+			&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 			&& myPlayer.allUnitCount(UnitType.Zerg_Queens_Nest) == 0
 			&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Queens_Nest) == 0
 			&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Queens_Nest, null) == 0) 

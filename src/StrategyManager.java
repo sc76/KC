@@ -2129,7 +2129,7 @@ public class StrategyManager {
 					}
 				}
 				
-				if(getCountCombatType1() >= necessaryNumberOfCombatUnitType1){
+				if(buildState != BuildState.blockDefence2Dragon8_P && getCountCombatType1() >= necessaryNumberOfCombatUnitType1){
 					isNecessaryNumberOfCombatUnitType = true;
 				}
 				
@@ -6838,9 +6838,7 @@ public class StrategyManager {
 		
 		if(blockDefence2Dragon8_P_CombatBuilding2 == false){
 			
-			if( selfAvailableMinerals > 200
-				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0
-				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
+			if( selfAvailableMinerals > 200){
 					
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, 
 						myMainBaseLocation.getTilePosition(), true);
@@ -7246,7 +7244,8 @@ public class StrategyManager {
 				
 				// canMultiExpansionCount 개 까지는 main location 주변에 나머지는 확장한다.
 				if (numberOfMyCombatUnitTrainingBuilding < canMultiExpansionCount
-					 && BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0 ) 
+					 && BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0 
+					 && ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0) 
 				{
 					// sc76.choi 해처리 갯수가 3개 이상이면 밖에 짓는다.
 					// sc76.choi 뛰울 최소한 공간 조정
@@ -7269,8 +7268,8 @@ public class StrategyManager {
 				// 확장지역에 건설한다.
 				else{
 					if(combatState == CombatState.attackStarted || combatState == CombatState.defenseMode || combatState == CombatState.eliminateEnemy){
-						if(BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0){
-//							&& ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0){
+						if(BuildManager.Instance().buildQueue.getItemCount(InformationManager.Instance().getBasicCombatBuildingType()) == 0
+							&& ConstructionManager.Instance().getConstructionQueueItemCount(InformationManager.Instance().getBasicCombatBuildingType(), null) == 0){
 							
 							if(DEBUG) System.out.println("**********************************************************");
 							if(DEBUG) System.out.println("                  add hatchery 2");
