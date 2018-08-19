@@ -21,7 +21,10 @@ public class Config {
 	
 	// sc76.choi 일꾼 공격 합세 기본 숫자
 	public static int COUNT_WORKERS_CANATTACK = 3; 
-	
+
+	// KTH Overload Drop 수
+	public static int COUNT_OVERLOAD_DROP = 2; 
+
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 방어 모드로 전환하기 위해 필요한 최소한의 유닛 숫자 설정
 	public static int necessaryNumberOfDefenceUnitType1AgainstProtoss = 4; // 저글링

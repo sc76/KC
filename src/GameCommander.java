@@ -106,7 +106,10 @@ public class GameCommander {
 		WorkerManager.Instance().onUnitDestroy(unit);
 		
 		// 오버로드 삭제 처리
-		OverloadManager.Instance().onUnitDestroy(unit);
+		if (unit.getType() == UnitType.Zerg_Overlord) {
+			OverloadManager.Instance().onUnitDestroy(unit);
+			OverloadManager.Instance().destroyDropOverloadList(unit);
+		}
 		
 		InformationManager.Instance().onUnitDestroy(unit);
 	}

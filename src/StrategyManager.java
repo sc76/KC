@@ -5087,69 +5087,99 @@ public class StrategyManager {
 
 	private void executeOverloadDrop() {
 //		if (combatState == CombatState.attackStarted) {
-			for (Unit unitOverload : OverloadManager.Instance().getOverloadData().getOverloads()) {
+		if(OverloadManager.Instance().getDropOverloadList().size() == 0) return;
+		if(!checkDrop && myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0) {
+			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
 				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 			
-				if (unitOverload.getType() == UnitType.Zerg_Overlord && 
-					    OverloadManager.Instance().getOverloadData().getJobCode(unitOverload) == 'R') {
-	
-					Position calPosition = null;
-					if(!checkDrop && myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0) {
-						for(Unit unit : myPlayer.getUnits()) {	
-							if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0) continue;
-							if (unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Zergling
-									|| unit.getType() == UnitType.Zerg_Lurker) {
-								unit.rightClick(unitOverload);
-								int cnt = 0;
-								for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-									cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
-								}
-								
-								if(cnt == 8) {
-									checkDrop = true;
-									calPosition = dropPosition(unitOverload);
-									
-									commandUtil.move(unitOverload, calPosition);
-									break;
-								}
-							}
+				int cnt = 0;
+				Position calPosition = null;
+				for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
+					cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
+				}
+				if(cnt != 8 ) {
+					int unit_cnt = 0;
+					for(Unit unit : myPlayer.getUnits()) {	
+						if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0) continue;
+						if (!unit.canLoad()) continue;
+						if (unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Zergling
+								|| unit.getType() == UnitType.Zerg_Lurker) {
+							unit.rightClick(unitOverload);
+							unit_cnt = unit_cnt + unit.getType().spaceRequired();
+							if(unit_cnt == 8) break;
+							
 						}
-					}
-					
-					if(checkDrop && unitOverload.getLoadedUnits().size() != 0) {
-						boolean enemyView1 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Terran_Missile_Turret);
-						boolean enemyView2 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Protoss_Photon_Cannon);
-						boolean enemyView3 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Zerg_Sunken_Colony);
-						boolean enemyView4 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Zerg_Spore_Colony);
-						
-	//					System.out.println("BWTA.getRegion(unitOverload.getTilePosition()) ==> " + InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer));
-	//					System.out.println("unitOverload 2===>" + unitOverload.getPosition().getX() + " " + unitOverload.getPosition().getY() );
-	//					System.out.println("calPosition 2===>" + unitOverload.getOrderTargetPosition().getX() + " " + unitOverload.getOrderTargetPosition().getY() );
-						if(enemyView1 || enemyView2 || enemyView3 || enemyView4) {
-							for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-								if(unitOverload.getLoadedUnits().get(i).canUnload()) {
-									unitOverload.unload(unitOverload.getLoadedUnits().get(i));
-								}
-							}
-							//commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
-						}
-						if(unitOverload.getOrderTargetPosition().getX() == 0 && unitOverload.getOrderTargetPosition().getY() == 0) { // 목적지에 도달했을때
-							if (chkOverloadArrived) { // Drop 위치에 왔을때
-								unitOverload.unloadAll(true);
-							} else {
-								calPosition = dropPosition(unitOverload);
-								commandUtil.move(unitOverload, calPosition);
-								//System.out.println("calPosition 3===>" + calPosition.getX() + " " + calPosition.getY() );
-							}
-						}					
-					} else if (checkDrop && unitOverload.getLoadedUnits().size() == 0) {
-						//checkDrop = false;
-						//chkOverloadArrived = false;
-						OverloadManager.Instance().getOverloadData().setOverloadJob(unitOverload, OverloadData.OverloadJob.Idle, (Unit)null);
-						commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
 					}
 				}
 			}
+			
+			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
+				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
+				int cnt = 0;
+				for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
+					cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
+				}
+				if(cnt == 8) {
+					checkDrop = true;
+				} else {
+					checkDrop = false;
+					break;
+				}
+			}
+			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
+				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
+				if (checkDrop) {
+					Position calPosition = null;
+					calPosition = dropPosition(unitOverload);
+					commandUtil.move(unitOverload, calPosition);
+				}
+			}
+		}
+		if(checkDrop) {
+			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
+				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
+				
+				Position calPosition = null;
+				if(unitOverload.getLoadedUnits().size() != 0) {
+					boolean enemyView1 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Terran_Missile_Turret);
+					boolean enemyView2 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Protoss_Photon_Cannon);
+					boolean enemyView3 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Zerg_Sunken_Colony);
+					boolean enemyView4 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Zerg_Spore_Colony);
+					boolean enemyView5 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Terran_Bunker);
+					
+//					System.out.println("BWTA.getRegion(unitOverload.getTilePosition()) ==> " + InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer));
+//					System.out.println("unitOverload 2===>" + unitOverload.getPosition().getX() + " " + unitOverload.getPosition().getY() );
+//					System.out.println("calPosition 2===>" + unitOverload.getOrderTargetPosition().getX() + " " + unitOverload.getOrderTargetPosition().getY() );
+					if(enemyView1 || enemyView2 || enemyView3 || enemyView4 || enemyView5) {
+						for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
+//								if(unitOverload.getLoadedUnits().get(i).canUnload()) {
+								unitOverload.unload(unitOverload.getLoadedUnits().get(i));
+//								}
+						}
+						//commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
+					}
+					if(unitOverload.getOrderTargetPosition().getX() == 0 && unitOverload.getOrderTargetPosition().getY() == 0) { // 목적지에 도달했을때
+						if (chkOverloadArrived) { // Drop 위치에 왔을때
+							unitOverload.unloadAll(true);
+						} else {
+							calPosition = dropPosition(unitOverload);
+							commandUtil.move(unitOverload, calPosition);
+							//System.out.println("calPosition 3===>" + calPosition.getX() + " " + calPosition.getY() );
+						}
+					}					
+				} else {
+					OverloadManager.Instance().getOverloadData().setOverloadJob(unitOverload, OverloadData.OverloadJob.Idle, (Unit)null);
+					OverloadManager.Instance().removeDropOverloadList(unitOverload);
+					commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
+				}
+				
+			}
+		}
+		// 계속 Drop 시도 -> 한번만 Drop할 경우 주석 처리 
+//		if (OverloadManager.Instance().getDropOverloadList().size()==0) {
+//			checkDrop = false;
+//			chkOverloadArrived = false;
+//			System.out.println("checkDrop ==> " + checkDrop);
 //		}
 	}
 	
@@ -5157,19 +5187,33 @@ public class StrategyManager {
 	// Overload Drop 공격시 벽에 붙어서 드랍이동하는 위치 설정 	
 	private Position dropPosition(Unit myUnit) {
 		
-		Position calPosition;;
+		Position calPosition;
 		if(myMainBaseLocation.getTilePosition().getX() == enemyMainBaseLocation.getTilePosition().getX()
 				&& myMainBaseLocation.getTilePosition().getY() != enemyMainBaseLocation.getTilePosition().getY()) { // 아군, 적군 세로로 위치
-	
-			if(myUnit.getPosition().getX() == Config.TILE_SIZE || myUnit.getPosition().getX() == (MyBotModule.Broodwar.mapWidth()-1)*Config.TILE_SIZE) { // 벽에 도달했을때 이동
-				calPosition = new Position(myUnit.getPosition().getX(), enemyMainBaseLocation.getTilePosition().getY()*Config.TILE_SIZE);
+			// 세로방향 위치일때는 중앙으로 이동후 위,아래로 이동;
+			if(myUnit.getPosition().getX() == enemyMainBaseLocation.getTilePosition().getX()*Config.TILE_SIZE) { // Overload와 적베이스기지에 도달했을때 자원 채취 뒤쪽으로 이동
 				chkOverloadArrived = true;
-			} else if(myMainBaseLocation.getTilePosition().getX() < MyBotModule.Broodwar.mapWidth()/2) { // 왼쪽 벽으로 이동
-				calPosition = new Position(Config.TILE_SIZE, myUnit.getPosition().getY());
-			} else { // 오른쪽 벽으로 이동
-				calPosition = new Position((MyBotModule.Broodwar.mapWidth()-1)*Config.TILE_SIZE, myUnit.getPosition().getY());
+				if(enemyMainBaseLocation.getTilePosition().getX() < MyBotModule.Broodwar.mapWidth()/2) { // 왼쪽 자원 채취 뒤쪽으로 이동
+					calPosition = new Position(Config.TILE_SIZE, enemyMainBaseLocation.getTilePosition().getY()*Config.TILE_SIZE);
+				} else { // 오른쪽 자원 채취 뒤쪽으로 이동
+					calPosition = new Position((MyBotModule.Broodwar.mapWidth()-1)*Config.TILE_SIZE, enemyMainBaseLocation.getTilePosition().getY()*Config.TILE_SIZE);
+				}
+			} else if(myUnit.getPosition().getY() == Config.TILE_SIZE || myUnit.getPosition().getY() == (MyBotModule.Broodwar.mapHeight()-1)*Config.TILE_SIZE-25) { // 벽에 도달했을때 이동, -25는 경계선의 공백이 존재해서 빼줌
+				calPosition = new Position(enemyMainBaseLocation.getTilePosition().getX()*Config.TILE_SIZE, myUnit.getPosition().getY());
+			} else if(myMainBaseLocation.getTilePosition().getY() < MyBotModule.Broodwar.mapHeight()/2) { // 아래쪽 벽으로 이동
+				if(myUnit.getPosition().getY()<2000) {
+					calPosition = new Position(2000,2000); // 세로방향 위치일때는 중앙으로 이동;
+				} else {
+					calPosition = new Position(myUnit.getPosition().getX(), (MyBotModule.Broodwar.mapHeight()-1)*Config.TILE_SIZE-25); // -25는 경계선의 공백이 존재해서 빼줌
+				}
+			} else { // 위쪽 벽으로 이동
+				if(myUnit.getPosition().getY()>2000) {
+					calPosition = new Position(2000,2000); // 세로방향 위치일때는 중앙으로 이동;
+				} else {
+					calPosition = new Position(myUnit.getPosition().getX(), Config.TILE_SIZE);
+				}
 			}
-	
+
 		} else if(myMainBaseLocation.getTilePosition().getX() != enemyMainBaseLocation.getTilePosition().getX()
 				&& myMainBaseLocation.getTilePosition().getY() == enemyMainBaseLocation.getTilePosition().getY()) { // 아군, 적군 가로로 위치
 	
@@ -5188,13 +5232,19 @@ public class StrategyManager {
 				calPosition = new Position(myUnit.getPosition().getX(), (MyBotModule.Broodwar.mapHeight()-1)*Config.TILE_SIZE-25); // -25는 경계선의 공백이 존재해서 빼줌
 			}
 		} else { // 아군, 적군 대각선으로 위치
-			if(myUnit.getPosition().getX() == Config.TILE_SIZE || myUnit.getPosition().getX() == (MyBotModule.Broodwar.mapWidth()-1)*Config.TILE_SIZE) { // 왼쪽, 오른쪽 벽에 도달했을때 이동
-				calPosition = new Position(myUnit.getPosition().getX(), enemyMainBaseLocation.getTilePosition().getY()*Config.TILE_SIZE);
+			if(myUnit.getPosition().getX() == enemyMainBaseLocation.getTilePosition().getX()*Config.TILE_SIZE) { // Overload와 적베이스기지에 도달했을때 자원 채취 뒤쪽으로 이동
 				chkOverloadArrived = true;
-			} else if(myMainBaseLocation.getTilePosition().getX() < MyBotModule.Broodwar.mapHeight()/2) { // 오른쪽 벽으로 이동
-				calPosition = new Position((MyBotModule.Broodwar.mapWidth()-1)*Config.TILE_SIZE, myUnit.getPosition().getY());
-			} else { // 왼쪽 벽으로 이동
-				calPosition = new Position(Config.TILE_SIZE, myUnit.getPosition().getY());
+				if(enemyMainBaseLocation.getTilePosition().getX() < MyBotModule.Broodwar.mapWidth()/2) { // 왼쪽 자원 채취 뒤쪽으로 이동
+					calPosition = new Position(Config.TILE_SIZE, enemyMainBaseLocation.getTilePosition().getY()*Config.TILE_SIZE);
+				} else { // 오른쪽 자원 채취 뒤쪽으로 이동
+					calPosition = new Position((MyBotModule.Broodwar.mapWidth()-1)*Config.TILE_SIZE, enemyMainBaseLocation.getTilePosition().getY()*Config.TILE_SIZE);
+				}
+			} else if(myUnit.getPosition().getY() == Config.TILE_SIZE || myUnit.getPosition().getY() == (MyBotModule.Broodwar.mapHeight()-1)*Config.TILE_SIZE-25) { // 벽에 도달했을때 이동, -25는 경계선의 공백이 존재해서 빼줌
+				calPosition = new Position(enemyMainBaseLocation.getTilePosition().getX()*Config.TILE_SIZE, myUnit.getPosition().getY());
+			} else if(myMainBaseLocation.getTilePosition().getY() < MyBotModule.Broodwar.mapHeight()/2) { // 아래쪽 벽으로 이동
+				calPosition = new Position(myUnit.getPosition().getX(), (MyBotModule.Broodwar.mapHeight()-1)*Config.TILE_SIZE-25); // -25는 경계선의 공백이 존재해서 빼줌
+			} else { // 위쪽 벽으로 이동
+				calPosition = new Position(myUnit.getPosition().getX(), Config.TILE_SIZE);
 			}
 		}
 		return calPosition;
@@ -5638,7 +5688,15 @@ public class StrategyManager {
 				// maxNumberOfSpecialUnitType1 숫자까지만 특수유닛 부대에 포함시킨다 (저그 종족의 경우 오버로드가 전부 전투참여했다가 위험해질 수 있으므로)
 				// sc76.choi defence 모드 시에 좀 애매 하다. 본진 으로 귀한하지 않는 유닛이 생길 수 있다.
 				char jobCode = OverloadManager.Instance().getOverloadData().getJobCode(unit);
-				if (mySpecialUnitType1List.size() < maxNumberOfSpecialUnitType1) {
+
+				// 오버로드 상태가 Idle인거 2기만 Drop에 사용
+				if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0 && OverloadManager.Instance().getDropOverloadList().size() < Config.COUNT_OVERLOAD_DROP) {
+					if(jobCode == 'I'){
+						OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Drop, (Unit)null);
+						OverloadManager.Instance().addDropOverloadList(unit);
+						//System.out.println("Drop용 Overload ===> " + unit.getID() + " : " + OverloadManager.Instance().getDropOverloadList().size());
+					}
+				} else if (mySpecialUnitType1List.size() < maxNumberOfSpecialUnitType1) {
 
 					//  'A'를 채웠으나 모자라면 'I'에서 찾는다.
 					if(jobCode == 'A' || jobCode == 'I'){

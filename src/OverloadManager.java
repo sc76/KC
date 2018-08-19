@@ -44,7 +44,8 @@ public class OverloadManager {
 	private Unit enemyFirstChokeOverload;
 	private Unit enemySecondChokeOverload;
 	private Unit enemyBasePatrolOverload;
-	private Unit dropOverload;
+//	private Unit dropOverload;
+	private static ArrayList<Unit> dropOverloadList = new ArrayList<Unit>(); // Drop Overload 배열관리
 	
     private BaseLocation firstScoutTargetBaseLocation = null;
     private BaseLocation secondScoutTargetBaseLocation = null;
@@ -541,11 +542,11 @@ public class OverloadManager {
 			//if(Config.DEBUG) System.out.println("** mySecondChokeOverload : " + mySecondChokeOverload.getID());
 		} 
 		// KTH. Drop 오버로드 Position
-		else if(dropOverload == null){
-			dropOverload = unit;
-			overloadData.setOverloadJob(dropOverload, OverloadData.OverloadJob.Drop, (Unit)null);
-			commandUtil.move(dropOverload, selfFirstChokePosition);
-		}		
+//		else if(dropOverload == null){
+//			dropOverload = unit;
+//			overloadData.setOverloadJob(dropOverload, OverloadData.OverloadJob.Drop, (Unit)null);
+//			commandUtil.move(dropOverload, selfFirstChokePosition);
+//		}		
 		// 나의 두번째 choke position
 		/*
 		else if(mySecondChokeOverload == null){
@@ -1125,13 +1126,13 @@ public class OverloadManager {
 		this.secondScoutOverload = secondScoutOverload;
 	}
 	
-	public void setDropOverload(Unit dropOverload) {
-		this.dropOverload = dropOverload;
-	}	
-
-	public Unit getDropOverload() {
-		return dropOverload;
-	}
+//	public void setDropOverload(Unit dropOverload) {
+//		this.dropOverload = dropOverload;
+//	}	
+//
+//	public Unit getDropOverload() {
+//		return dropOverload;
+//	}
 	
 	public BaseLocation getCurrentScoutTargetBaseLocation() {
 		return currentScoutTargetBaseLocation;
@@ -1148,5 +1149,25 @@ public class OverloadManager {
 	public void setSecondScoutTargetBaseLocation(BaseLocation secondScoutTargetBaseLocation) {
 		this.secondScoutTargetBaseLocation = secondScoutTargetBaseLocation;
 	}
+	
+	public ArrayList<Unit> getDropOverloadList() {
+		return dropOverloadList;
+	}
 
+	public void addDropOverloadList(Unit unit) {
+		dropOverloadList.add(unit);
+	}
+
+	public void removeDropOverloadList(Unit unit) {
+		dropOverloadList.remove(unit);
+	}
+
+	public void destroyDropOverloadList(Unit unit) {
+		for (Unit overUnit : dropOverloadList) {
+			//System.out.println("unit.getID() : " + unit.getID() + ", overUnit.getID() : " + overUnit.getID());
+			if (unit.getID() == overUnit.getID()) {
+				dropOverloadList.remove(overUnit);
+			}
+		}
+	}
 }
