@@ -980,7 +980,7 @@ public class StrategyManager {
 
 		
 		/// KTH. 오버로드 드랍 실행합니다
-		// executeOverloadDrop();
+		executeOverloadDrop();
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// sc76.choi start
@@ -2038,7 +2038,7 @@ public class StrategyManager {
 			if(isInitialBuildOrderFinished == false){
 				
 				// sc76.choi defence저글링수만 초반 러쉬를 한번 간다.
-				if((myCombatUnitType1List.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size() - getCountBurrowedZergling()) 
+				if((myCombatUnitType1List.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size()) 
 					>= necessaryNumberOfCombatUnitType1){
 //				if(myKilledCombatUnitCount1 < 6){
 					isNecessaryNumberOfCombatUnitType = true;
@@ -4875,8 +4875,11 @@ public class StrategyManager {
 	    			
 	    			Config.BuildingDefenseTowerSpacing = 2;
 	    			
-	       			Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 3;
-	       			Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 3;
+	       			Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
+	       			Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 2;
+	       			
+	       			Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 7; // 저글링
+	       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 14;
 	       			
 	    			// sc76.choi 저글링 4 마리 추가	    		
 		    		//excuteUrgenturgent_Add_Zergling1();
@@ -4902,8 +4905,8 @@ public class StrategyManager {
 	       			excuteUrgentCombatConstructionInBaseLocation(myMainBaseLocation.getTilePosition());
 	       			
 	    	}
-	    	else if (countEnemyGoliathCombatUnitType >= 4
-	    			&& countEnemyTankCombatUnitType >= 2){
+	    	
+	   		if (countEnemyGoliathCombatUnitType >= 4 && countEnemyTankCombatUnitType >= 2){
 	    		
     			buildState = BuildState.vulture_Galia_Tank_T;
     			
@@ -4920,55 +4923,53 @@ public class StrategyManager {
 	   		
 	   		
 	   		if(enemyMainBaseLocation !=null
-	   			&& existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Missile_Turret, enemyMainBaseLocation.getRegion(), false, false)
-	   			&& existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyMainBaseLocation.getRegion(), false, false)
-	   			&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyMainBaseLocation.getRegion(), false, false)
-	   					|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyMainBaseLocation.getRegion(), false, false))
-	   			&& countEnemyBasicCombatUnitType >= 2){
+	   			&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Missile_Turret, enemyMainBaseLocation.getRegion(), false, false)
+	   			|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyMainBaseLocation.getRegion(), false, false)
+	   			|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyMainBaseLocation.getRegion(), false, false)
+	   			|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyMainBaseLocation.getRegion(), false, false))
+	   			){
 	   			
 	   			buildState = BuildState.blockTheFirstChokePoint_T;
 	   			
 	   		}
 	   		
 	   		if(enemyMainBaseLocation !=null
-		   			&& existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyMainBaseLocation.getRegion(), false, false)
-		   			&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyMainBaseLocation.getRegion(), false, false)
-		   					|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyMainBaseLocation.getRegion(), false, false))
-		   			&& countEnemyBasicCombatUnitType >= 2){
+		   		&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyMainBaseLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyMainBaseLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyMainBaseLocation.getRegion(), false, false))
+		   		){
 	   			
 		   			buildState = BuildState.blockTheFirstChokePoint_T;
 		   			
 		   		}
 	   		
 	   		if(enemyFirstExpansionLocation !=null
-		   			&& existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Missile_Turret, enemyFirstExpansionLocation.getRegion(), false, false)
-		   			&& existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyFirstExpansionLocation.getRegion(), false, false)
-		   			&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyFirstExpansionLocation.getRegion(), false, false)
-		   					|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyFirstExpansionLocation.getRegion(), false, false))
-		   			
-		   			&& countEnemyBasicCombatUnitType >= 2){
+		   		&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Missile_Turret, enemyFirstExpansionLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyFirstExpansionLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyFirstExpansionLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyFirstExpansionLocation.getRegion(), false, false))
+		   		){
 	   			
 		   			buildState = BuildState.blockTheSecondChokePoint_T;
 		   			
 		   	}
 	   		
 	   		if(enemyFirstExpansionLocation !=null
-		   			&& existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyFirstExpansionLocation.getRegion(), false, false)
-		   			&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyFirstExpansionLocation.getRegion(), false, false)
-		   					|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyFirstExpansionLocation.getRegion(), false, false))
-		   			
-		   			&& countEnemyBasicCombatUnitType >= 2){
+		   		&& (existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Bunker, enemyFirstExpansionLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Tank_Mode, enemyFirstExpansionLocation.getRegion(), false, false)
+		   		|| existUnitTypeInRegion(enemyPlayer, UnitType.Terran_Siege_Tank_Siege_Mode, enemyFirstExpansionLocation.getRegion(), false, false))
+		   		){
 	   			
 		   			buildState = BuildState.blockTheSecondChokePoint_T;
 		   			
 		   	}
 	   		
-	   		if(myKilledCombatUnitCount3 >= 4 && 
-	   			(buildState == BuildState.vulture_Galia_Tank_T
-	   			|| buildState == BuildState.fastVulture_T
-	   			|| buildState == BuildState.Tank_T
-	   			|| buildState == BuildState.blockTheFirstChokePoint_T
-	   			|| buildState == BuildState.blockTheSecondChokePoint_T)){
+	   		if(myKilledCombatUnitCount3 >= 4 
+	   			&& (buildState == BuildState.vulture_Galia_Tank_T
+	   				|| buildState == BuildState.fastVulture_T
+	   				|| buildState == BuildState.Tank_T
+	   				|| buildState == BuildState.blockTheFirstChokePoint_T
+	   				|| buildState == BuildState.blockTheSecondChokePoint_T)){
 	   			
 	   			buildState = BuildState.totally_attack_T;
 	   			
@@ -4979,12 +4980,12 @@ public class StrategyManager {
 	   			
 				// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
 				Config.maxNumberOfTrainUnitType1AgainstTerran = 30; 		
-				Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 4;
+				Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 6;
 				Config.necessaryNumberOfCombatUnitType1AgainstTerran = 12;
 				
-				Config.maxNumberOfTrainUnitType2AgainstTerran = 12;
-				Config.necessaryNumberOfDefenceUnitType2AgainstTerran = 4;
-				Config.necessaryNumberOfCombatUnitType2AgainstTerran = 8;
+				Config.maxNumberOfTrainUnitType2AgainstTerran = 24;
+				Config.necessaryNumberOfDefenceUnitType2AgainstTerran = 6;
+				Config.necessaryNumberOfCombatUnitType2AgainstTerran = 12;
 				
 				Config.maxNumberOfTrainUnitType3AgainstTerran = 10;
 				Config.necessaryNumberOfDefenceUnitType3AgainstTerran = 1;
@@ -6497,8 +6498,6 @@ public class StrategyManager {
 		}else if(enemyRace == Race.Terran){
 			if(myKilledCombatUnitCount2 >= 30 && isIncreasingUnitType2Number4 == false){
 				
-				Config.necessaryNumberOfCombatUnitType3AgainstTerran = Config.necessaryNumberOfCombatUnitType3AgainstTerran + 1;
-				Config.necessaryNumberOfDefenceUnitType3AgainstTerran = Config.necessaryNumberOfDefenceUnitType3AgainstTerran + 1;
 				Config.necessaryNumberOfCombatUnitType2AgainstTerran = Config.necessaryNumberOfCombatUnitType2AgainstTerran + 1;
 				Config.necessaryNumberOfDefenceUnitType2AgainstTerran = Config.necessaryNumberOfDefenceUnitType2AgainstTerran + 1;
 				Config.necessaryNumberOfCombatUnitType1AgainstTerran = Config.necessaryNumberOfCombatUnitType1AgainstTerran + 1;
@@ -6506,8 +6505,6 @@ public class StrategyManager {
 				isIncreasingUnitType2Number4 = true;
 				
 			}else if(myKilledCombatUnitCount2 >= 20 && isIncreasingUnitType2Number3 == false){
-				Config.necessaryNumberOfCombatUnitType3AgainstTerran = Config.necessaryNumberOfCombatUnitType3AgainstTerran + 1;
-				Config.necessaryNumberOfDefenceUnitType3AgainstTerran = Config.necessaryNumberOfDefenceUnitType3AgainstTerran + 1;
 				Config.necessaryNumberOfCombatUnitType2AgainstTerran = Config.necessaryNumberOfCombatUnitType2AgainstTerran + 1;
 				Config.necessaryNumberOfDefenceUnitType2AgainstTerran = Config.necessaryNumberOfDefenceUnitType2AgainstTerran + 1;
 				Config.necessaryNumberOfCombatUnitType1AgainstTerran = Config.necessaryNumberOfCombatUnitType1AgainstTerran + 1;
@@ -6515,8 +6512,6 @@ public class StrategyManager {
 				isIncreasingUnitType2Number3 = true;
 				
 			}else if(myKilledCombatUnitCount2 >= 10 && isIncreasingUnitType2Number2 == false){
-				Config.necessaryNumberOfCombatUnitType3AgainstTerran = Config.necessaryNumberOfCombatUnitType3AgainstTerran + 1;
-				Config.necessaryNumberOfDefenceUnitType3AgainstTerran = Config.necessaryNumberOfDefenceUnitType3AgainstTerran + 1;
 				Config.necessaryNumberOfCombatUnitType2AgainstTerran = Config.necessaryNumberOfCombatUnitType2AgainstTerran + 1;
 				Config.necessaryNumberOfDefenceUnitType2AgainstTerran = Config.necessaryNumberOfDefenceUnitType2AgainstTerran + 1;
 				Config.necessaryNumberOfCombatUnitType1AgainstTerran = Config.necessaryNumberOfCombatUnitType1AgainstTerran + 1;

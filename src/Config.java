@@ -64,7 +64,7 @@ public class Config {
 	
 	public static int necessaryNumberOfCombatUnitType1AgainstTerran = 6; // 저글링
 	public static int necessaryNumberOfCombatUnitType2AgainstTerran = 10;  // 히드라
-	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 2;  // 럴커
+	public static int necessaryNumberOfCombatUnitType3AgainstTerran = 3;  // 럴커
 	public static int necessaryNumberOfCombatUnitType4AgainstTerran = 6;  // 뮤탈
 	public static int necessaryNumberOfCombatUnitType5AgainstTerran = 2;  // 웉트라
 	public static int necessaryNumberOfCombatUnitType6AgainstTerran = 2;  // 가디언
