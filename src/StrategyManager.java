@@ -394,10 +394,18 @@ public class StrategyManager {
 		if(enemyRace == Race.Terran && isInitialBuildOrderFinished == false){
 			
 			// sc76.choi 아직 발견 전이면, 앞마당을 지정
-			// sc76.choi 아직 발견 전이면, 앞마당을 지정
 			if(enemyMainBaseLocation == null){
-				TARGET_POSITION = mySecondChokePoint.getCenter();
-				TARGET_TILEPOSITION = mySecondChokePoint.getCenter().toTilePosition();
+				TARGET_POSITION = DEFENCE_POSITION;
+				TARGET_TILEPOSITION = DEFENCE_TILEPOSITION;
+			}else{
+			
+				if(existUnitTypeInRegion(myPlayer, UnitType.Zerg_Lurker, enemyFirstExpansionLocation.getRegion(), false, false)){
+					TARGET_POSITION = enemyMainBaseLocation.getPosition();
+					TARGET_TILEPOSITION = enemyMainBaseLocation.getPosition().toTilePosition();
+				}else{
+					TARGET_POSITION = enemySecondChokePoint.getCenter();
+					TARGET_TILEPOSITION = enemySecondChokePoint.getCenter().toTilePosition();
+				}
 			}
 			
 //			System.out.println("TARGET_POSITION 1     : " + TARGET_POSITION);
@@ -996,7 +1004,7 @@ public class StrategyManager {
 	}
 
 	int getCountCombatType1() {
-		return (myCombatUnitType1List.size() + myCombatUnitType1ListAway.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size());
+		return (myCombatUnitType1List.size() + myCombatUnitType1ListAway.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size() - getCountBurrowedZergling());
 	}
 	
 	int getCountCombatType2() {
@@ -2046,7 +2054,7 @@ public class StrategyManager {
 						// 저글링, 럴커
 						// 럴커가 5마리 죽을 때 까지는 저글링과 같이 공격 간다.
 						|| (
-						(myCombatUnitType1List.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size()) 
+						(myCombatUnitType1List.size() + myCombatUnitType1ScoutList.size() + myCombatUnitType1ScoutList2.size() - getCountBurrowedZergling()) 
 						   >= necessaryNumberOfCombatUnitType1      
 						&& myCombatUnitType3List.size() >= necessaryNumberOfCombatUnitType3) 
 
@@ -2207,7 +2215,7 @@ public class StrategyManager {
 		if(enemyRace == Race.Terran){
 			// sc76.choi 초기 빌더오더 중일때, 한번 저글링 러쉬를 가기 위해
 			if(isInitialBuildOrderFinished == false){
-				if (getCountCombatType1() < necessaryNumberOfDefenceUnitType1){ // 저글링
+				if (getCountCombatType1() < necessaryNumberOfCombatUnitType1){ // 저글링
 					countDefenceMode++;
 					returnDefenceMode = true;
 				}
@@ -2845,32 +2853,45 @@ public class StrategyManager {
 						commandUtil.move(unit, new Position(2000, 2000));
 					}
 					
-				}else{
+				}
+				// 적을 발견했다면
+				else{
 					
 					// sc76.choi 적진 가까이 가서 건설중인 일꾼을 강제 어택한다.
 					// TODO 빌드를 좀더 빠르게 하면 더 효율적일 것이다.
-//					if(BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(enemyMainBaseLocation.getPosition())){
-					if(unit.getDistance(enemyMainBaseLocation.getPosition()) >= Config.TILE_SIZE*7){
-						
-						if(isAttackPositionForInitialZergling == false){
-							commandUtil.move(unit, enemyMainBaseLocation.getPosition());
+//					if(unit.getDistance(TARGET_POSITION) >= Config.TILE_SIZE*5){
+//						commandUtil.move(unit, TARGET_POSITION);
+//					}
+//					// 앞마당 도착 했다면, burrow 한다.
+//					else{
+						if(unit.getID() % 4 == 0){
+							if(unit.canBurrow() == true && unit.getDistance(enemyFirstExpansionLocation.getPosition()) < Config.TILE_SIZE-15){
+								unit.burrow();
+							}else{
+								commandUtil.attackMove(unit, enemyFirstExpansionLocation.getPosition());
+							}
+						}else if(unit.getID() % 4 == 1){
+							if(unit.canBurrow() == true && unit.getDistance(enemyFirstExpansionLocation.getPosition()) < Config.TILE_SIZE-25){
+								unit.burrow();
+							}else{
+								commandUtil.attackMove(unit, enemyFirstExpansionLocation.getPosition());
+							}
+						}else if(unit.getID() % 4 == 2){
+							if(unit.canBurrow() == true && unit.getDistance(enemySecondChokePoint.getCenter()) < Config.TILE_SIZE-15){
+								unit.burrow();
+							}else{
+								commandUtil.attackMove(unit, enemySecondChokePoint.getCenter());
+							}
+						}else if(unit.getID() % 4 == 3){
+							if(unit.canBurrow() == true && unit.getDistance(enemySecondChokePoint.getCenter()) < Config.TILE_SIZE-25){
+								unit.burrow();
+							}else{
+								commandUtil.attackMove(unit, enemySecondChokePoint.getCenter());
+							}
 						}
-
-					}else{
 						
-						isAttackPositionForInitialZergling = true;
-						
-						//if(findAttackTargetForInitialZergling() == null){
-						attackTargetForInitialZerglingUnit = getClosestUnitType(enemyPlayer, InformationManager.Instance().getWorkerType(enemyRace), enemyFirstExpansionLocation.getPosition());
-						if(attackTargetForInitialZerglingUnit == null){
-							commandUtil.attackMove(unit, enemyMainBaseLocation.getPosition());
-							//unit.attack(findAttackTargetForInitialZergling());
-						}else{
-							if(DEBUG) System.out.println("attackTargetForInitialZerglingUnit : " + attackTargetForInitialZerglingUnit.getID());
-							commandUtil.attackUnit(unit, attackTargetForInitialZerglingUnit);
-						}
-
-					}
+						//commandUtil.attackMove(unit, TARGET_POSITION);
+//					}
 				}
 			}
 			// sc76.choi 테란이 아니고, 초기 빌드가 끝났으면
@@ -4899,7 +4920,7 @@ public class StrategyManager {
     	else if(enemyRace == Race.Terran){
 			
 	   		if(buildState != BuildState.hardCoreMarine_T
-	   			&& (countEnemyBasicCombatUnitType >= 8 || countEnemyAdvancedCombatUnitType >= 1 || countEnemyBasicCombatBuildingType >= 2)
+	   			&& (countEnemyBasicCombatUnitType >= 7 || countEnemyAdvancedCombatUnitType >= 1 || countEnemyBasicCombatBuildingType >= 2)
 	    			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 7)){
 	   			
 	    			buildState = BuildState.hardCoreMarine_T;
@@ -4909,8 +4930,8 @@ public class StrategyManager {
 	       			Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
 	       			Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 2;
 	       			
-	       			Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
-	       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 6;
+	       			Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 7; // 저글링
+	       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 14;
 	       			
 	    			// sc76.choi 저글링 4 마리 추가	    		
 		    		//excuteUrgenturgent_Add_Zergling1();
@@ -4929,8 +4950,8 @@ public class StrategyManager {
 	       			Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
 	       			Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 2;
 	       			
-	       			Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
-	       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 8;
+	       			Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 4; // 저글링
+	       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 10;
 	       			
 	       			// 즉각 해처리 증설
 	       			excuteUrgentCombatConstructionInBaseLocation(myMainBaseLocation.getTilePosition());
@@ -5124,7 +5145,7 @@ public class StrategyManager {
 //	 1 시 => [7, 118]
 //	 7 시 => [117, 9]
 //	 5 시 => [117, 118]
-//	OverWatch startLocation.getTilePosition()
+//	Spirit startLocation.getTilePosition()
 //	11 시 => [7, 7]
 //	 1 시 => [7, 117]
 //	 7 시 => [117, 7]
@@ -5140,48 +5161,63 @@ public class StrategyManager {
 		
 //		if (combatState == CombatState.attackStarted) {
 		if(OverloadManager.Instance().getDropOverloadList().size() == 0) return;
+
 		
 		if(!checkDrop && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs) > 0) {
+			if(OverloadManager.Instance().getDropOverloadList().size() < Config.COUNT_OVERLOAD_DROP) return;
+			
 			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
 				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 			
+				boolean chkLoadComplete = false;
 				int cnt = 0;
 				Position calPosition = null;
-				for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-					cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
+				for(Unit loadUnit : unitOverload.getLoadedUnits()) {
+					cnt += loadUnit.getType().spaceRequired();
 				}
-				if(cnt < 7 ) {
-					int unit_cnt = 0;
-					for(Unit unit : myPlayer.getUnits()) {	
+				if(cnt != 8 ) {
+					int unit_cnt = cnt;
+//					for(Unit unit : myAllCombatUnitList) {	
+					for(Unit unit : myPlayer.getUnits()) {
 						if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0) continue;
-						if (!unit.canLoad()) continue;
-						if (unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Zergling
-								|| unit.getType() == UnitType.Zerg_Lurker) {
+						if (unit.isLoaded()) continue;
+						if ((unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Zergling) && !unit.isBurrowed()) {
+//								|| unit.getType() == UnitType.Zerg_Lurker) && !unit.isBurrowed()) {
+							if(unit_cnt < 8 && (unit_cnt + unit.getType().spaceRequired()) > 8 ) continue;
+							unit_cnt += unit.getType().spaceRequired();
+//							if(unit.getType() == UnitType.Zerg_Lurker && unit.isBurrowed()) {
+//								unit.unburrow();
+//							}
 							unit.rightClick(unitOverload);
-							unit_cnt = unit_cnt + unit.getType().spaceRequired();
-							if(unit_cnt >= 7) break;
+							if(unit_cnt > 6) {
+								chkLoadComplete = true;
+								break;
+							}
 							
 						}
 					}
+				} else {
+					chkLoadComplete = true;
 				}
+				if(!chkLoadComplete) break;
 			}
 			
 			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
 				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 				int cnt = 0;
-				for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-					cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
+				for(Unit loadUnit : unitOverload.getLoadedUnits()) {
+					cnt += loadUnit.getType().spaceRequired();
 				}
-				if(cnt == 8) {
+				if(cnt > 6) {
 					checkDrop = true;
 				} else {
 					checkDrop = false;
 					break;
 				}
 			}
-			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
-				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
-				if (checkDrop) {
+			if (checkDrop) {
+				for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
+					if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 					Position calPosition = null;
 					calPosition = dropPosition(unitOverload);
 					commandUtil.move(unitOverload, calPosition);
@@ -5200,29 +5236,34 @@ public class StrategyManager {
 					boolean enemyView4 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Zerg_Spore_Colony);
 					boolean enemyView5 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Terran_Bunker);
 					
-//					System.out.println("BWTA.getRegion(unitOverload.getTilePosition()) ==> " + InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer));
-//					System.out.println("unitOverload 2===>" + unitOverload.getPosition().getX() + " " + unitOverload.getPosition().getY() );
-//					System.out.println("calPosition 2===>" + unitOverload.getOrderTargetPosition().getX() + " " + unitOverload.getOrderTargetPosition().getY() );
 					if(enemyView1 || enemyView2 || enemyView3 || enemyView4 || enemyView5) {
 						for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-//								if(unitOverload.getLoadedUnits().get(i).canUnload()) {
-								unitOverload.unload(unitOverload.getLoadedUnits().get(i));
-//								}
+							Unit unit = unitOverload.getLoadedUnits().get(i);
+							unitOverload.unload(unit);
+							if(unit.getType() == UnitType.Zerg_Lurker) { // 럴커가 버로우를 하지 않음
+								unit.burrow();
+							}
 						}
 						//commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
 					}
 					if(unitOverload.getOrderTargetPosition().getX() == 0 && unitOverload.getOrderTargetPosition().getY() == 0) { // 목적지에 도달했을때
 						if (chkOverloadArrived) { // Drop 위치에 왔을때
-							unitOverload.unloadAll(true);
+							for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
+								Unit unit = unitOverload.getLoadedUnits().get(i);
+								unitOverload.unload(unit);
+								if(unit.getType() == UnitType.Zerg_Lurker) {
+									unit.burrow();
+								}
+							}
+//							unitOverload.unloadAll(true);
 						} else {
 							calPosition = dropPosition(unitOverload);
 							commandUtil.move(unitOverload, calPosition);
-							//System.out.println("calPosition 3===>" + calPosition.getX() + " " + calPosition.getY() );
 						}
 					}					
-				} else {
-					OverloadManager.Instance().getOverloadData().setOverloadJob(unitOverload, OverloadData.OverloadJob.Idle, (Unit)null);
-//					OverloadManager.Instance().removeDropOverloadList(unitOverload);
+//				} else {
+//					OverloadManager.Instance().getOverloadData().setOverloadJob(unitOverload, OverloadData.OverloadJob.Idle, (Unit)null);
+//					OverloadManager.Instance().destroyDropOverloadList(unitOverload);
 //					commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
 				}
 				

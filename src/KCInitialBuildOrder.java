@@ -224,6 +224,8 @@ public class KCInitialBuildOrder {
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Hydralisk);	//27			
 		
 		BuildManager.Instance().buildQueue.queueAsLowestPriority(UpgradeType.Ventral_Sacs, false);
+		
+		BuildManager.Instance().buildQueue.queueAsLowestPriority(UnitType.Zerg_Overlord);	// 네번째 오버로드
 	}
 
 	public void setInitialBuildOrderAgainstRandom(){
