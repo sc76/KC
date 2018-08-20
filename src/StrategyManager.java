@@ -3081,6 +3081,10 @@ public class StrategyManager {
 				if(unit.isUnderStorm()){
 					commandUtil.move(unit, myMainBaseLocation.getPosition());
 				}
+				// sc76.choi 다른 멀티 지역에 적이 발견되었으면 해당 지점으로 어택
+				else if(findAttackTargetForOtherBaseWhenDenfence() != null){
+					commandUtil.attackMove(unit, findAttackTargetForOtherBaseWhenDenfence());
+				}
 				// sc76.choi 스톰을 맞고 있지 않으면
 				else{
 					
@@ -3689,8 +3693,29 @@ public class StrategyManager {
 		return hasCommanded;
 	}
 	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////// 
-	// sc76.choi 오버로드 유닛에 대해 컨트롤 명령을 입력합니다
+	private Position findAttackTargetForOtherBaseWhenDenfence(){
+		Position attackPosition = null;
+		
+		// sc76.choi 멀티 지역에 적을 체크 한다.
+		int countSelfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer).size();
+		if(countSelfRegions >= 3){
+			Set<Region> selfRegions = InformationManager.Instance().getOccupiedRegions(InformationManager.Instance().selfPlayer);
+			Iterator<Region> it1 = selfRegions.iterator();
+			while (it1.hasNext()) {
+				Region selfRegion = it1.next();
+
+				if(selfRegion == BWTA.getRegion(myMainBaseLocation.getPosition())) continue;
+				if(selfRegion == BWTA.getRegion(myFirstExpansionLocation.getPosition())) continue;
+				
+				if(existUnitTypeInRegion(enemyPlayer, null, selfRegion, false, true)){
+					return selfRegion.getCenter();
+				}
+			}
+		}
+		
+		
+		return attackPosition;
+	}
 	
 	// sc76.choi Defence 모드 일때, 실행한다. 
 	// TODO 적의 거리를 따져, 가까운 유닛만 반환해야 한다. 안그러면 계속 싸운다.
@@ -4691,6 +4716,10 @@ public class StrategyManager {
 						countEnemyBasicCombatUnitType++;
 					}
 					
+					if(ui.getType() == UnitType.Zerg_Sunken_Colony){
+						countEnemyAdvancedDefenceBuilding++;
+					}
+					
 					if(getCountUnitTypeInPosition(enemyPlayer, UnitType.Zerg_Sunken_Colony, enemyMainBaseLocation.getPosition(), Config.TILE_SIZE*12) > 2
 							&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 5)){
 						
@@ -5047,6 +5076,22 @@ public class StrategyManager {
 	   			Config.maxNumberOfTrainUnitType1AgainstZerg = 30;
 	   			Config.maxNumberOfTrainUnitType2AgainstZerg = 24;
 	   			
+			}
+			
+			if(countEnemyAdvancedDefenceBuilding >= 2
+				&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
+				
+				buildState = BuildState.superZergling_Z;
+				
+				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 13;
+	   			Config.necessaryNumberOfCombatUnitType1AgainstZerg = 22;
+	   			
+	   			Config.necessaryNumberOfDefenceUnitType2AgainstZerg = 8;
+	   			Config.necessaryNumberOfCombatUnitType2AgainstZerg = 14;
+	   			
+	   			Config.maxNumberOfTrainUnitType1AgainstZerg = 30;
+	   			Config.maxNumberOfTrainUnitType2AgainstZerg = 24;
+				
 			}
 			
 			if(buildState == BuildState.fastMutalisk_Z){
@@ -5601,7 +5646,7 @@ public class StrategyManager {
 				}
 				
 				// 멀리 떨어진 곳에서 생산된 유닛
-				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*22
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*35
 						&& combatState == CombatState.defenseMode
 						&& myOccupiedBaseLocations >= 3){
 					
@@ -5667,7 +5712,7 @@ public class StrategyManager {
 					}
 				}
 					
-				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*22
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*35
 					&& combatState == CombatState.defenseMode
 					&& myOccupiedBaseLocations >= 3){
 					
@@ -5677,6 +5722,7 @@ public class StrategyManager {
 					
 					myCombatUnitType2ListAway.add(unit);
 				}else{
+					
 					if(myCombatUnitType2ListAway.contains(unit)) continue;
 					
 					// 공격할 만큼만 채운다.
@@ -7181,8 +7227,8 @@ public class StrategyManager {
 				
 				// creep colony가 없으면
 				if(InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Hatchery) == true
-						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
-						&& InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Sunken_Colony) == false
+						&& (InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Creep_Colony) == false
+						    || InformationManager.Instance().existsPlayerBuildingInRegion(selfRegion, myPlayer, UnitType.Zerg_Sunken_Colony) == false)
 						&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Creep_Colony) == 0
 						&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Creep_Colony, null) == 0){
 					
@@ -7857,7 +7903,10 @@ public class StrategyManager {
 							// sc76.choi 럴커 생산 시, 주의 히드라가 없으면 락이 걸린다.
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Lurker) {
 								
-								if (unit.getType() == UnitType.Zerg_Hydralisk 
+								if(buildState == BuildState.carrier_P){
+									isPossibleToTrain = false;
+								}
+								else if (unit.getType() == UnitType.Zerg_Hydralisk 
 									&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0 
 									&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) > 0
 									&& myPlayer.hasResearched(TechType.Lurker_Aspect) == true) {

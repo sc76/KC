@@ -95,7 +95,7 @@ public class Config {
 	
 	public static int maxNumberOfSpecialUnitType1AgainstZerg = 2;  // 오버로드
 	public static int maxNumberOfSpecialUnitType2AgainstZerg = 2; // 디파일러
-	public static int maxNumberOfSpecialUnitType3AgainstZerg = 6;  // 스커지
+	public static int maxNumberOfSpecialUnitType3AgainstZerg = 10;  // 스커지
 	public static int maxNumberOfSpecialUnitType4AgainstZerg = 2;  // 퀸
 	
 	public static int maxNumberOfCombatUnitType1AgainstTerran = 12;  // 저글링
@@ -130,7 +130,7 @@ public class Config {
 	
 	public static int maxNumberOfTrainSpecialUnitType1AgainstZerg = 1;  // 오버로드
 	public static int maxNumberOfTrainSpecialUnitType2AgainstZerg = 1;  // 디파일러
-	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 6;  // 스커지
+	public static int maxNumberOfTrainSpecialUnitType3AgainstZerg = 10;  // 스커지
 	public static int maxNumberOfTrainSpecialUnitType4AgainstZerg = 0;  // 퀸
 	
 	public static int maxNumberOfTrainUnitType1AgainstTerran = 8; // 저글링
