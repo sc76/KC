@@ -3013,6 +3013,9 @@ public class StrategyManager {
 					}
 				}
 				else{
+					
+					if(getCountCombatType2() >= 20) return true;
+					
 					//APM 관리
 					if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
 						return true;
@@ -3042,7 +3045,7 @@ public class StrategyManager {
 			if(combatState == CombatState.defenseMode){
 				MOVE_POSITION = getTargetPositionForDefence(unit);
 				
-				if((myCombatUnitType1ListAway.size() + myCombatUnitType2ListAway.size() + myCombatUnitType3ListAway.size()) >= 10){
+				if((myCombatUnitType1ListAway.size() + myCombatUnitType2ListAway.size()) >= 10){
 					// 10초에 한번 실행
 					if (MyBotModule.Broodwar.getFrameCount() % 24*60 != 0) {
 						commandUtil.attackMove(unit, DEFENCE_POSITION);
@@ -3167,6 +3170,9 @@ public class StrategyManager {
 					}
 					// sc76.choi 적이 없으면, 앞마당을 벗어난 DEFENCE 지역인 경우.
 					else{
+						
+						if(getCountCombatType2() >= 20) return true;
+						
 						// 유닛이 멀리 있으면 강제로 소환
 						if(unit.getDistance(DEFENCE_POSITION_TO_UNIT) <= Config.TILE_SIZE*4){
 							
@@ -4639,6 +4645,11 @@ public class StrategyManager {
 						countClockingCombatUnitType++;
 					}
 					
+					if(ui.getType() == UnitType.Protoss_Cybernetics_Core
+						&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 5)){
+						buildState = BuildState.blockDefence2Dragon8_P;
+					}
+					
 					if(ui.getType() == UnitType.Protoss_Fleet_Beacon || ui.getType() == UnitType.Protoss_Carrier || ui.getType() == UnitType.Protoss_Interceptor){
 						buildState = BuildState.carrier_P;
 					}
@@ -4756,6 +4767,13 @@ public class StrategyManager {
 	    		excuteUrgentDefenceConstructionInBaseLocation(myFirstExpansionLocation);
     		}
     		
+    		if(countEnemyBasicCombatUnitType >= 6
+        			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 7)){
+        			
+        		buildState = BuildState.blockDefence2Dragon8_P;
+        			
+        	}
+    		
     		// 포토캐넌이 2개이상이고, 드라곤이 6개 이상 혹은 드라곤이 8개 이상 있다면
     		// TODO 가스 일꾼 수를 줄여야 한다. 1 or 2
     		if((countEnemyAdvancedDefenceBuilding >= 2 && countEnemyAdvancedCombatUnitType >= 6)
@@ -4796,6 +4814,9 @@ public class StrategyManager {
        			Config.maxNumberOfTrainUnitType1AgainstProtoss = 18;
        			Config.maxNumberOfTrainUnitType2AgainstProtoss = 35;
     	   		
+       			// 멀티에 증설
+       			excuteUrgentCombatConstructionInMultiBase();
+       			
        			if(getCountCombatType2() >= 2){
 	       			// 즉각 해처리 증설
 	       			excuteUrgentCombatConstructionInBaseLocation(mySecondChokePoint.getCenter().toTilePosition());
@@ -4809,8 +4830,8 @@ public class StrategyManager {
     		   			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 5;
     	   			}else{
     	   				Config.BuildingDefenseTowerSpacing = 1;
-    		   			Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 4;
-    		   			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 4;
+    		   			Config.necessaryNumberOfDefenseBuilding1AgainstProtoss = 5;
+    		   			Config.necessaryNumberOfDefenseBuilding2AgainstProtoss = 5;
     	   			}
     	   			
     	   			// 메인 증설
@@ -5086,6 +5107,11 @@ public class StrategyManager {
 	boolean checkDrop = false;              // Drop 완료 여부       
 
 	private void executeOverloadDrop() {
+		
+		if(enemyRace != Race.Terran){
+			return;
+		}
+		
 //		if (combatState == CombatState.attackStarted) {
 		if(OverloadManager.Instance().getDropOverloadList().size() == 0) return;
 		if(!checkDrop && myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0) {
@@ -5575,7 +5601,7 @@ public class StrategyManager {
 				}
 				
 				// 멀리 떨어진 곳에서 생산된 유닛
-				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*40
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*22
 						&& combatState == CombatState.defenseMode
 						&& myOccupiedBaseLocations >= 3){
 					
@@ -5641,7 +5667,7 @@ public class StrategyManager {
 					}
 				}
 					
-				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*35
+				if(unit.getDistance(myMainBaseLocation.getPosition()) > Config.TILE_SIZE*22
 					&& combatState == CombatState.defenseMode
 					&& myOccupiedBaseLocations >= 3){
 					
@@ -6896,6 +6922,8 @@ public class StrategyManager {
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, 
 						myMainBaseLocation.getTilePosition(), true);
 				
+				if(DEBUG) System.out.println("excuteUrgentCombatConstructionInBaseLocation2 !!!!" );
+				
 				blockDefence2Dragon8_P_CombatBuilding2 = true;
 			}
 			
@@ -6907,11 +6935,15 @@ public class StrategyManager {
 	void excuteUrgentCombatConstructionInMultiBase(){
 		
 		if(urgentCombatConstructionInMultiBase == false){
-	
-			BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, 
-					myMainBaseLocation.getTilePosition(), true);
 			
-			urgentCombatConstructionInMultiBase = true;
+			//if(bestMultiLocation != null && selfAvailableMinerals > 300){
+				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, 
+						bestMultiLocation.getTilePosition(), true);
+				
+				urgentCombatConstructionInMultiBase = true;
+				
+				if(DEBUG) System.out.println("ConstructionInMultiBase !!!! ");
+			//}
 			
 		}
 	}
