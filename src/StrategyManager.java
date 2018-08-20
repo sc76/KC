@@ -3248,6 +3248,8 @@ public class StrategyManager {
 					// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
 					else{
 						
+						if(getCountCombatType2() >= necessaryNumberOfCombatUnitType2) return true;
+						
 						// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 
 						// 건물만 있으면, 그냥 계속 공격하도록 한다.
 						int checkAroundCanAttakUnit = 0;
@@ -7928,7 +7930,13 @@ public class StrategyManager {
 							}
 							// sc76.choi TODO 가스가 작으면 만들지 않는다.
 							else if (nextUnitTypeToTrain == UnitType.Zerg_Mutalisk) {
-								if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+								
+								// sc76.choi 저그나, 프로토스 일때는 생산하지 않음
+								if(enemyRace == Race.Zerg || enemyRace == Race.Protoss){
+									isPossibleToTrain = false;
+								}
+								
+								else if (myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
 									|| myPlayer.completedUnitCount(UnitType.Zerg_Greater_Spire) > 0) {
 									
 									// sc76.choi 뮤탈의 생산제한을 한다.
