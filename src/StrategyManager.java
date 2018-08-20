@@ -416,7 +416,7 @@ public class StrategyManager {
 			// sc76.choi TODO 해당지역에 건물이 없으면 그냥 본진을 타켓을 잡아야 한다. (Basic Bot 버그)
 			// sc76.choi TODO 적 본진이 정확히 보이지 않았다면(오버로드가 정찰을 깊숙히 못했을 경우) 본진으로 타켓이 이동하지 않는다.
 			// sc76.choi 본진 근처에 적이 있으면 그 pos로 타겟을 잡는다.
-			Unit urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*80, true);
+			Unit urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, myMainBaseLocation.getPosition(), Config.TILE_SIZE*80, false);
 	
 			// sc76.choi 본진에 없으면 나의 멀티지역에 가까운 적 유닛이 있는지
 			if(urgentUnit == null){
@@ -425,7 +425,7 @@ public class StrategyManager {
 				while (it1.hasNext()) {
 					Region selfRegion = it1.next();
 	
-					urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, selfRegion.getCenter(), Config.TILE_SIZE*50, true);
+					urgentUnit = getClosestCanAttackUnitTypeToTarget(enemyPlayer, null, selfRegion.getCenter(), Config.TILE_SIZE*50, false);
 			    
 					// sc76.choi 발견되면 바로 그 지역을 타켓을 잡는다, 찾으면 리턴하는 로직
 					if(commandUtil.IsValidUnit(urgentUnit)){
@@ -2848,7 +2848,7 @@ public class StrategyManager {
 					// sc76.choi 적진 가까이 가서 건설중인 일꾼을 강제 어택한다.
 					// TODO 빌드를 좀더 빠르게 하면 더 효율적일 것이다.
 //					if(BWTA.getRegion(unit.getPosition()) == BWTA.getRegion(enemyMainBaseLocation.getPosition())){
-					if(unit.getDistance(enemyMainBaseLocation.getPosition()) >= Config.TILE_SIZE*7){
+					if(unit.getDistance(enemyMainBaseLocation.getPosition()) >= Config.TILE_SIZE*6){
 						
 						if(isAttackPositionForInitialZergling == false){
 							commandUtil.move(unit, enemyMainBaseLocation.getPosition());
@@ -2865,7 +2865,7 @@ public class StrategyManager {
 							//unit.attack(findAttackTargetForInitialZergling());
 						}else{
 							if(DEBUG) System.out.println("attackTargetForInitialZerglingUnit : " + attackTargetForInitialZerglingUnit.getID());
-							commandUtil.attackUnit(unit, attackTargetForInitialZerglingUnit);
+							commandUtil.attackMove(unit, attackTargetForInitialZerglingUnit.getPosition());
 						}
 
 					}
@@ -3330,7 +3330,7 @@ public class StrategyManager {
 			// sc76.choi TODO 본진 근처면 그냥 계속 버로우 한다.
 			else{
 				if(unit.isUnderAttack() 
-					&& unit.getDistance(DEFENCE_POSITION) >= 25 * Config.TILE_SIZE){
+					&& unit.getDistance(DEFENCE_POSITION) >= Config.TILE_SIZE*4){
 					
 					// 근처에 적 유닛이 있으면 버로우 시키고, 없으면 언버로우 시킨다
 					Position nearEnemyUnitPosition = null;
@@ -3380,6 +3380,7 @@ public class StrategyManager {
 					}
 				}else{
 					commandUtil.move(unit, DEFENCE_POSITION);
+					//unit.unburrow();
 				}
 			}
 			hasCommanded = true;
@@ -4285,8 +4286,8 @@ public class StrategyManager {
 						}
 						
 						// 적군이 5마리 이상이면,  Swarm을 뿌린다.
-						if(enemyUnitCount >= 3 && commandUtil.IsValidUnit(targetEnemyUnit)){
-							System.out.println("Use Plague enemyUnitCount total : " + enemyUnitCount);
+						if(enemyRace == Race.Terran && enemyUnitCount >= 3 && commandUtil.IsValidUnit(targetEnemyUnit)){
+							if(DEBUG) System.out.println("Use Plague enemyUnitCount total : " + enemyUnitCount);
 							unit.useTech(TechType.Plague, targetEnemyUnit);
 							hasCommanded = true;
 						}
@@ -6049,7 +6050,7 @@ public class StrategyManager {
 			// sc76.choi 가스가 없고, 히드라가 없으면 럴커를 넣으면 안된다. lock 걸림
 			if(selfGas < 200){
 				strBuildOrderStep = "T 50";
-				buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 1, 2, 1, 2, 1, 2, 2, 2, 1, 4};
+				buildOrderArrayOfMyCombatUnitType = new int[]{1, 2, 1, 2, 1, 2, 1, 3, 2, 2, 1, 4};
 			}else if(selfGas < 200){
 				if(existHydralisk){
 					strBuildOrderStep = "T 60";
@@ -6077,12 +6078,12 @@ public class StrategyManager {
 			
 				if(selfGas < 200){
 					strBuildOrderStep = "T 100";
-					buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
+					buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 1, 3, 2, 2, 1, 2, 2, 3, 1, 4}; 	// 저글링 히드라 히드라 럴커 뮤탈 뮤탈
 					
 				}else{
 					if(existHydralisk){
 						strBuildOrderStep = "T 110";
-						buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 2, 2, 5, 1, 2, 2, 3, 5, 4};
+						buildOrderArrayOfMyCombatUnitType = new int[]{2, 1, 2, 3, 2, 5, 1, 3, 2, 3, 5, 4};
 					}
 					else{
 						strBuildOrderStep = "T 120";

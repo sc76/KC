@@ -41,7 +41,7 @@ public class Config {
 	
 	public static int necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
 	public static int necessaryNumberOfDefenceUnitType2AgainstTerran = 3; // 히드라
-	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 1; // 럴커
+	public static int necessaryNumberOfDefenceUnitType3AgainstTerran = 2; // 럴커
 	public static int necessaryNumberOfDefenceUnitType4AgainstTerran = 0; // 뮤탈
 	public static int necessaryNumberOfDefenceUnitType5AgainstTerran = 0; // 울트라
 	
