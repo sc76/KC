@@ -1158,16 +1158,7 @@ public class OverloadManager {
 		dropOverloadList.add(unit);
 	}
 
-	public void removeDropOverloadList(Unit unit) {
-		dropOverloadList.remove(unit);
-	}
-
 	public void destroyDropOverloadList(Unit unit) {
-		for (Unit overUnit : dropOverloadList) {
-			//System.out.println("unit.getID() : " + unit.getID() + ", overUnit.getID() : " + overUnit.getID());
-			if (unit.getID() == overUnit.getID()) {
-				dropOverloadList.remove(overUnit);
-			}
-		}
+		dropOverloadList.remove(unit);
 	}
 }

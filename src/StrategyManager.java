@@ -5145,7 +5145,7 @@ public class StrategyManager {
 //	 1 시 => [7, 118]
 //	 7 시 => [117, 9]
 //	 5 시 => [117, 118]
-//	OverWatch startLocation.getTilePosition()
+//	Spirit startLocation.getTilePosition()
 //	11 시 => [7, 7]
 //	 1 시 => [7, 117]
 //	 7 시 => [117, 7]
@@ -5161,47 +5161,63 @@ public class StrategyManager {
 		
 //		if (combatState == CombatState.attackStarted) {
 		if(OverloadManager.Instance().getDropOverloadList().size() == 0) return;
-		if(!checkDrop && myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0) {
+
+		
+		if(!checkDrop && myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs) > 0) {
+			if(OverloadManager.Instance().getDropOverloadList().size() < Config.COUNT_OVERLOAD_DROP) return;
+			
 			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
 				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 			
+				boolean chkLoadComplete = false;
 				int cnt = 0;
 				Position calPosition = null;
-				for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-					cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
+				for(Unit loadUnit : unitOverload.getLoadedUnits()) {
+					cnt += loadUnit.getType().spaceRequired();
 				}
 				if(cnt != 8 ) {
-					int unit_cnt = 0;
-					for(Unit unit : myPlayer.getUnits()) {	
+					int unit_cnt = cnt;
+//					for(Unit unit : myAllCombatUnitList) {	
+					for(Unit unit : myPlayer.getUnits()) {
 						if (unit == null || unit.exists() == false || unit.getHitPoints() <= 0) continue;
-						if (!unit.canLoad()) continue;
-						if (unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Zergling
-								|| unit.getType() == UnitType.Zerg_Lurker) {
+						if (unit.isLoaded()) continue;
+						if ((unit.getType() == UnitType.Zerg_Hydralisk || unit.getType() == UnitType.Zerg_Zergling) && !unit.isBurrowed()) {
+//								|| unit.getType() == UnitType.Zerg_Lurker) && !unit.isBurrowed()) {
+							if(unit_cnt < 8 && (unit_cnt + unit.getType().spaceRequired()) > 8 ) continue;
+							unit_cnt += unit.getType().spaceRequired();
+//							if(unit.getType() == UnitType.Zerg_Lurker && unit.isBurrowed()) {
+//								unit.unburrow();
+//							}
 							unit.rightClick(unitOverload);
-							unit_cnt = unit_cnt + unit.getType().spaceRequired();
-							if(unit_cnt == 8) break;
+							if(unit_cnt > 6) {
+								chkLoadComplete = true;
+								break;
+							}
 							
 						}
 					}
+				} else {
+					chkLoadComplete = true;
 				}
+				if(!chkLoadComplete) break;
 			}
 			
 			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
 				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 				int cnt = 0;
-				for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-					cnt = cnt + unitOverload.getLoadedUnits().get(i).getType().spaceRequired();
+				for(Unit loadUnit : unitOverload.getLoadedUnits()) {
+					cnt += loadUnit.getType().spaceRequired();
 				}
-				if(cnt == 8) {
+				if(cnt > 6) {
 					checkDrop = true;
 				} else {
 					checkDrop = false;
 					break;
 				}
 			}
-			for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
-				if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
-				if (checkDrop) {
+			if (checkDrop) {
+				for (Unit unitOverload : OverloadManager.Instance().getDropOverloadList()) {
+					if (unitOverload == null || unitOverload.exists() == false || unitOverload.getHitPoints() <= 0) continue;
 					Position calPosition = null;
 					calPosition = dropPosition(unitOverload);
 					commandUtil.move(unitOverload, calPosition);
@@ -5220,30 +5236,35 @@ public class StrategyManager {
 					boolean enemyView4 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Zerg_Spore_Colony);
 					boolean enemyView5 = InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer, UnitType.Terran_Bunker);
 					
-//					System.out.println("BWTA.getRegion(unitOverload.getTilePosition()) ==> " + InformationManager.Instance().existsPlayerBuildingInRegion(BWTA.getRegion(unitOverload.getTilePosition()),enemyPlayer));
-//					System.out.println("unitOverload 2===>" + unitOverload.getPosition().getX() + " " + unitOverload.getPosition().getY() );
-//					System.out.println("calPosition 2===>" + unitOverload.getOrderTargetPosition().getX() + " " + unitOverload.getOrderTargetPosition().getY() );
 					if(enemyView1 || enemyView2 || enemyView3 || enemyView4 || enemyView5) {
 						for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
-//								if(unitOverload.getLoadedUnits().get(i).canUnload()) {
-								unitOverload.unload(unitOverload.getLoadedUnits().get(i));
-//								}
+							Unit unit = unitOverload.getLoadedUnits().get(i);
+							unitOverload.unload(unit);
+							if(unit.getType() == UnitType.Zerg_Lurker) { // 럴커가 버로우를 하지 않음
+								unit.burrow();
+							}
 						}
 						//commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
 					}
 					if(unitOverload.getOrderTargetPosition().getX() == 0 && unitOverload.getOrderTargetPosition().getY() == 0) { // 목적지에 도달했을때
 						if (chkOverloadArrived) { // Drop 위치에 왔을때
-							unitOverload.unloadAll(true);
+							for(int i=0; i<unitOverload.getLoadedUnits().size(); i++) {
+								Unit unit = unitOverload.getLoadedUnits().get(i);
+								unitOverload.unload(unit);
+								if(unit.getType() == UnitType.Zerg_Lurker) {
+									unit.burrow();
+								}
+							}
+//							unitOverload.unloadAll(true);
 						} else {
 							calPosition = dropPosition(unitOverload);
 							commandUtil.move(unitOverload, calPosition);
-							//System.out.println("calPosition 3===>" + calPosition.getX() + " " + calPosition.getY() );
 						}
 					}					
-				} else {
-					OverloadManager.Instance().getOverloadData().setOverloadJob(unitOverload, OverloadData.OverloadJob.Idle, (Unit)null);
-					OverloadManager.Instance().removeDropOverloadList(unitOverload);
-					commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
+//				} else {
+//					OverloadManager.Instance().getOverloadData().setOverloadJob(unitOverload, OverloadData.OverloadJob.Idle, (Unit)null);
+//					OverloadManager.Instance().destroyDropOverloadList(unitOverload);
+//					commandUtil.move(unitOverload, myMainBaseLocation.getPosition());
 				}
 				
 			}
@@ -5764,7 +5785,7 @@ public class StrategyManager {
 				char jobCode = OverloadManager.Instance().getOverloadData().getJobCode(unit);
 
 				// 오버로드 상태가 Idle인거 2기만 Drop에 사용
-				if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) > 0 && OverloadManager.Instance().getDropOverloadList().size() < Config.COUNT_OVERLOAD_DROP) {
+				if(myPlayer.getUpgradeLevel(UpgradeType.Ventral_Sacs) > 0 && OverloadManager.Instance().getDropOverloadList().size() < Config.COUNT_OVERLOAD_DROP) {
 					if(jobCode == 'I'){
 						OverloadManager.Instance().getOverloadData().setOverloadJob(unit, OverloadData.OverloadJob.Drop, (Unit)null);
 						OverloadManager.Instance().addDropOverloadList(unit);
