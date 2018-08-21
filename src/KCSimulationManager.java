@@ -379,7 +379,7 @@ public class KCSimulationManager {
 		} else if (enemyRace == Race.Terran) {
 			return 0;
 		} else if (enemyRace == Race.Zerg) {
-			return 8;
+			return 5;
 		} else {
 			return 0;
 		}

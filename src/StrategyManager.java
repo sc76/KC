@@ -1927,22 +1927,30 @@ public class StrategyManager {
 			}
 			
 			// sc76.choi 버그, 락이 걸린다. 크립클로리가 없는데 빌드 상단에 성큰이나, 스포어가 존재하면 제거한다.
-			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 0 ||
-					myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony) <= 0){
-				BuildOrderItem bi = BuildManager.Instance().getBuildQueue().getHighestPriorityItem();
-				if(bi.metaType.getUnitType() ==  UnitType.Zerg_Sunken_Colony
-						|| bi.metaType.getUnitType() ==  UnitType.Zerg_Spore_Colony){
+			if (MyBotModule.Broodwar.getFrameCount() % 24*5 == 0){
+				if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 0 ||
+						myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony) <= 0){
 					
-					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
-					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
-					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
-					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
-					
-					BuildManager.Instance().getBuildQueue().removeHighestPriorityItem();
-					
+					if(BuildManager.Instance().getBuildQueue().getQueue().size() > 0){
+						
+						BuildOrderItem bi = BuildManager.Instance().getBuildQueue().getHighestPriorityItem();
+						
+						if(bi == null) return;
+						
+						if(bi.metaType.getUnitType() ==  UnitType.Zerg_Sunken_Colony
+								|| bi.metaType.getUnitType() ==  UnitType.Zerg_Spore_Colony){
+							
+							if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+							if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+							if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+							if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+							
+							BuildManager.Instance().getBuildQueue().removeHighestPriorityItem();
+							
+						}
+					}
 				}
 			}
-			
 		} // ininitial check
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5100,7 +5108,7 @@ public class StrategyManager {
 				
 				buildState = BuildState.superZergling_Z;
 				
-				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 13;
+				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 8;
 	   			Config.necessaryNumberOfCombatUnitType1AgainstZerg = 22;
 	   			
 	   			Config.necessaryNumberOfDefenceUnitType2AgainstZerg = 8;
@@ -5116,7 +5124,7 @@ public class StrategyManager {
 				
 				buildState = BuildState.superZergling_Z;
 				
-				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 13;
+				Config.necessaryNumberOfDefenceUnitType1AgainstZerg = 8;
 	   			Config.necessaryNumberOfCombatUnitType1AgainstZerg = 22;
 	   			
 	   			Config.necessaryNumberOfDefenceUnitType2AgainstZerg = 8;
@@ -6546,7 +6554,10 @@ public class StrategyManager {
 					if(myOccupiedBaseLocations >= 3){
 						Config.WorkersPerRefinery = 3;
 					}else{
-						if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 || myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0){
+						if(myPlayer.incompleteUnitCount(UnitType.Zerg_Spire) > 0 
+								|| myPlayer.completedUnitCount(UnitType.Zerg_Spire) > 0
+								|| buildState == BuildState.lurker_Z
+								|| buildState == BuildState.darkTemplar_P){
 							if(selfMinerals*3 <= selfGas){
 								Config.WorkersPerRefinery = 1;
 							}else{
