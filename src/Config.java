@@ -105,9 +105,9 @@ public class Config {
 	public static int maxNumberOfCombatUnitType5AgainstTerran = 2;  // 울트라
 	
 	public static int maxNumberOfSpecialUnitType1AgainstTerran = 2;  // 오버로드
-	public static int maxNumberOfSpecialUnitType2AgainstTerran = 2; // 디파일러
-	public static int maxNumberOfSpecialUnitType3AgainstTerran = 4;  // 스커지
-	public static int maxNumberOfSpecialUnitType4AgainstTerran = 2;  // 퀸	
+	public static int maxNumberOfSpecialUnitType2AgainstTerran = 3; // 디파일러
+	public static int maxNumberOfSpecialUnitType3AgainstTerran = 6;  // 스커지
+	public static int maxNumberOfSpecialUnitType4AgainstTerran = 4;  // 퀸	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// sc76.choi 아군 최대 생산 제한 유닛수

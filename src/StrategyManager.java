@@ -754,8 +754,8 @@ public class StrategyManager {
 	// 유닛의 위치에서 가까운 DEFENCE_POSITION을 찾는다.
 	public Position getTargetPositionForDefence(Unit unit){
 		
-		Position defencePositionToUnit = null;
-		BaseLocation cloestBase = getCloestOccupiedBaseLocation(unit.getPosition(), false);
+		Position defencePositionToUnit = DEFENCE_POSITION;
+		BaseLocation cloestBase = getCloestOccupiedBaseLocation(unit.getPosition(), true);
 		
 		if(cloestBase == null){
 			defencePositionToUnit = DEFENCE_POSITION;
@@ -784,8 +784,7 @@ public class StrategyManager {
 			BaseLocation selfBaseLocation = it.next();
 			
 			if(include == false){
-				if(selfBaseLocation == myMainBaseLocation
-					|| selfBaseLocation == myFirstExpansionLocation){
+				if(selfBaseLocation == myMainBaseLocation || selfBaseLocation == myFirstExpansionLocation){
 					continue;
 				}
 				
@@ -1359,7 +1358,7 @@ public class StrategyManager {
 				}
 				
 				// sc76.choi 본진에 성큰이 있으면, 짓는 것을 취소한다.
-				if(creepRegion == BWTA.getRegion(myMainBaseLocation.getPosition())){
+				if(enemyRace == Race.Protoss && creepRegion == BWTA.getRegion(myMainBaseLocation.getPosition())){
 					
 					//if(existUnitTypeInRegion(myPlayer, UnitType.Zerg_Sunken_Colony, BWTA.getRegion(myMainBaseLocation.getPosition()), false, false)){
 					if(getCountUnitTypeInPosition(myPlayer, UnitType.Zerg_Sunken_Colony, myMainBaseLocation.getPosition(), Config.TILE_SIZE* 15) >= 2){
@@ -1927,6 +1926,23 @@ public class StrategyManager {
 				}
 			}
 			
+			// sc76.choi 버그, 락이 걸린다. 크립클로리가 없는데 빌드 상단에 성큰이나, 스포어가 존재하면 제거한다.
+			if(myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) <= 0 ||
+					myPlayer.allUnitCount(UnitType.Zerg_Creep_Colony) <= 0){
+				BuildOrderItem bi = BuildManager.Instance().getBuildQueue().getHighestPriorityItem();
+				if(bi.metaType.getUnitType() ==  UnitType.Zerg_Sunken_Colony
+						|| bi.metaType.getUnitType() ==  UnitType.Zerg_Spore_Colony){
+					
+					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+					if(DEBUG) System.out.println("removeHighestPriorityItem removeHighestPriorityItem removeHighestPriorityItem !!!");
+					
+					BuildManager.Instance().getBuildQueue().removeHighestPriorityItem();
+					
+				}
+			}
+			
 		} // ininitial check
 		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2115,6 +2131,13 @@ public class StrategyManager {
 				if(buildState == BuildState.blockDefence2Dragon8_P){
 					if(myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk_Den) > 0
 						&& myPlayer.getUpgradeLevel(UpgradeType.Grooved_Spines) == 0){
+						return false;
+					}
+				}
+				
+				// 럴커나, 다크템플러가 있으면 오버로드 속업 후, 공격에 가담
+				if(buildState == BuildState.lurker_Z || buildState == BuildState.darkTemplar_P){
+					if(myPlayer.getUpgradeLevel(UpgradeType.Pneumatized_Carapace) == 0){
 						return false;
 					}
 				}
