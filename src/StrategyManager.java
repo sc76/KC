@@ -2993,10 +2993,10 @@ public class StrategyManager {
 					
 					if(getCountCombatType2() >= 20) return true;
 					
-					//APM 관리
-					if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
-						return true;
-					}
+//					//APM 관리
+//					if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
+//						return true;
+//					}
 
 					// 유닛이 멀리 있으면 강제로 소환
 					if(unit.getDistance(DEFENCE_POSITION_TO_UNIT) > Config.TILE_SIZE*6){
@@ -4742,7 +4742,7 @@ public class StrategyManager {
 		// 프로토스    	
     	if(enemyRace == Race.Protoss){
     		
-    		if(countEnemyBasicCombatUnitType >= 4
+    		if(countEnemyBasicCombatUnitType >= 5
     			&& MyBotModule.Broodwar.getFrameCount() < (24 * 60 * 6)){
     			
     			buildState = BuildState.hardCoreZealot_P;
@@ -6964,7 +6964,9 @@ public class StrategyManager {
 		
 		if(blockDefence2Dragon8_P_CombatBuilding2 == false){
 			
-			if( selfAvailableMinerals > 200){
+			if( selfAvailableMinerals > 200
+				&& BuildManager.Instance().buildQueue.getItemCount(UnitType.Zerg_Hatchery) == 0
+				&& ConstructionManager.Instance().getConstructionQueueItemCount(UnitType.Zerg_Hatchery, null) == 0){
 					
 				BuildManager.Instance().buildQueue.queueAsHighestPriority(UnitType.Zerg_Hatchery, 
 						myMainBaseLocation.getTilePosition(), true);
@@ -7084,7 +7086,7 @@ public class StrategyManager {
 		buildAirDefenceUnit();
 		
 		// 1초에 한번만 실행
-		if (MyBotModule.Broodwar.getFrameCount() % 24*2 != 0) {
+		if (MyBotModule.Broodwar.getFrameCount() % 24*1 != 0) {
 			return;
 		}
 		
@@ -7094,7 +7096,7 @@ public class StrategyManager {
 		}
 		
 		// sc76.choi 일꾼 숫자가 적으면 건설하지 않는다.
-		if(WorkerManager.Instance().getNumMineralWorkers() <= 4){
+		if(WorkerManager.Instance().getNumMineralWorkers() <= 6){
 			return;
 		}
 		
@@ -7116,8 +7118,8 @@ public class StrategyManager {
 		}
 		
 		if(enemyUnitsInMyFirstExpansion > 0 && myUnitsInMyFirstExpansion <= 0){
-			System.out.println("executeDefenceConstruction 2 cancle!!");
-			System.out.println();
+			if(DEBUG) System.out.println("executeDefenceConstruction 2 cancle!!");
+			if(DEBUG) System.out.println();
 			return;
 		}
 
@@ -7147,9 +7149,8 @@ public class StrategyManager {
 		numberOfMyDefenseBuildingType2 += getCountUnitTypeInPosition(myPlayer, myDefenseBuildingType2, DEFENCE_POSITION, Config.TILE_SIZE*7);
 		numberOfMyDefenseBuildingType2 += BuildManager.Instance().buildQueue.getItemCount(myDefenseBuildingType2);
 
-		// sc76.choi 드론이 작으면 지으면 안된다.
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0
-				&& WorkerManager.Instance().getWorkerData().getNumWorkers() >= 7) {
+
+		if (myPlayer.completedUnitCount(UnitType.Zerg_Spawning_Pool) > 0) {
 			isPossibleToConstructDefenseBuildingType1 = true;	
 		}
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Creep_Colony) > 0) {
@@ -7711,7 +7712,7 @@ public class StrategyManager {
 		BaseLocation enemyFirstExpansionLocation = InformationManager.Instance().getFirstExpansionLocation(MyBotModule.Broodwar.enemy());
 		
 		// 그냥 베이스에서 찾는다.
-		for(BaseLocation b : BWTA.getBaseLocations()){
+		for(BaseLocation b : BWTA.getStartLocations()){
 			
 			// 가스가 없다면 skip
 			if(b.getGeysers().isEmpty() || b.getGeysers().size() == 0){
