@@ -356,7 +356,7 @@ public class StrategyManager {
 
 			if(commandUtil.IsValidUnit(enemyUnit)) continue;
 			
-			System.out.println("enemyUnit.getType() : " + enemyUnit.getType() + " " + enemyUnit.getType().isBuilding());
+			if(DEBUG) System.out.println("enemyUnit.getType() : " + enemyUnit.getType() + " " + enemyUnit.getType().isBuilding());
 			// 해당 player의 공격유닛이 200 거리 안에 몇 마리나 존재 하는지 파악
 				if(pos.getDistance(enemyUnit.getPosition()) <= radius){
 					if(enemyUnit.getType().isBuilding()){
@@ -1307,7 +1307,7 @@ public class StrategyManager {
 			
 			if (ui.getType().canAttack()){
 				if(ui.getType().isWorker()) continue;
-				System.out.println("["+ UnitAndUnitInfoMapSize + "]" + ui.getLastPosition() + ui.getUnitID() + " " + ui.getType() + " " + ui.getDistanceFromSelfMainBase() + " " + ui.getDistanceFromEnemyMainBase());
+				if(DEBUG) System.out.println("["+ UnitAndUnitInfoMapSize + "]" + ui.getLastPosition() + ui.getUnitID() + " " + ui.getType() + " " + ui.getDistanceFromSelfMainBase() + " " + ui.getDistanceFromEnemyMainBase());
 			}
 		}
 		//System.out.println();

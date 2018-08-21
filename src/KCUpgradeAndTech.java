@@ -72,7 +72,8 @@ public class KCUpgradeAndTech {
 				&& myPlayer.isResearching(necessaryTechType1) == true
   			    && myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2				
 		) {
-			isTimeToStartUpgradeType5 = true;
+//			isTimeToStartUpgradeType5 = true;
+			isTimeToStartUpgradeType5 = false;
 		}			
 		
 		if (myPlayer.completedUnitCount(UnitType.Zerg_Hive) > 0 
