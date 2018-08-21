@@ -2997,9 +2997,12 @@ public class StrategyManager {
 //					if (MyBotModule.Broodwar.getFrameCount() % 6 != 0) {
 //						return true;
 //					}
-
+					
+					int defenceReturnDist = 6; 
+					if(getCountCombatType2() > 20) defenceReturnDist = 8;
+						
 					// 유닛이 멀리 있으면 강제로 소환
-					if(unit.getDistance(DEFENCE_POSITION_TO_UNIT) > Config.TILE_SIZE*6){
+					if(unit.getDistance(DEFENCE_POSITION_TO_UNIT) > Config.TILE_SIZE*defenceReturnDist){
 						// 확장이 되어 멀리 있는 base에서 오면 어택으로 이동한다.
 						commandUtil.move(unit, DEFENCE_POSITION_TO_UNIT);
 					}				
@@ -3135,8 +3138,11 @@ public class StrategyManager {
 									return true;
 								}
 								
+								int defenceReturnDist = 6; 
+								if(getCountCombatType2() > 20) defenceReturnDist = 8;
+								
 								// 유닛이 멀리 있으면 강제로 소환
-								if(unit.getDistance(DEFENCE_POSITION_TO_UNIT) > Config.TILE_SIZE*6){
+								if(unit.getDistance(DEFENCE_POSITION_TO_UNIT) > Config.TILE_SIZE*defenceReturnDist){
 									// 확장이 되어 멀리 있는 base에서 오면 어택으로 이동한다.
 									if(myOccupiedBaseLocations >= 3){
 										commandUtil.move(unit, DEFENCE_POSITION_TO_UNIT);
@@ -3225,7 +3231,7 @@ public class StrategyManager {
 					// sc76.choi 공격중, cooldown이 빠졌을때는 뒤로 도망, 갈때는
 					else{
 						
-						if(getCountCombatType2() >= necessaryNumberOfCombatUnitType2) return true;
+						if(getCountCombatType2() >= 14) return true;
 						
 						// sc76.choi Config.TILE_SIZE*3 거리 만큼 적이 있으면 공격을 하지 않는다. 
 						// 건물만 있으면, 그냥 계속 공격하도록 한다.
@@ -4882,14 +4888,17 @@ public class StrategyManager {
     			
     			buildState = BuildState.carrier_P;
     			
-       			// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
-       			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 12;
-       			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 35;
-       			
-       			Config.maxNumberOfTrainUnitType1AgainstProtoss = 4;
-       			Config.maxNumberOfTrainUnitType2AgainstProtoss = 40;
-       			
-    			excuteUrgentCombatConstructionInBaseLocation(mySecondChokePoint.getCenter().toTilePosition());
+    			// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
+	   			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 4;
+	   			
+	   			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 15;
+	   			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 38;
+	   			
+	   			Config.maxNumberOfTrainUnitType1AgainstProtoss = 10;
+	   			Config.maxNumberOfTrainUnitType2AgainstProtoss = 50;
+	   			Config.maxNumberOfTrainUnitType2AgainstProtoss = 1;
+	   			
+				excuteUrgentCombatConstructionInBaseLocation(mySecondChokePoint.getCenter().toTilePosition());
     			
     		}
 		}
@@ -4924,12 +4933,33 @@ public class StrategyManager {
 	   			
 	    			buildState = BuildState.fastVulture_T;
 	    			
-	    			Config.BuildingDefenseTowerSpacing = 3;
-	       			Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
-	       			Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 2;
-	       			
-	       			Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
-	       			Config.necessaryNumberOfCombatUnitType1AgainstTerran = 8;
+	    			if(enemyPlayer.getName().equals("")){
+	    				
+	    				// sc76.choi 방어 타입 갯수 늘림, 정수로 할당
+			   			Config.necessaryNumberOfDefenceUnitType1AgainstProtoss = 4;
+
+			   			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 2;
+			   			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 10;
+
+			   			Config.necessaryNumberOfDefenceUnitType2AgainstProtoss = 3;
+			   			Config.necessaryNumberOfCombatUnitType2AgainstProtoss = 24;
+			   			
+			   			Config.necessaryNumberOfDefenceUnitType3AgainstProtoss = 1;
+			   			Config.necessaryNumberOfCombatUnitType3AgainstProtoss = 7;
+			   			
+			   			Config.maxNumberOfTrainUnitType1AgainstProtoss = 10;
+			   			Config.maxNumberOfTrainUnitType2AgainstProtoss = 40;
+			   			Config.maxNumberOfTrainUnitType3AgainstProtoss = 10;
+			   			
+	    			}else{
+	    				
+	    				Config.BuildingDefenseTowerSpacing = 3;
+	    				Config.necessaryNumberOfDefenseBuilding1AgainstTerran = 2;
+	    				Config.necessaryNumberOfDefenseBuilding2AgainstTerran = 2;
+	    				
+	    				Config.necessaryNumberOfDefenceUnitType1AgainstTerran = 2; // 저글링
+	    				Config.necessaryNumberOfCombatUnitType1AgainstTerran = 8;
+	    			}
 	       			
 	       			// 즉각 해처리 증설
 	       			excuteUrgentCombatConstructionInBaseLocation(myMainBaseLocation.getTilePosition());

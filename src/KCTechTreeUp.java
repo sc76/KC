@@ -59,7 +59,8 @@ public class KCTechTreeUp {
 		}
 		
 		// sc76.choi 기본 spire 테크 작성예정
-		if (myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
+		if (StrategyManager.Instance().buildState != StrategyManager.BuildState.carrier_P
+				&& myPlayer.completedUnitCount(UnitType.Zerg_Lair) > 0
 //				&& InformationManager.Instance().getTotalHatcheryCount() >= 3
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Lurker) >= 2
 				&& myPlayer.completedUnitCount(UnitType.Zerg_Hydralisk) >= 6
